@@ -1,0 +1,59 @@
+<header class="header">
+      <div class="container">
+        <nav class="navbar">
+          <div class="navbar-brand" (click)="switchPage('home')">
+            <i class="fas fa-seedling"></i>
+            <div class="brand-text">
+              <span class="brand-name">AgriPrice</span>
+              <small class="brand-subtitle">Transparent Agricultural Pricing</small>
+            </div>
+          </div>
+          
+          <div class="navbar-menu" [class.active]="isMenuOpen">
+            <a href="#" class="nav-link" 
+               [class.active]="currentPage === 'home'"
+               (click)="switchPage('home')">
+              <i class="fas fa-home"></i>
+              Home
+            </a>
+            
+            <a href="#" class="nav-link"
+               [class.active]="currentPage === 'public'"
+               (click)="switchPage('public')">
+              <i class="fas fa-chart-line"></i>
+              Public Portal
+            </a>
+            
+            <a href="#" class="nav-link"
+               [class.active]="currentPage === 'admin'"
+               (click)="switchPage('admin')"
+               *ngIf="isAdmin">
+              <i class="fas fa-cog"></i>
+              Admin Dashboard
+            </a>
+            
+            <button class="btn btn-register" 
+                    (click)="registerAdmin()"
+                    *ngIf="!isAdmin">
+              <i class="fas fa-user-plus"></i>
+              Register as Admin
+            </button>
+          </div>
+          
+          <div class="navbar-actions">
+            <div class="user-status" *ngIf="isAdmin">
+              <span class="status-badge admin">
+                <i class="fas fa-shield-alt"></i>
+                Admin
+              </span>
+            </div>
+            
+            <button 
+              class="mobile-menu-toggle"
+              (click)="toggleMenu()">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>

@@ -1,0 +1,367 @@
+<div class="sms-interface-container">
+      <div class="interface-header">
+        <h1><i class="fas fa-sms"></i> SMS Interface & Management</h1>
+        <p class="text-muted">Manage SMS communications for farmers with feature phones</p>
+      </div>
+
+      <!-- SMS Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-paper-plane" style="color: var(--success);"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ totalSent }}</h3>
+            <p>SMS Sent Today</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users" style="color: var(--info);"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ subscribedFarmers }}</h3>
+            <p>Subscribed Farmers</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-clock" style="color: var(--warning);"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ pendingSms }}</h3>
+            <p>Pending SMS</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ failedSms }}</h3>
+            <p>Failed SMS</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SMS Tabs -->
+      <div class="sms-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'send'"
+          (click)="activeTab = 'send'">
+          <i class="fas fa-paper-plane"></i>
+          Send SMS
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'templates'"
+          (click)="activeTab = 'templates'">
+          <i class="fas fa-file-alt"></i>
+          Templates
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'logs'"
+          (click)="activeTab = 'logs'">
+          <i class="fas fa-list"></i>
+          SMS Logs
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'subscriptions'"
+          (click)="activeTab = 'subscriptions'">
+          <i class="fas fa-user-plus"></i>
+          Subscriptions
+        </button>
+      </div>
+
+      <!-- Send SMS Tab -->
+      <div *ngIf="activeTab === 'send'" class="tab-content">
+        <div class="send-sms-grid">
+          <!-- SMS Composer -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-paper-plane"></i> Compose SMS</h3>
+            </div>
+            <div class="card-body">
+              <form (ngSubmit)="sendSms()" #smsForm="ngForm">
+                <div class="form-group">
+                  <label class="form-label">SMS Type</label>
+                  <select class="form-select" [(ngModel)]="smsData.type" name="type" required>
+                    <option value="">Select SMS Type</option>
+                    <option value="price-alert">Price Alert</option>
+                    <option value="price-update">Price Update</option>
+                    <option value="prediction">Price Prediction</option>
+                    <option value="weather">Weather Alert</option>
+                    <option value="general">General Information</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Recipients</label>
+                  <select class="form-select" [(ngModel)]="smsData.recipients" name="recipients" required>
+                    <option value="">Select Recipients</option>
+                    <option value="all">All Subscribers</option>
+                    <option value="region-central">Central Kenya</option>
+                    <option value="region-western">Western Kenya</option>
+                    <option value="region-eastern">Eastern Kenya</option>
+                    <option value="region-rift-valley">Rift Valley</option>
+                    <option value="crop-maize">Maize Farmers</option>
+                    <option value="crop-beans">Beans Farmers</option>
+                    <option value="custom">Custom List</option>
+                  </select>
+                </div>
+                
+                <div class="form-group" *ngIf="smsData.recipients === 'custom'">
+                  <label class="form-label">Phone Numbers (comma separated)</label>
+                  <textarea class="form-control" rows="3" [(ngModel)]="smsData.customNumbers" name="customNumbers" 
+                            placeholder="+254700123456, +254722987654"></textarea>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Template</label>
+                  <select class="form-select" [(ngModel)]="selectedTemplate" (change)="loadTemplate()">
+                    <option value="">Select Template (Optional)</option>
+                    <option *ngFor="let template of smsTemplates" [value]="template.id">
+                      {{ template.name }}
+                    </option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Message</label>
+                  <textarea class="form-control" rows="4" [(ngModel)]="smsData.message" name="message" 
+                            placeholder="Type your SMS message here..." required maxlength="160"></textarea>
+                  <small class="text-muted">{{ smsData.message.length || 0 }}/160 characters</small>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Schedule</label>
+                  <select class="form-select" [(ngModel)]="smsData.schedule" name="schedule">
+                    <option value="now">Send Now</option>
+                    <option value="schedule">Schedule for Later</option>
+                  </select>
+                </div>
+                
+                <div class="form-group" *ngIf="smsData.schedule === 'schedule'">
+                  <label class="form-label">Send Date & Time</label>
+                  <input type="datetime-local" class="form-control" [(ngModel)]="smsData.scheduledTime" name="scheduledTime">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" [disabled]="!smsForm.valid">
+                  <i class="fas fa-paper-plane"></i>
+                  {{ smsData.schedule === 'now' ? 'Send SMS' : 'Schedule SMS' }}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Quick SMS Actions -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            </div>
+            <div class="card-body">
+              <div class="quick-sms-actions">
+                <button class="quick-action-btn" (click)="sendQuickSms('price-spike')">
+                  <i class="fas fa-arrow-up"></i>
+                  <span>Price Spike Alert</span>
+                  <small>Maize +15% in Central</small>
+                </button>
+                
+                <button class="quick-action-btn" (click)="sendQuickSms('weather-alert')">
+                  <i class="fas fa-cloud-rain"></i>
+                  <span>Weather Alert</span>
+                  <small>Heavy rains expected</small>
+                </button>
+                
+                <button class="quick-action-btn" (click)="sendQuickSms('market-opportunity')">
+                  <i class="fas fa-handshake"></i>
+                  <span>Market Opportunity</span>
+                  <small>High demand for tomatoes</small>
+                </button>
+                
+                <button class="quick-action-btn" (click)="sendQuickSms('daily-update')">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>Daily Price Update</span>
+                  <small>All regions</small>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Templates Tab -->
+      <div *ngIf="activeTab === 'templates'" class="tab-content">
+        <div class="templates-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-file-alt"></i> SMS Templates</h3>
+              <button class="btn btn-primary btn-sm" (click)="showCreateTemplate = true">
+                <i class="fas fa-plus"></i>
+                New Template
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="templates-list">
+                <div *ngFor="let template of smsTemplates" class="template-item">
+                  <div class="template-info">
+                    <h4>{{ template.name }}</h4>
+                    <p>{{ template.template }}</p>
+                    <small class="text-muted">Variables: {{ template.variables.join(', ') }}</small>
+                  </div>
+                  <div class="template-actions">
+                    <button class="btn btn-outline btn-sm" (click)="editTemplate(template)">
+                      <i class="fas fa-edit"></i>
+                      Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteTemplate(template.id)">
+                      <i class="fas fa-trash"></i>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create/Edit Template Form -->
+          <div class="card" *ngIf="showCreateTemplate">
+            <div class="card-header">
+              <h3><i class="fas fa-plus"></i> Create SMS Template</h3>
+            </div>
+            <div class="card-body">
+              <form (ngSubmit)="saveTemplate()" #templateForm="ngForm">
+                <div class="form-group">
+                  <label class="form-label">Template Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="newTemplate.name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Template Message</label>
+                  <textarea class="form-control" rows="4" [(ngModel)]="newTemplate.template" name="template" 
+                            placeholder="Use {variable} for dynamic content" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Variables (comma separated)</label>
+                  <input type="text" class="form-control" [(ngModel)]="newTemplate.variablesString" name="variables"
+                         placeholder="crop, price, region">
+                </div>
+                
+                <div class="template-form-actions">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save Template
+                  </button>
+                  <button type="button" class="btn btn-outline" (click)="cancelTemplate()">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SMS Logs Tab -->
+      <div *ngIf="activeTab === 'logs'" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-list"></i> SMS Delivery Logs</h3>
+            <div class="log-filters">
+              <select class="form-select" [(ngModel)]="logFilter">
+                <option value="">All Status</option>
+                <option value="sent">Sent</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="sms-logs-table">
+                <thead>
+                  <tr>
+                    <th>Recipient</th>
+                    <th>Message</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let log of getFilteredLogs()">
+                    <td>{{ log.recipient }}</td>
+                    <td>
+                      <div class="message-preview">
+                        {{ log.message.length > 50 ? (log.message.substring(0, 50) + '...') : log.message }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge badge-info">{{ log.type }}</span>
+                    </td>
+                    <td>
+                      <span class="badge" 
+                            [class.badge-success]="log.status === 'sent'"
+                            [class.badge-warning]="log.status === 'pending'"
+                            [class.badge-danger]="log.status === 'failed'">
+                        {{ log.status }}
+                      </span>
+                    </td>
+                    <td>{{ log.timestamp }}</td>
+                    <td>
+                      <button class="btn btn-outline btn-sm" (click)="resendSms(log)" *ngIf="log.status === 'failed'">
+                        <i class="fas fa-redo"></i>
+                        Resend
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscriptions Tab -->
+      <div *ngIf="activeTab === 'subscriptions'" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-user-plus"></i> SMS Subscriptions Management</h3>
+          </div>
+          <div class="card-body">
+            <div class="subscription-info">
+              <h4>SMS Subscription Instructions</h4>
+              <div class="instruction-grid">
+                <div class="instruction-item">
+                  <h5>For Farmers to Subscribe:</h5>
+                  <ul>
+                    <li>Send SMS to: <strong>21234</strong></li>
+                    <li>Format: <strong>AGRI SUBSCRIBE [CROP]</strong></li>
+                    <li>Example: <strong>AGRI SUBSCRIBE MAIZE</strong></li>
+                    <li>Cost: <strong>Free</strong></li>
+                  </ul>
+                </div>
+                
+                <div class="instruction-item">
+                  <h5>Available Commands:</h5>
+                  <ul>
+                    <li><strong>AGRI PRICE MAIZE</strong> - Get current maize prices</li>
+                    <li><strong>AGRI WEATHER</strong> - Get weather forecast</li>
+                    <li><strong>AGRI STOP</strong> - Unsubscribe from all alerts</li>
+                    <li><strong>AGRI HELP</strong> - Get help information</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
