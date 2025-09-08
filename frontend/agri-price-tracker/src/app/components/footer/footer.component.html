@@ -1,4 +1,4 @@
- <footer class="footer">
+   <footer class="footer">
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
@@ -24,20 +24,19 @@
           <div class="footer-section">
             <h4>System Modules</h4>
             <ul>
-              <li><a href="#dashboard">Dashboard</a></li>
-              <li><a href="#public">Public Portal</a></li>
-              <li><a href="#admin">Admin Dashboard</a></li>
-              <li><a href="#sms">SMS Interface</a></li>
+              <li><a href="#" (click)="navigateToPage('public')">Public Portal</a></li>
+              <li><a href="#" (click)="handleAdminDashboard()">Admin Dashboard</a></li>
+              <li><a href="#" (click)="navigateToSection('sms')">SMS Interface</a></li>
             </ul>
           </div>
           
           <div class="footer-section">
             <h4>Features</h4>
             <ul>
-              <li><a href="#prices">Price Tracking</a></li>
-              <li><a href="#predictions">ML Predictions</a></li>
-              <li><a href="#chatbot">AI Chatbot</a></li>
-              <li><a href="#kamis">KAMIS Integration</a></li>
+              <li><a href="#" (click)="navigateToSection('prices')">Price Tracking</a></li>
+              <li><a href="#" (click)="navigateToSection('predictions')">ML Predictions</a></li>
+              <li><a href="#" (click)="openChatbot()">AI Chatbot</a></li>
+              <li><a href="#" (click)="navigateToPage('public')">KAMIS Integration</a></li>
             </ul>
           </div>
           
@@ -45,7 +44,7 @@
             <h4>Support</h4>
             <div class="contact-info">
               <p><i class="fas fa-phone"></i> SMS: +254-700-AGRI (2474)</p>
-              <p><i class="fas fa-envelope"></i> support&#64;agriprice.co.ke</p>
+              <p><i class="fas fa-envelope"></i>support&#64;agriprice.co.ke</p>
               <p><i class="fas fa-map-marker-alt"></i> Agricultural Technology Hub, Kenya</p>
             </div>
           </div>
@@ -53,8 +52,8 @@
         
         <div class="footer-bottom">
           <p>&copy; 2025 AgriPrice Agricultural Price Tracking System. All rights reserved. | 
-             <a href="#privacy">Privacy Policy</a> | 
-             <a href="#terms">Terms of Service</a>
+             <a href="#" (click)="showPrivacyPolicy()">Privacy Policy</a> | 
+             <a href="#" (click)="showTermsOfService()">Terms of Service</a>
           </p>
         </div>
       </div>

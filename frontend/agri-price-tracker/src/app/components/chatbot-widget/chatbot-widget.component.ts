@@ -32,6 +32,14 @@ export class ChatbotWidgetComponent implements OnInit {
 
   ngOnInit() {
     // Initialize chatbot with price-focused suggestions
+    
+    // Listen for chatbot open events
+    window.addEventListener('openChatbot', () => {
+      this.isOpen = true;
+      if (this.messages.length === 0) {
+        this.updateSuggestions();
+      }
+    });
     this.updateSuggestions();
   }
 

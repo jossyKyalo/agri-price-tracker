@@ -119,9 +119,10 @@ export class PublicPortalComponent implements OnInit {
   
   filteredCrops: CropPrice[] = [];
 
-  ngOnInit() {
-    this.filteredCrops = [...this.allCrops];
+  ngOnInit(): void {
+    this.filterCrops();
   }
+
 
   filterCrops() {
     this.filteredCrops = this.allCrops.filter(crop => {

@@ -1,4 +1,4 @@
-.header {
+ .header {
       background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
       color: var(--white);
       box-shadow: 0 4px 20px rgba(45, 90, 39, 0.3);

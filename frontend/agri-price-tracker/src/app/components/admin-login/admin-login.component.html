@@ -1,0 +1,51 @@
+ <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2><i class="fas fa-sign-in-alt"></i> Admin Login</h2>
+          <button class="close-btn" (click)="closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p class="login-info">
+            Sign in to access the admin dashboard and manage the agricultural pricing system.
+          </p>
+          
+          <form (ngSubmit)="submitLogin()" #loginForm="ngForm">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" [(ngModel)]="loginData.email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" [(ngModel)]="loginData.password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="loginData.rememberMe" name="rememberMe">
+                <span class="checkmark"></span>
+                Remember me
+              </label>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" (click)="closeModal()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="!loginForm.valid">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+              </button>
+            </div>
+          </form>
+          
+          <div class="login-footer">
+            <p>Don't have admin access? <a href="#" (click)="switchToRegistration()">Request admin access</a></p>
+            <p><a href="#" (click)="forgotPassword()">Forgot your password?</a></p>
+          </div>
+        </div>
+      </div>
+    </div>

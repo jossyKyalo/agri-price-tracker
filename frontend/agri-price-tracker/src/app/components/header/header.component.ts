@@ -13,6 +13,7 @@ export class HeaderComponent {
   @Input() isAdmin = false;
   @Output() pageChange = new EventEmitter<string>();
   @Output() adminRegister = new EventEmitter<void>();
+  @Output() adminLogin = new EventEmitter<void>();
   
   isMenuOpen = false;
 
@@ -27,6 +28,11 @@ export class HeaderComponent {
 
   registerAdmin() {
     this.adminRegister.emit();
+    this.isMenuOpen = false;
+  }
+
+  handleAdminAccess() {
+    this.adminLogin.emit();
     this.isMenuOpen = false;
   }
 }

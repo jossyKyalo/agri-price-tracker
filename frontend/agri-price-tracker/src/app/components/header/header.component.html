@@ -1,4 +1,4 @@
-<header class="header">
+ <header class="header">
       <div class="container">
         <nav class="navbar">
           <div class="navbar-brand" (click)="switchPage('home')">
@@ -22,6 +22,14 @@
                (click)="switchPage('public')">
               <i class="fas fa-chart-line"></i>
               Public Portal
+            </a>
+            
+            <a href="#" class="nav-link"
+               [class.active]="currentPage === 'admin'"
+               (click)="handleAdminAccess()"
+               *ngIf="!isAdmin">
+              <i class="fas fa-sign-in-alt"></i>
+              Admin Login
             </a>
             
             <a href="#" class="nav-link"

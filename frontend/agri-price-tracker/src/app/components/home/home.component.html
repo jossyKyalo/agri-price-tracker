@@ -13,11 +13,11 @@
                 Say goodbye to middleman exploitation and hello to fair trade.
               </p>
               <div class="hero-actions">
-                <button class="btn btn-primary btn-large">
+                <button class="btn btn-primary btn-large" (click)="navigateToCurrentPrices()">
                   <i class="fas fa-chart-line"></i>
                   View Current Prices
                 </button>
-                <button class="btn btn-outline btn-large">
+                <button class="btn btn-outline btn-large" (click)="navigateToSmsAlerts()">
                   <i class="fas fa-mobile-alt"></i>
                   SMS Alerts
                 </button>
@@ -184,11 +184,11 @@
             <h2>Ready to Get Fair Prices?</h2>
             <p>Join thousands of farmers who are already benefiting from transparent agricultural pricing.</p>
             <div class="cta-actions">
-              <button class="btn btn-primary btn-large">
+              <button class="btn btn-primary btn-large" (click)="getStarted()">
                 <i class="fas fa-rocket"></i>
                 Get Started Now
               </button>
-              <button class="btn btn-outline btn-large">
+              <button class="btn btn-outline btn-large" (click)="learnMore()">
                 <i class="fas fa-question-circle"></i>
                 Learn More
               </button>
