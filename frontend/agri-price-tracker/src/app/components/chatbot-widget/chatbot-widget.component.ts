@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Input, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface ChatMessage {
@@ -30,17 +30,27 @@ export class ChatbotWidgetComponent implements OnInit {
     'Best time to sell tomatoes'
   ];
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   ngOnInit() {
-    // Initialize chatbot with price-focused suggestions
-    
-    // Listen for chatbot open events
-    window.addEventListener('openChatbot', () => {
-      this.isOpen = true;
-      if (this.messages.length === 0) {
-        this.updateSuggestions();
-      }
-    });
+    // Only run browser-specific code when in browser
+    if (isPlatformBrowser(this.platformId)) {
+      // Initialize chatbot with price-focused suggestions
+      this.initializeBrowserFeatures();
+    }
     this.updateSuggestions();
+  }
+
+  private initializeBrowserFeatures() {
+    // Listen for chatbot open events - only in browser
+    if (typeof window !== 'undefined') {
+      window.addEventListener('openChatbot', () => {
+        this.isOpen = true;
+        if (this.messages.length === 0) {
+          this.updateSuggestions();
+        }
+      });
+    }
   }
 
   toggleChat() {
@@ -201,11 +211,13 @@ export class ChatbotWidgetComponent implements OnInit {
   }
 
   scrollToBottom() {
-    setTimeout(() => {
-      const chatBody = document.querySelector('.chat-body');
-      if (chatBody) {
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }
-    }, 100);
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        const chatBody = document.querySelector('.chat-body');
+        if (chatBody) {
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+      }, 100);
+    }
   }
 }

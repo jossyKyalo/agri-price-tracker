@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { HeaderComponent } from './components/header/header.component';
@@ -65,9 +65,9 @@ import { AdminLoginComponent } from './components/admin-login/admin-login.compon
       </main>
       
       <app-footer 
-        (navigateToSection)="switchToPublicPortalSection($event)"
-        (navigateToPage)="switchPage(getPageFromEvent($event))"
-        (openChatbot)="openChatbot()"
+        (navigateToSectionEvent)="switchToPublicPortalSection($event)"
+        (navigateToPageEvent)="switchPage(getPageFromEvent($event))"
+        (openChatbotEvent)="openChatbot()"
         (showAdminLogin)="showAdminLogin()">
       </app-footer>
       
@@ -97,10 +97,13 @@ export class AppComponent implements OnInit {
   showAdminRegModal = false;
   showAdminLoginModal = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
-    // Check if user is admin (from localStorage or API)
+    // Check if user is admin (only in browser environment)
     this.checkAdminStatus();
   }
 
@@ -131,15 +134,22 @@ export class AppComponent implements OnInit {
       section = '';
     }
     this.currentPage = 'public';
-    setTimeout(() => {
-      const customEvent = new CustomEvent('switchToSection', { detail: section });
-      window.dispatchEvent(customEvent);
-    }, 100);
+    
+    // Only dispatch custom events in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        const customEvent = new CustomEvent('switchToSection', { detail: section });
+        window.dispatchEvent(customEvent);
+      }, 100);
+    }
   }
 
   openChatbot() {
-    const event = new CustomEvent('openChatbot');
-    window.dispatchEvent(event);
+    // Only dispatch custom events in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      const event = new CustomEvent('openChatbot');
+      window.dispatchEvent(event);
+    }
   }
 
   showAdminRegistration() {
@@ -161,20 +171,28 @@ export class AppComponent implements OnInit {
   onAdminRegistered() {
     this.showAdminRegModal = false;
     // Handle successful admin registration
-    alert('Admin registration submitted! You will be notified once approved.');
+    if (isPlatformBrowser(this.platformId)) {
+      alert('Admin registration submitted! You will be notified once approved.');
+    }
   }
 
   onAdminLogin() {
     this.showAdminLoginModal = false;
     this.isAdmin = true;
     this.currentPage = 'admin';
-    // Store admin status
-    localStorage.setItem('userRole', 'admin');
+    
+    // Store admin status only in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('userRole', 'admin');
+    }
   }
 
   checkAdminStatus() {
-    // Check localStorage or make API call to verify admin status
-    const userRole = localStorage.getItem('userRole');
-    this.isAdmin = userRole === 'admin' || userRole === 'super_admin';
+    // Only check localStorage in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      const userRole = localStorage.getItem('userRole');
+      this.isAdmin = userRole === 'admin' || userRole === 'super_admin';
+    }
+    
   }
 }
