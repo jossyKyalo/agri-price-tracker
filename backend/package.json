@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
+    "africastalking": "^0.7.4",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
@@ -41,6 +42,7 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@types/africastalking": "^0.6.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",

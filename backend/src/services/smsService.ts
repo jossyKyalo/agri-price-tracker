@@ -1,14 +1,19 @@
-import twilio from 'twilio';
+import africastalking from 'africastalking';
 import { query } from '../database/connection.js';
 import { logger } from '../utils/logger.js';
 import type { SmsLog } from '../types/index.js';
 
-// Initialize Twilio client
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// Initialize Africa's Talking
+const at = africastalking({
+  apiKey: process.env.AFRICASTALKING_API_KEY as string,
+  username: process.env.AFRICASTALKING_USERNAME as string,
+});
 
+const sms = at.SMS;
+
+/**
+ * Send a single SMS
+ */
 export const sendSmsMessage = async (
   recipient: string,
   message: string,
@@ -16,29 +21,31 @@ export const sendSmsMessage = async (
   sentBy?: string
 ): Promise<SmsLog> => {
   try {
-    // Send SMS via Twilio
-    if (!process.env.TWILIO_PHONE_NUMBER) {
-      throw new Error('TWILIO_PHONE_NUMBER environment variable is not set');
-    }
-    const twilioMessage = await twilioClient.messages.create({
-      body: message,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: recipient
+    // Send SMS via Africa's Talking
+    const response = await sms.send({
+      to: [recipient],
+      message,
+      from: process.env.AFRICASTALKING_SHORTCODE || '',  
     });
+
+ 
+    const smsData = response.Recipients;
+    const status = smsData.status;
+    const messageId = smsData.messageId;
 
     // Log SMS in database
     const result = await query(
       `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, sent_at)
        VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
        RETURNING *`,
-      [recipient, message, smsType, 'sent', twilioMessage.sid, sentBy]
+      [recipient, message, smsType, status, messageId, sentBy]
     );
 
-    logger.info(`SMS sent successfully to ${recipient}: ${twilioMessage.sid}`);
+    logger.info(`📨 SMS sent to ${recipient}: ${messageId}`);
     return result.rows[0];
 
   } catch (error: any) {
-    logger.error(`Failed to send SMS to ${recipient}:`, error);
+    logger.error(`❌ Failed to send SMS to ${recipient}:`, error);
 
     // Log failed SMS
     const result = await query(
@@ -52,6 +59,9 @@ export const sendSmsMessage = async (
   }
 };
 
+/**
+ * Send bulk SMS (multiple recipients)
+ */
 export const sendBulkSms = async (
   recipients: string[],
   message: string,
@@ -64,17 +74,20 @@ export const sendBulkSms = async (
     try {
       const result = await sendSmsMessage(recipient, message, smsType, sentBy);
       results.push(result);
-      
+
       // Add delay between messages to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 300));
     } catch (error) {
-      logger.error(`Failed to send bulk SMS to ${recipient}:`, error);
+      logger.error(`❌ Bulk SMS failed for ${recipient}:`, error);
     }
   }
 
   return results;
 };
 
+/**
+ * Fetch subscribed numbers (filters: crop, region, alert type)
+ */
 export const getSubscribedNumbers = async (
   cropIds?: string[],
   regionIds?: string[],
@@ -107,11 +120,14 @@ export const getSubscribedNumbers = async (
 
     return result.rows.map(row => row.phone);
   } catch (error) {
-    logger.error('Failed to get subscribed numbers:', error);
+    logger.error('❌ Failed to get subscribed numbers:', error);
     return [];
   }
 };
 
+/**
+ * Send price alert notification
+ */
 export const sendPriceAlert = async (
   cropName: string,
   price: number,
@@ -120,20 +136,20 @@ export const sendPriceAlert = async (
   percentage: number
 ): Promise<void> => {
   try {
-    // Get template
+    // Load SMS template
     const templateResult = await query(
       'SELECT template FROM sms_templates WHERE name = $1 AND is_active = true',
       ['Price Alert']
     );
 
     if (templateResult.rows.length === 0) {
-      logger.warn('Price alert template not found');
+      logger.warn('⚠️ Price alert template not found');
       return;
     }
 
     let message = templateResult.rows[0].template;
-    
-    // Replace variables
+
+    // Replace placeholders
     message = message
       .replace('{crop}', cropName)
       .replace('{trend}', trend === 'up' ? 'increased' : trend === 'down' ? 'decreased' : 'remained stable')
@@ -142,21 +158,23 @@ export const sendPriceAlert = async (
       .replace('{region}', region)
       .replace('{market}', 'Local Market');
 
-    // Get subscribed numbers for this crop and region
+    // Subscribers for crop & region
     const subscribers = await getSubscribedNumbers([cropName.toLowerCase()], [region.toLowerCase()], ['price-alert']);
 
     if (subscribers.length > 0) {
       await sendBulkSms(subscribers, message, 'alert');
-      logger.info(`Price alert sent to ${subscribers.length} subscribers for ${cropName} in ${region}`);
+      logger.info(`✅ Price alert sent to ${subscribers.length} subscribers for ${cropName} in ${region}`);
     }
   } catch (error) {
-    logger.error('Failed to send price alert:', error);
+    logger.error('❌ Failed to send price alert:', error);
   }
 };
 
+/**
+ * Send daily top price update
+ */
 export const sendDailyPriceUpdate = async (): Promise<void> => {
   try {
-    // Get today's top price changes
     const priceChanges = await query(`
       SELECT c.name as crop_name, pe.price, r.name as region_name
       FROM price_entries pe
@@ -168,42 +186,44 @@ export const sendDailyPriceUpdate = async (): Promise<void> => {
     `);
 
     if (priceChanges.rows.length === 0) {
-      logger.info('No price updates to send today');
+      logger.info('ℹ️ No price updates to send today');
       return;
     }
 
-    // Build message
+    // Build SMS message
     let message = 'AGRI UPDATE: Today\'s prices - ';
-    const priceList = priceChanges.rows.map(row => 
-      `${row.crop_name}: KSh ${row.price}/kg (${row.region_name})`
-    ).join(', ');
+    const priceList = priceChanges.rows
+      .map(row => `${row.crop_name}: KSh ${row.price}/kg (${row.region_name})`)
+      .join(', ');
     
     message += priceList + '. For more info, reply HELP';
 
-    // Get all active subscribers
+    // Subscribers interested in daily updates
     const subscribers = await getSubscribedNumbers([], [], ['price-update']);
 
     if (subscribers.length > 0) {
       await sendBulkSms(subscribers, message, 'update');
-      logger.info(`Daily price update sent to ${subscribers.length} subscribers`);
+      logger.info(`✅ Daily price update sent to ${subscribers.length} subscribers`);
     }
   } catch (error) {
-    logger.error('Failed to send daily price update:', error);
+    logger.error('❌ Failed to send daily price update:', error);
   }
 };
 
+/**
+ * Process SMS delivery webhook
+ */
 export const processSmsWebhook = async (req: any): Promise<void> => {
   try {
-    const { MessageSid, MessageStatus, To, From } = req.body;
+    const { id, status, phoneNumber } = req.body;
 
-    // Update SMS log status
     await query(
       'UPDATE sms_logs SET status = $1, delivered_at = CURRENT_TIMESTAMP WHERE external_id = $2',
-      [MessageStatus, MessageSid]
+      [status, id]
     );
 
-    logger.info(`SMS status updated: ${MessageSid} - ${MessageStatus}`);
+    logger.info(`📬 Delivery report updated: ${id} - ${status} (${phoneNumber})`);
   } catch (error) {
-    logger.error('Failed to process SMS webhook:', error);
+    logger.error('❌ Failed to process SMS webhook:', error);
   }
 };
