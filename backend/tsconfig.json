@@ -27,7 +27,7 @@
   },
   "include": [
     "src/**/*"
-  ],
+, "../frontend/agri-price-tracker/src/app/environments"  ],
   "exclude": [
     "node_modules",
     "dist",
