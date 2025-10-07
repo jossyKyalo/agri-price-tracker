@@ -1,19 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface CropPrice {
-  id: number;
-  name: string;
-  category: string;
-  currentPrice: number;
-  previousPrice: number;
-  trend: 'up' | 'down' | 'stable';
-  prediction: number;
-  region: string;
-  market: string;
-  lastUpdated: string;
-}
+import { PriceService, CropPrice, CreatePriceEntry } from '../../services/price.service';
+import { CropService, Crop, Region } from '../../services/crop.service';
 
 @Component({
   selector: 'app-public-portal',
@@ -27,6 +16,8 @@ export class PublicPortalComponent implements OnInit {
   searchTerm = '';
   selectedCategory = '';
   selectedRegion = '';
+  isLoading = false;
+  errorMessage = '';
   
   // Stats
   totalCrops = 156;
@@ -42,124 +33,95 @@ export class PublicPortalComponent implements OnInit {
     notes: ''
   };
   
-  allCrops: CropPrice[] = [
-    {
-      id: 1,
-      name: 'Maize',
-      category: 'cereals',
-      currentPrice: 50,
-      previousPrice: 48,
-      trend: 'up',
-      prediction: 55,
-      region: 'Central Kenya',
-      market: 'Nairobi',
-      lastUpdated: '2 hours ago'
-    },
-    {
-      id: 2,
-      name: 'Beans',
-      category: 'legumes',
-      currentPrice: 90,
-      previousPrice: 92,
-      trend: 'down',
-      prediction: 85,
-      region: 'Western Kenya',
-      market: 'Kisumu',
-      lastUpdated: '1 hour ago'
-    },
-    {
-      id: 3,
-      name: 'Tomatoes',
-      category: 'vegetables',
-      currentPrice: 42,
-      previousPrice: 42,
-      trend: 'stable',
-      prediction: 43,
-      region: 'Rift Valley',
-      market: 'Nakuru',
-      lastUpdated: '30 mins ago'
-    },
-    {
-      id: 4,
-      name: 'Potatoes',
-      category: 'vegetables',
-      currentPrice: 35,
-      previousPrice: 32,
-      trend: 'up',
-      prediction: 38,
-      region: 'Eastern Kenya',
-      market: 'Meru',
-      lastUpdated: '1 hour ago'
-    },
-    {
-      id: 5,
-      name: 'Onions',
-      category: 'vegetables',
-      currentPrice: 55,
-      previousPrice: 58,
-      trend: 'down',
-      prediction: 52,
-      region: 'Central Kenya',
-      market: 'Nairobi',
-      lastUpdated: '45 mins ago'
-    },
-    {
-      id: 6,
-      name: 'Bananas',
-      category: 'fruits',
-      currentPrice: 25,
-      previousPrice: 25,
-      trend: 'stable',
-      prediction: 26,
-      region: 'Central Kenya',
-      market: 'Nairobi',
-      lastUpdated: '2 hours ago'
-    }
-  ];
+  allCrops: CropPrice[] = [];
+  crops: Crop[] = [];
+  regions: Region[] = [];
   
   filteredCrops: CropPrice[] = [];
 
+  constructor(
+    private priceService: PriceService,
+    private cropService: CropService
+  ) {}
+
   ngOnInit(): void {
-    this.filterCrops();
+    this.loadInitialData();
   }
 
-
-  filterCrops() {
-    this.filteredCrops = this.allCrops.filter(crop => {
-      const matchesSearch = crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesCategory = !this.selectedCategory || crop.category === this.selectedCategory;
-      const matchesRegion = !this.selectedRegion || crop.region.toLowerCase().includes(this.selectedRegion);
-      
-      return matchesSearch && matchesCategory && matchesRegion;
+  loadInitialData(): void {
+    this.isLoading = true;
+    
+    // Load crops, regions, and prices
+    Promise.all([
+      this.cropService.getCrops().toPromise(),
+      this.cropService.getRegions().toPromise(),
+      this.priceService.getPrices({ limit: 50 }).toPromise()
+    ]).then(([crops, regions, pricesResponse]) => {
+      this.crops = crops || [];
+      this.regions = regions || [];
+      this.allCrops = pricesResponse?.prices || [];
+      this.totalCrops = this.crops.length;
+      this.filterCrops();
+      this.isLoading = false;
+    }).catch(error => {
+      console.error('Error loading data:', error);
+      this.errorMessage = 'Failed to load data. Please try again.';
+      this.isLoading = false;
     });
   }
 
-  getPriceChange(current: number, previous: number): number {
-    return Math.round(((current - previous) / previous) * 100);
-  }
-
-  getPredictionChange(current: number, prediction: number): number {
-    return Math.round(((prediction - current) / current) * 100);
-  }
-
-  getPredictionTrend(current: number, prediction: number): string {
-    if (prediction > current) return 'up';
-    if (prediction < current) return 'down';
-    return 'stable';
+  filterCrops() {
+    this.filteredCrops = this.allCrops.filter(crop => {
+      const matchesSearch = crop.crop_name?.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesRegion = !this.selectedRegion || crop.region_name?.toLowerCase().includes(this.selectedRegion.toLowerCase());
+      
+      return matchesSearch && matchesRegion;
+    });
   }
 
   submitPrice() {
-    // Submit price to backend
-    console.log('Submitting price:', this.priceInput);
-    alert('Price submitted successfully! It will be verified by our admin team.');
-    
-    // Reset form
-    this.priceInput = {
-      crop: '',
-      price: 0,
-      location: '',
-      region: '',
-      notes: ''
+    if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
+      this.errorMessage = 'Please fill in all required fields';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+ 
+    const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
+    const region = this.regions.find(r => r.name.toLowerCase().includes(this.priceInput.region.toLowerCase()));
+
+    if (!crop || !region) {
+      this.errorMessage = 'Invalid crop or region selected';
+      this.isLoading = false;
+      return;
+    }
+
+    const priceData: CreatePriceEntry = {
+      crop_id: crop.id,
+      region_id: region.id,
+      price: this.priceInput.price,
+      notes: this.priceInput.notes
     };
+
+    this.priceService.createPriceEntry(priceData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        alert('Price submitted successfully! It will be verified by our admin team.');
+        
+        // Reset form
+        this.priceInput = {
+          crop: '',
+          price: 0,
+          location: '',
+          region: '',
+          notes: ''
+        };
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.userMessage || 'Failed to submit price. Please try again.';
+      }
+    });
   }
 }

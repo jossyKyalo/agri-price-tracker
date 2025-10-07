@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ChatbotService, ChatRequest } from '../../services/chatbot.service';
 
-interface ChatMessage {
+export interface ChatMessage {
   id: number;
   content: string;
   sender: 'user' | 'bot';
@@ -23,6 +24,7 @@ export class ChatbotWidgetComponent implements OnInit {
   isOpen = false;
   currentMessage = '';
   isTyping = false;
+  sessionId = '';
   messages: ChatMessage[] = [];
   suggestedQuestions: string[] = [
     'Maize prices today',
@@ -30,15 +32,22 @@ export class ChatbotWidgetComponent implements OnInit {
     'Best time to sell tomatoes'
   ];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private chatbotService: ChatbotService
+  ) {}
 
   ngOnInit() {
-    // Only run browser-specific code when in browser
     if (isPlatformBrowser(this.platformId)) {
       // Initialize chatbot with price-focused suggestions
       this.initializeBrowserFeatures();
+      this.sessionId = this.generateSessionId();
     }
     this.updateSuggestions();
+  }
+
+  private generateSessionId(): string {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
   private initializeBrowserFeatures() {
@@ -78,12 +87,45 @@ export class ChatbotWidgetComponent implements OnInit {
     this.currentMessage = '';
     this.isTyping = true;
     
-    // Simulate bot response
-    setTimeout(() => {
-      this.generateBotResponse(messageToProcess);
-      this.isTyping = false;
-      this.scrollToBottom();
-    }, 1500);
+    // Send message to backend
+    const chatRequest: ChatRequest = {
+      message: messageToProcess,
+      session_id: this.sessionId,
+      context: { focusOnPrices: this.focusOnPrices }
+    };
+
+    this.chatbotService.sendMessage(chatRequest).subscribe({
+      next: (response) => {
+        this.isTyping = false;
+        
+        const botMessage: ChatMessage = {
+          id: this.messages.length + 1,
+          content: response.response,
+          sender: 'bot',
+          timestamp: new Date(),
+          type: 'text'
+        };
+        
+        this.messages.push(botMessage);
+        this.scrollToBottom();
+      },
+      error: (error) => {
+        this.isTyping = false;
+        console.error('Chat error:', error);
+        
+        // Fallback response
+        const botMessage: ChatMessage = {
+          id: this.messages.length + 1,
+          content: 'Sorry, I\'m having trouble connecting right now. Please try again later.',
+          sender: 'bot',
+          timestamp: new Date(),
+          type: 'text'
+        };
+        
+        this.messages.push(botMessage);
+        this.scrollToBottom();
+      }
+    });
     
     this.scrollToBottom();
   }
@@ -93,7 +135,16 @@ export class ChatbotWidgetComponent implements OnInit {
     this.sendMessage();
   }
 
+   
   generateBotResponse(userMessage: string) {
+    setTimeout(() => {
+      this.addBotResponse(userMessage);
+      this.isTyping = false;
+      this.scrollToBottom();
+    }, 1500);
+  }
+
+  addBotResponse(userMessage: string) {
     let response = '';
     let type: 'text' | 'price' | 'weather' | 'suggestion' = 'text';
     
