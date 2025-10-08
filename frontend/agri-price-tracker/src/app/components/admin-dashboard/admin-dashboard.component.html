@@ -110,12 +110,12 @@
                   </thead>
                   <tbody>
                     <tr *ngFor="let request of adminRequests">
-                      <td>{{ request.name }}</td>
+                      <td>{{ request.full_name }}</td>
                       <td>{{ request.email }}</td>
                       <td>{{ request.phone }}</td>
                       <td>{{ request.region }}</td>
                       <td>{{ request.organization }}</td>
-                      <td>{{ request.requestDate }}</td>
+                      <td>{{ formatDate(request.created_at) }}</td>
                       <td>
                         <span class="badge" 
                               [class.badge-warning]="request.status === 'pending'"
@@ -206,10 +206,11 @@
                 <div class="verification-list">
                   <div *ngFor="let entry of pendingVerifications" class="verification-item">
                     <div class="entry-info">
-                      <strong>{{ entry.crop | titlecase }}</strong>
+                      <strong>{{ entry.crop_name }}</strong>
                       <span class="price">KSh {{ entry.price }}/kg</span>
-                      <small class="text-muted">{{ entry.region }} - {{ entry.market }}</small>
-                      <small class="text-muted">Submitted by: {{ entry.enteredBy }}</small>
+                      <small class="text-muted">{{ entry.region_name }} - {{ entry.market_name }}</small>
+                      <small class="text-muted">Submitted by: {{ entry.entered_by_name }}</small>
+                      <small class="text-muted">{{ formatDate(entry.entry_date) }}</small>
                     </div>
                     <div class="verification-actions">
                       <button class="btn btn-success btn-sm" (click)="verifyEntry(entry.id)">

@@ -213,7 +213,7 @@
                   <div class="template-info">
                     <h4>{{ template.name }}</h4>
                     <p>{{ template.template }}</p>
-                    <small class="text-muted">Variables: {{ template.variables.join(', ') }}</small>
+                    <small class="text-muted">Variables: {{ template.variables?.join(', ') }}</small>
                   </div>
                   <div class="template-actions">
                     <button class="btn btn-outline btn-sm" (click)="editTemplate(template)">
@@ -305,7 +305,7 @@
                       </div>
                     </td>
                     <td>
-                      <span class="badge badge-info">{{ log.type }}</span>
+                      <span class="badge badge-info">{{ log.sms_type }}</span>
                     </td>
                     <td>
                       <span class="badge" 
@@ -315,7 +315,7 @@
                         {{ log.status }}
                       </span>
                     </td>
-                    <td>{{ log.timestamp }}</td>
+                    <td>{{ formatDate(log.created_at) }}</td>
                     <td>
                       <button class="btn btn-outline btn-sm" (click)="resendSms(log)" *ngIf="log.status === 'failed'">
                         <i class="fas fa-redo"></i>

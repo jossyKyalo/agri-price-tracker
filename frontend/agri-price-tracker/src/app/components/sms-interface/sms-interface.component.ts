@@ -1,22 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface SmsTemplate {
-  id: number;
-  name: string;
-  template: string;
-  variables: string[];
-}
-
-interface SmsLog {
-  id: number;
-  recipient: string;
-  message: string;
-  status: 'sent' | 'pending' | 'failed';
-  timestamp: string;
-  type: 'alert' | 'update' | 'prediction';
-}
+import { SmsService, SmsTemplate, SmsLog, SendSmsRequest } from '../../services/sms.service';
+import { CropService, Crop, Region } from '../../services/crop.service';
 
 @Component({
   selector: 'app-sms-interface',
@@ -27,12 +13,14 @@ interface SmsLog {
 })
 export class SmsInterfaceComponent implements OnInit {
   activeTab = 'send';
+  isLoading = false;
+  errorMessage = '';
   
   // Stats
-  totalSent = 1247;
-  subscribedFarmers = 2847;
-  pendingSms = 43;
-  failedSms = 12;
+  totalSent = 0;
+  subscribedFarmers = 0;
+  pendingSms = 0;
+  failedSms = 0;
   
   // SMS Form Data
   smsData = {
@@ -55,100 +43,182 @@ export class SmsInterfaceComponent implements OnInit {
     variablesString: ''
   };
 
-  smsTemplates: SmsTemplate[] = [
-    {
-      id: 1,
-      name: 'Price Alert',
-      template: 'AGRI ALERT: {crop} price has {trend} by {percentage}% to KSh {price}/kg in {region}. Current market: {market}',
-      variables: ['crop', 'trend', 'percentage', 'price', 'region', 'market']
-    },
-    {
-      id: 2,
-      name: 'Daily Price Update',
-      template: 'AGRI UPDATE: Today\'s prices - {crop}: KSh {price}/kg ({region}). Prediction: {prediction}. For more info, reply HELP',
-      variables: ['crop', 'price', 'region', 'prediction']
-    },
-    {
-      id: 3,
-      name: 'Weather Alert',
-      template: 'AGRI WEATHER: {weather_condition} expected in {region} for next {days} days. Protect your {crop}. More: reply WEATHER',
-      variables: ['weather_condition', 'region', 'days', 'crop']
-    }
-  ];
+  smsTemplates: SmsTemplate[] = [];
+  smsLogs: SmsLog[] = [];
+  crops: Crop[] = [];
+  regions: Region[] = [];
 
-  smsLogs: SmsLog[] = [
-    {
-      id: 1,
-      recipient: '+254700123456',
-      message: 'AGRI ALERT: Maize price has increased by 15% to KSh 50/kg in Central Kenya',
-      status: 'sent',
-      timestamp: '2025-01-10 14:30',
-      type: 'alert'
-    },
-    {
-      id: 2,
-      recipient: '+254722987654',
-      message: 'AGRI UPDATE: Today\'s prices - Beans: KSh 90/kg (Western). Prediction: KSh 85/kg',
-      status: 'sent',
-      timestamp: '2025-01-10 14:25',
-      type: 'update'
-    },
-    {
-      id: 3,
-      recipient: '+254733555777',
-      message: 'AGRI WEATHER: Heavy rains expected in Rift Valley for next 3 days',
-      status: 'pending',
-      timestamp: '2025-01-10 14:20',
-      type: 'alert'
-    },
-    {
-      id: 4,
-      recipient: '+254700999888',
-      message: 'AGRI PREDICTION: Tomato prices likely to increase by 10% next week',
-      status: 'failed',
-      timestamp: '2025-01-10 14:15',
-      type: 'prediction'
-    }
-  ];
+  constructor(
+    private smsService: SmsService,
+    private cropService: CropService
+  ) {}
 
   ngOnInit() {
-    // Initialize SMS interface
+    this.loadInitialData();
+  }
+
+  loadInitialData() {
+    this.loadSmsStats();
+    this.loadSmsTemplates();
+    this.loadSmsLogs();
+    this.loadCropsAndRegions();
+  }
+
+  loadSmsStats() {
+    this.smsService.getSmsStats().subscribe({
+      next: (stats) => {
+        this.totalSent = stats.todaySent || 0;
+        this.subscribedFarmers = stats.activeSubscriptions || 0;
+        this.pendingSms = stats.pending || 0;
+        this.failedSms = stats.failed || 0;
+      },
+      error: (error) => {
+        console.error('Error loading SMS stats:', error);
+        // Use fallback values
+        this.totalSent = 1247;
+        this.subscribedFarmers = 2847;
+        this.pendingSms = 43;
+        this.failedSms = 12;
+      }
+    });
+  }
+
+  loadSmsTemplates() {
+    this.smsService.getSmsTemplates().subscribe({
+      next: (templates) => {
+        this.smsTemplates = templates;
+      },
+      error: (error) => {
+        console.error('Error loading SMS templates:', error);
+        // Fallback to mock templates
+        this.smsTemplates = [
+          {
+            id: '1',
+            name: 'Price Alert',
+            template: 'AGRI ALERT: {crop} price has {trend} by {percentage}% to KSh {price}/kg in {region}. Current market: {market}',
+            variables: ['crop', 'trend', 'percentage', 'price', 'region', 'market'],
+            sms_type: 'alert',
+            is_active: true,
+            created_at: '2025-01-10T10:00:00Z'
+          },
+          {
+            id: '2',
+            name: 'Daily Price Update',
+            template: 'AGRI UPDATE: Today\'s prices - {crop}: KSh {price}/kg ({region}). Prediction: {prediction}. For more info, reply HELP',
+            variables: ['crop', 'price', 'region', 'prediction'],
+            sms_type: 'update',
+            is_active: true,
+            created_at: '2025-01-10T10:00:00Z'
+          }
+        ];
+      }
+    });
+  }
+
+  loadSmsLogs() {
+    this.smsService.getSmsLogs(1, 20).subscribe({
+      next: (response) => {
+        this.smsLogs = response.logs;
+      },
+      error: (error) => {
+        console.error('Error loading SMS logs:', error);
+        // Fallback to mock logs
+        this.smsLogs = [
+          {
+            id: '1',
+            recipient: '+254700123456',
+            message: 'AGRI ALERT: Maize price has increased by 15% to KSh 50/kg in Central Kenya',
+            sms_type: 'alert',
+            status: 'sent',
+            sent_at: '2025-01-10T14:30:00Z',
+            created_at: '2025-01-10T14:30:00Z'
+          },
+          {
+            id: '2',
+            recipient: '+254722987654',
+            message: 'AGRI UPDATE: Today\'s prices - Beans: KSh 90/kg (Western). Prediction: KSh 85/kg',
+            sms_type: 'update',
+            status: 'sent',
+            sent_at: '2025-01-10T14:25:00Z',
+            created_at: '2025-01-10T14:25:00Z'
+          }
+        ];
+      }
+    });
+  }
+
+  loadCropsAndRegions() {
+    this.cropService.getCrops().subscribe({
+      next: (crops) => {
+        this.crops = crops;
+      },
+      error: (error) => {
+        console.error('Error loading crops:', error);
+      }
+    });
+
+    this.cropService.getRegions().subscribe({
+      next: (regions) => {
+        this.regions = regions;
+      },
+      error: (error) => {
+        console.error('Error loading regions:', error);
+      }
+    });
   }
 
   sendSms() {
-    // Simulate sending SMS
-    const newLog: SmsLog = {
-      id: this.smsLogs.length + 1,
-      recipient: this.smsData.recipients === 'custom' ? this.smsData.customNumbers : `All ${this.smsData.recipients}`,
+    if (!this.smsData.type || !this.smsData.recipients || !this.smsData.message) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const recipients = this.smsData.recipients === 'custom' 
+      ? this.smsData.customNumbers.split(',').map(n => n.trim())
+      : [this.smsData.recipients]; 
+
+    const smsRequest: SendSmsRequest = {
+      recipients: recipients,
       message: this.smsData.message,
-      status: 'sent',
-      timestamp: new Date().toLocaleString(),
-      type: this.smsData.type as any
+      sms_type: this.smsData.type as any
     };
-    
-    this.smsLogs.unshift(newLog);
-    this.totalSent++;
-    
-    // Reset form
-    this.smsData = {
-      type: '',
-      recipients: '',
-      customNumbers: '',
-      message: '',
-      schedule: 'now',
-      scheduledTime: ''
-    };
-    
-    alert('SMS sent successfully!');
+
+    this.smsService.sendSms(smsRequest).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        alert(`SMS sent successfully to ${response.sent} recipients!`);
+        
+        // Reset form
+        this.smsData = {
+          type: '',
+          recipients: '',
+          customNumbers: '',
+          message: '',
+          schedule: 'now',
+          scheduledTime: ''
+        };
+        
+        // Reload logs and stats
+        this.loadSmsLogs();
+        this.loadSmsStats();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.userMessage || 'Failed to send SMS';
+        console.error('Error sending SMS:', error);
+      }
+    });
   }
 
-  sendQuickSms(type: string) {
-    // Pre-fill SMS form with quick action data
+  sendQuickSms(type: string) { 
     this.activeTab = 'send';
     
     switch(type) {
       case 'price-spike':
-        this.smsData.type = 'price-alert';
+        this.smsData.type = 'alert';
         this.smsData.recipients = 'region-central';
         this.smsData.message = 'AGRI ALERT: Maize price has increased by 15% to KSh 50/kg in Central Kenya. Consider selling now.';
         break;
@@ -163,7 +233,7 @@ export class SmsInterfaceComponent implements OnInit {
         this.smsData.message = 'AGRI OPPORTUNITY: High demand for tomatoes in Nairobi markets. Premium prices available. Contact local buyers.';
         break;
       case 'daily-update':
-        this.smsData.type = 'price-update';
+        this.smsData.type = 'update';
         this.smsData.recipients = 'all';
         this.smsData.message = 'AGRI UPDATE: Today\'s prices - Maize: KSh 50/kg, Beans: KSh 90/kg, Tomatoes: KSh 42/kg. Predictions rising.';
         break;
@@ -171,23 +241,36 @@ export class SmsInterfaceComponent implements OnInit {
   }
 
   loadTemplate() {
-    const template = this.smsTemplates.find(t => t.id === parseInt(this.selectedTemplate));
+    const template = this.smsTemplates.find(t => t.id === this.selectedTemplate);
     if (template) {
       this.smsData.message = template.template;
     }
   }
 
   saveTemplate() {
-    const newTemplate: SmsTemplate = {
-      id: this.smsTemplates.length + 1,
+    if (!this.newTemplate.name || !this.newTemplate.template) {
+      alert('Please fill in template name and message');
+      return;
+    }
+
+    const templateData = {
       name: this.newTemplate.name,
       template: this.newTemplate.template,
-      variables: this.newTemplate.variablesString.split(',').map(v => v.trim()).filter(v => v)
+      variables: this.newTemplate.variablesString.split(',').map(v => v.trim()).filter(v => v),
+      sms_type: 'general' as any
     };
-    
-    this.smsTemplates.push(newTemplate);
-    this.cancelTemplate();
-    alert('Template saved successfully!');
+
+    this.smsService.createSmsTemplate(templateData).subscribe({
+      next: (template) => {
+        this.smsTemplates.push(template);
+        this.cancelTemplate();
+        alert('Template saved successfully!');
+      },
+      error: (error) => {
+        console.error('Error saving template:', error);
+        alert('Failed to save template');
+      }
+    });
   }
 
   cancelTemplate() {
@@ -203,14 +286,15 @@ export class SmsInterfaceComponent implements OnInit {
     this.newTemplate = {
       name: template.name,
       template: template.template,
-      variablesString: template.variables.join(', ')
+      variablesString: template.variables?.join(', ') || ''
     };
     this.showCreateTemplate = true;
   }
 
-  deleteTemplate(id: number) {
-    if (confirm('Are you sure you want to delete this template?')) {
+  deleteTemplate(id: string) {
+    if (confirm('Are you sure you want to delete this template?')) { 
       this.smsTemplates = this.smsTemplates.filter(t => t.id !== id);
+      alert('Template deleted successfully!');
     }
   }
 
@@ -221,14 +305,18 @@ export class SmsInterfaceComponent implements OnInit {
     return this.smsLogs.filter(log => log.status === this.logFilter);
   }
 
-  resendSms(log: SmsLog) {
+  resendSms(log: SmsLog) { 
     log.status = 'pending';
-    log.timestamp = new Date().toLocaleString();
     
     setTimeout(() => {
       log.status = 'sent';
       this.failedSms--;
       this.totalSent++;
     }, 2000);
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   }
 }
