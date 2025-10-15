@@ -2,6 +2,9 @@ import africastalking from 'africastalking';
 import { query } from '../database/connection.js';
 import { logger } from '../utils/logger.js';
 import type { SmsLog } from '../types/index.js';
+import dotenv from "dotenv";
+dotenv.config();
+
 
 // Initialize Africa's Talking
 const at = africastalking({
