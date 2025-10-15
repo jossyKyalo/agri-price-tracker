@@ -1,0 +1,1001 @@
+Date,Commodity,Market,County,Retail,Wholesale,Supply Volume
+2023-03-11,Yam,Embu Town,Embu,160.0,100.0,900.0
+2023-03-15,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-03-18,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-03-22,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-03-25,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-03-29,Yam,Embu Town,Embu,180.0,130.0,600.0
+2023-04-01,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-04-05,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-04-08,Yam,Embu Town,Embu,160.0,400.0,1200.0
+2023-04-12,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-04-15,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-04-19,Yam,Embu Town,Embu,180.0,0.15,1100.0
+2023-04-22,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-04-26,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-04-29,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-05-03,Yam,Embu Town,Embu,180.0,140.0,500.0
+2023-05-06,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-05-13,Yam,Embu Town,Embu,170.0,120.0,700.0
+2023-05-17,Yam,Embu Town,Embu,160.0,110.0,1000.0
+2023-05-20,Yam,Embu Town,Embu,160.0,100.0,700.0
+2023-05-24,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-05-27,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-05-31,Yam,Embu Town,Embu,160.0,100.0,500.0
+2023-06-03,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-06-07,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-06-10,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-06-14,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-06-17,Yam,Embu Town,Embu,160.0,120.0,900.0
+2023-06-24,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-06-28,Yam,Embu Town,Embu,160.0,100.0,800.0
+2023-07-01,Yam,Embu Town,Embu,160.0,100.0,900.0
+2023-07-05,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-07-08,Yam,Embu Town,Embu,180.0,120.0,1000.0
+2023-07-12,Yam,Embu Town,Embu,170.0,100.0,1000.0
+2023-07-15,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-07-19,Yam,Embu Town,Embu,170.0,120.0,1100.0
+2023-07-22,Yam,Embu Town,Embu,170.0,100.0,1000.0
+2023-07-26,Yam,Embu Town,Embu,180.0,120.0,800.0
+2023-07-29,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-08-02,Yam,Embu Town,Embu,180.0,120.0,1200.0
+2023-08-05,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-08-09,Yam,Embu Town,Embu,180.0,120.0,1200.0
+2023-08-12,Yam,Embu Town,Embu,170.0,110.0,1200.0
+2023-08-16,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-08-19,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-08-23,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-08-26,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-08-30,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-09-02,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-09-06,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-09-13,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-09-16,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-09-20,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-09-23,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-09-27,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-09-30,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-10-04,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-10-07,Yam,Embu Town,Embu,160.0,100.0,1200.0
+2023-10-11,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-10-14,Yam,Embu Town,Embu,180.0,120.0,800.0
+2023-10-18,Yam,Embu Town,Embu,170.0,110.0,1000.0
+2023-10-21,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-10-25,Yam,Embu Town,Embu,160.0,100.0,1100.0
+2023-10-28,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-11-01,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2023-11-08,Yam,Embu Town,Embu,180.0,120.0,900.0
+2023-11-11,Yam,Embu Town,Embu,180.0,120.0,700.0
+2023-11-15,Yam,Embu Town,Embu,180.0,120.0,800.0
+2023-11-18,Yam,Embu Town,Embu,180.0,120.0,900.0
+2023-11-22,Yam,Embu Town,Embu,170.0,1100.0,800.0
+2023-11-29,Yam,Embu Town,Embu,170.0,110.0,900.0
+2023-12-06,Yam,Embu Town,Embu,600.0,100.0,1200.0
+2023-12-09,Yam,Embu Town,Embu,180.0,120.0,1200.0
+2023-12-13,Yam,Embu Town,Embu,160.0,110.0,1000.0
+2023-12-16,Yam,Embu Town,Embu,170.0,120.0,800.0
+2023-12-20,Yam,Embu Town,Embu,170.0,110.0,1200.0
+2023-12-30,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2024-01-03,Yam,Embu Town,Embu,160.0,100.0,800.0
+2024-01-10,Yam,Embu Town,Embu,160.0,100.0,800.0
+2024-01-20,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2024-01-24,Yam,Embu Town,Embu,180.0,120.0,1000.0
+2024-01-27,Yam,Embu Town,Embu,180.0,120.0,900.0
+2024-02-03,Yam,Embu Town,Embu,160.0,100.0,1000.0
+2024-09-11,Yam,Embu Town,Embu,180.0,150.0,800.0
+2024-09-18,Yam,Embu Town,Embu,200.0,150.0,1200.0
+2024-09-25,Yam,Embu Town,Embu,180.0,120.0,1000.0
+2024-10-02,Yam,Embu Town,Embu,180.0,120.0,1000.0
+2024-10-09,Yam,Embu Town,Embu,180.0,120.0,1200.0
+2025-07-30,Yam,Embu Town,Embu,200.0,120.0,1000.0
+2021-05-24,Yam,Engineer,Nyandarua,200.0,130.0,0.0
+2021-11-10,Yam,Engineer,Nyandarua,200.0,100.0,200.0
+2021-12-01,Yam,Engineer,Nyandarua,200.0,160.0,200.0
+2022-01-12,Yam,Engineer,Nyandarua,200.0,100.0,200.0
+2022-02-09,Yam,Engineer,Nyandarua,250.0,200.0,400.0
+2021-07-02,Yam,Gakoromone,Meru,100.0,80.0,1000.0
+2022-09-09,Yam,Gakoromone,Meru,120.0,100.0,1000.0
+2023-05-19,Yam,Gakoromone,Meru,120.0,80.0,1000.0
+2023-05-26,Yam,Gakoromone,Meru,130.0,100.0,1000.0
+2023-06-02,Yam,Gakoromone,Meru,200.0,150.0,500.0
+2023-06-16,Yam,Gakoromone,Meru,150.0,100.0,500.0
+2023-06-23,Yam,Gakoromone,Meru,250.0,200.0,1000.0
+2023-06-30,Yam,Gakoromone,Meru,150.0,100.0,600.0
+2023-07-07,Yam,Gakoromone,Meru,100.0,80.0,1000.0
+2023-07-21,Yam,Gakoromone,Meru,300.0,200.0,500.0
+2023-07-28,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2023-08-04,Yam,Gakoromone,Meru,200.0,150.0,600.0
+2023-08-14,Yam,Gakoromone,Meru,300.0,120.0,600.0
+2023-08-25,Yam,Gakoromone,Meru,200.0,150.0,800.0
+2023-09-01,Yam,Gakoromone,Meru,300.0,200.0,600.0
+2023-09-11,Yam,Gakoromone,Meru,300.0,200.0,600.0
+2023-09-15,Yam,Gakoromone,Meru,300.0,200.0,400.0
+2023-09-22,Yam,Gakoromone,Meru,300.0,250.0,500.0
+2023-09-29,Yam,Gakoromone,Meru,300.0,250.0,300.0
+2023-10-09,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2023-10-13,Yam,Gakoromone,Meru,250.0,200.0,900.0
+2023-10-27,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2023-11-17,Yam,Gakoromone,Meru,350.0,300.0,600.0
+2023-12-01,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2024-01-12,Yam,Gakoromone,Meru,350.0,300.0,600.0
+2024-01-19,Yam,Gakoromone,Meru,350.0,300.0,500.0
+2024-02-02,Yam,Gakoromone,Meru,350.0,300.0,600.0
+2024-02-09,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2024-02-23,Yam,Gakoromone,Meru,350.0,300.0,800.0
+2024-03-01,Yam,Gakoromone,Meru,350.0,300.0,600.0
+2024-03-15,Yam,Gakoromone,Meru,100.0,80.0,600.0
+2024-03-22,Yam,Gakoromone,Meru,350.0,300.0,600.0
+2024-04-08,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2024-05-03,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2024-05-13,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2024-05-24,Yam,Gakoromone,Meru,300.0,250.0,400.0
+2024-06-03,Yam,Gakoromone,Meru,250.0,200.0,600.0
+2024-06-07,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2024-07-19,Yam,Gakoromone,Meru,300.0,250.0,600.0
+2024-08-05,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2024-08-09,Yam,Gakoromone,Meru,250.0,200.0,600.0
+2024-08-16,Yam,Gakoromone,Meru,250.0,200.0,500.0
+2024-08-23,Yam,Gakoromone,Meru,250.0,200.0,400.0
+2024-09-02,Yam,Gakoromone,Meru,250.0,200.0,300.0
+2024-09-27,Yam,Gakoromone,Meru,250.0,200.0,300.0
+2024-10-04,Yam,Gakoromone,Meru,200.0,150.0,400.0
+2021-09-21,Yam,Gikomba,Nairobi,80.0,100.0,0.0
+2023-11-08,Yam,Gikomba,Nairobi,100.0,100.0,0.0
+2023-12-07,Yam,Gikomba,Nairobi,150.0,100.0,0.0
+2023-12-13,Yam,Gikomba,Nairobi,100.0,100.0,0.0
+2024-01-09,Yam,Gikomba,Nairobi,150.0,100.0,0.0
+2024-01-18,Yam,Gikomba,Nairobi,150.0,100.0,0.0
+2024-01-20,Yam,Gikomba,Nairobi,150.0,100.0,0.0
+2024-01-27,Yam,Gikomba,Nairobi,80.0,100.0,0.0
+2024-01-30,Yam,Gikomba,Nairobi,150.0,100.0,0.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,100.0,100.0,90.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,100.0,100.0,90.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,100.0,100.0,90.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,120.0,100.0,90.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,100.0,100.0,90.0
+2021-05-24,Yam,Illbissil Food Market,Kajiado,120.0,100.0,90.0
+2023-03-19,Yam,Isebania Market,Migori,80.0,100.0,350.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,150.0,100.0,250.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,66.67,46.67,20.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,300.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,400.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,450.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,400.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,0.0
+2021-05-24,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,350.0
+2021-09-06,Yam,Kaanwa,Tharaka-Nithi,70.0,50.0,1000.0
+2021-09-13,Yam,Kaanwa,Tharaka-Nithi,70.0,50.0,500.0
+2021-09-16,Yam,Kaanwa,Tharaka-Nithi,70.0,50.0,500.0
+2021-09-23,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,400.0
+2021-09-27,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,350.0
+2021-09-30,Yam,Kaanwa,Tharaka-Nithi,60.0,40.0,300.0
+2021-10-04,Yam,Kaanwa,Tharaka-Nithi,80.0,60.0,400.0
+2021-10-11,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,500.0
+2021-10-14,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,200.0
+2021-10-18,Yam,Kaanwa,Tharaka-Nithi,80.0,60.0,300.0
+2021-10-21,Yam,Kaanwa,Tharaka-Nithi,70.0,50.0,300.0
+2021-11-01,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,300.0
+2021-11-08,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2021-11-11,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2021-12-13,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,200.0
+2021-12-16,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2021-12-20,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2021-12-23,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2021-12-30,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,200.0
+2022-01-03,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-01-06,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-01-13,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,100.0
+2022-01-17,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,100.0
+2022-01-20,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,100.0
+2022-01-24,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,150.0
+2022-01-27,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,100.0
+2022-02-07,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-02-10,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,100.0
+2022-02-14,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-02-21,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,200.0
+2022-02-28,Yam,Kaanwa,Tharaka-Nithi,100.0,70.0,150.0
+2022-03-03,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-03-07,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-03-10,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,150.0
+2022-03-14,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-03-17,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-03-24,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,200.0
+2022-03-31,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-04-04,Yam,Kaanwa,Tharaka-Nithi,80.0,70.0,300.0
+2022-04-11,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-04-14,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-04-18,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-04-21,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-04-21,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-04-25,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-05-02,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-05-05,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-05-09,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-05-16,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-05-19,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-05-23,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-05-26,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2022-06-09,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-06-13,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-06-16,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-06-20,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-06-27,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-06-30,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-07-14,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-07-18,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-07-21,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-07-25,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,300.0
+2022-07-28,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-08-01,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-08-04,Yam,Kaanwa,Tharaka-Nithi,90.0,80.0,200.0
+2022-08-11,Yam,Kaanwa,Tharaka-Nithi,110.0,90.0,200.0
+2022-08-29,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-09-08,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-09-12,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,250.0
+2022-09-15,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,150.0
+2022-09-22,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-09-29,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-10-06,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-10-17,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-10-27,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2022-11-07,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,100.0
+2022-11-10,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2023-05-22,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2023-06-01,Yam,Kaanwa,Tharaka-Nithi,120.0,100.0,150.0
+2024-02-29,Yam,Kaanwa,Tharaka-Nithi,100.0,80.0,200.0
+2021-09-30,Yam,Kaare,Tharaka-Nithi,60.0,50.0,20.0
+2021-11-04,Yam,Kaare,Tharaka-Nithi,70.0,50.0,100.0
+2021-11-18,Yam,Kaare,Tharaka-Nithi,50.0,40.0,50.0
+2022-02-28,Yam,Kaare,Tharaka-Nithi,50.0,30.0,300.0
+2022-03-14,Yam,Kaare,Tharaka-Nithi,50.0,30.0,200.0
+2022-04-04,Yam,Kaare,Tharaka-Nithi,50.0,30.0,200.0
+2022-08-22,Yam,Kaare,Tharaka-Nithi,100.0,50.0,200.0
+2022-12-29,Yam,Kaare,Tharaka-Nithi,50.0,20.0,200.0
+2022-08-24,Yam,Kabati - Muranga,Muranga,150.0,100.0,0.0
+2022-09-07,Yam,Kabati - Muranga,Muranga,150.0,100.0,0.0
+2022-09-14,Yam,Kabati - Muranga,Muranga,150.0,100.0,0.0
+2022-09-28,Yam,Kabati - Muranga,Muranga,150.0,100.0,200.0
+2022-11-24,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-04-05,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-04-28,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2023-05-03,Yam,Kabati - Muranga,Muranga,120.0,100.0,300.0
+2023-05-13,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-05-19,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2023-05-24,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-06-09,Yam,Kabati - Muranga,Muranga,100.0,80.0,300.0
+2023-06-14,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-07-12,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2023-08-09,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2024-01-22,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2024-02-05,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2024-02-21,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2024-03-14,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-04-20,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-04-24,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-05-08,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2024-05-24,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2024-06-19,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-06-29,Yam,Kabati - Muranga,Muranga,140.0,110.0,0.0
+2024-08-13,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-09-13,Yam,Kabati - Muranga,Muranga,120.0,100.0,0.0
+2024-09-21,Yam,Kabati - Muranga,Muranga,130.0,110.0,0.0
+2025-05-21,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-05-24,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-05-28,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-06-27,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-07-26,Yam,Kabati - Muranga,Muranga,66.67,53.33,0.0
+2025-08-08,Yam,Kabati - Muranga,Muranga,80.0,53.33,0.0
+2025-08-16,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-08-25,Yam,Kabati - Muranga,Muranga,120.0,80.0,0.0
+2025-09-04,Yam,Kabati - Muranga,Muranga,100.0,80.0,0.0
+2023-12-05,Yam,Kabiyet Market,Nandi,100.0,95.0,1500.0
+2024-02-08,Yam,Kabiyet Market,Nandi,100.0,90.0,1200.0
+2024-03-12,Yam,Kabiyet Market,Nandi,150.0,100.0,250.0
+2024-04-23,Yam,Kabiyet Market,Nandi,70.0,50.0,200.0
+2021-05-24,Yam,Kagio,Kirinyaga,70.0,40.4,198.0
+2021-07-12,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-07-12,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-07-29,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-08-02,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-08-05,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-08-09,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-08-12,Yam,Kagio,Kirinyaga,100.0,50.51,149.0
+2021-08-16,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-08-23,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-08-26,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-08-30,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-09-06,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-09-13,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-09-16,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-09-20,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-09-23,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-09-27,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-09-30,Yam,Kagio,Kirinyaga,100.0,70.71,297.0
+2021-10-04,Yam,Kagio,Kirinyaga,100.0,45.45,198.0
+2021-10-07,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-10-11,Yam,Kagio,Kirinyaga,100.0,50.51,50.0
+2021-10-14,Yam,Kagio,Kirinyaga,100.0,50.0,99.0
+2021-10-18,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-10-21,Yam,Kagio,Kirinyaga,100.0,70.0,50.0
+2021-11-01,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-11-04,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2021-11-08,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-11-11,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-11-15,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-11-18,Yam,Kagio,Kirinyaga,100.0,50.51,297.0
+2021-11-22,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2021-11-25,Yam,Kagio,Kirinyaga,100.0,60.61,145.0
+2021-11-29,Yam,Kagio,Kirinyaga,100.0,60.61,148.0
+2021-12-02,Yam,Kagio,Kirinyaga,100.0,65.66,99.0
+2021-12-09,Yam,Kagio,Kirinyaga,90.0,50.51,99.0
+2021-12-13,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2021-12-16,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2021-12-20,Yam,Kagio,Kirinyaga,70.0,50.51,99.0
+2022-01-03,Yam,Kagio,Kirinyaga,100.0,50.51,198.0
+2022-01-06,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-01-17,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2022-01-20,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2022-01-24,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-01-31,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-02-03,Yam,Kagio,Kirinyaga,100.0,6000.0,99.0
+2022-02-07,Yam,Kagio,Kirinyaga,100.0,60.61,198.0
+2022-02-10,Yam,Kagio,Kirinyaga,100.0,60.61,198.0
+2022-02-14,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-02-17,Yam,Kagio,Kirinyaga,100.0,60.61,148.5
+2022-02-21,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-02-24,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-02-24,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-02-28,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-03-03,Yam,Kagio,Kirinyaga,100.0,70.71,149.0
+2022-03-14,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-03-17,Yam,Kagio,Kirinyaga,100.0,6000.0,99.0
+2022-03-21,Yam,Kagio,Kirinyaga,100.0,70.71,99.0
+2022-03-24,Yam,Kagio,Kirinyaga,100.0,60.61,297.0
+2022-03-31,Yam,Kagio,Kirinyaga,100.0,60.61,50.0
+2022-04-07,Yam,Kagio,Kirinyaga,100.0,60.61,50.0
+2022-04-11,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-04-14,Yam,Kagio,Kirinyaga,100.0,90.91,792.0
+2022-04-18,Yam,Kagio,Kirinyaga,100.0,90.91,198.0
+2022-04-21,Yam,Kagio,Kirinyaga,100.0,90.91,297.0
+2022-04-25,Yam,Kagio,Kirinyaga,100.0,90.91,297.0
+2022-04-28,Yam,Kagio,Kirinyaga,100.0,90.91,198.0
+2022-05-05,Yam,Kagio,Kirinyaga,100.0,90.91,150.0
+2022-05-09,Yam,Kagio,Kirinyaga,100.0,90.91,198.0
+2022-05-16,Yam,Kagio,Kirinyaga,100.0,85.86,99.0
+2022-05-19,Yam,Kagio,Kirinyaga,100.0,80.81,198.0
+2022-05-26,Yam,Kagio,Kirinyaga,100.0,80.81,99.0
+2022-05-30,Yam,Kagio,Kirinyaga,100.0,50.51,99.0
+2022-06-02,Yam,Kagio,Kirinyaga,80.0,60.61,198.0
+2022-06-09,Yam,Kagio,Kirinyaga,75.0,60.61,99.0
+2022-06-13,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-06-16,Yam,Kagio,Kirinyaga,100.0,60.61,99.0
+2022-06-20,Yam,Kagio,Kirinyaga,100.0,60.61,50.0
+2022-06-23,Yam,Kagio,Kirinyaga,100.0,60.61,149.0
+2022-06-27,Yam,Kagio,Kirinyaga,100.0,60.61,149.0
+2022-06-30,Yam,Kagio,Kirinyaga,100.0,50.0,100.0
+2022-07-04,Yam,Kagio,Kirinyaga,100.0,60.0,1200.0
+2022-07-11,Yam,Kagio,Kirinyaga,100.0,50.0,1500.0
+2022-07-14,Yam,Kagio,Kirinyaga,100.0,50.0,800.0
+2022-07-18,Yam,Kagio,Kirinyaga,150.0,100.0,1500.0
+2022-07-25,Yam,Kagio,Kirinyaga,100.0,60.0,1500.0
+2022-08-01,Yam,Kagio,Kirinyaga,100.0,50.0,1400.0
+2022-08-01,Yam,Kagio,Kirinyaga,100.0,50.0,1400.0
+2022-08-04,Yam,Kagio,Kirinyaga,100.0,40.0,1300.0
+2022-08-18,Yam,Kagio,Kirinyaga,60.0,30.0,1100.0
+2022-08-22,Yam,Kagio,Kirinyaga,100.0,50.0,2000.0
+2022-08-29,Yam,Kagio,Kirinyaga,80.0,40.0,1200.0
+2022-09-05,Yam,Kagio,Kirinyaga,100.0,50.0,1200.0
+2022-09-08,Yam,Kagio,Kirinyaga,100.0,40.0,600.0
+2022-09-12,Yam,Kagio,Kirinyaga,80.0,50.0,1200.0
+2022-09-15,Yam,Kagio,Kirinyaga,80.0,40.0,1800.0
+2022-09-19,Yam,Kagio,Kirinyaga,80.0,40.0,800.0
+2022-09-26,Yam,Kagio,Kirinyaga,70.0,40.0,2000.0
+2022-09-29,Yam,Kagio,Kirinyaga,100.0,50.0,800.0
+2022-10-06,Yam,Kagio,Kirinyaga,70.0,40.0,800.0
+2022-10-10,Yam,Kagio,Kirinyaga,80.0,50.0,350.0
+2022-10-17,Yam,Kagio,Kirinyaga,70.0,40.0,700.0
+2022-10-20,Yam,Kagio,Kirinyaga,60.0,30.0,1200.0
+2022-10-24,Yam,Kagio,Kirinyaga,100.0,50.0,800.0
+2022-10-31,Yam,Kagio,Kirinyaga,70.0,50.0,600.0
+2022-11-07,Yam,Kagio,Kirinyaga,70.0,40.0,250.0
+2022-11-10,Yam,Kagio,Kirinyaga,60.0,30.0,600.0
+2022-11-14,Yam,Kagio,Kirinyaga,60.0,30.0,600.0
+2022-11-21,Yam,Kagio,Kirinyaga,100.0,50.0,2400.0
+2022-11-21,Yam,Kagio,Kirinyaga,100.0,50.0,2400.0
+2022-12-05,Yam,Kagio,Kirinyaga,120.0,60.0,800.0
+2023-01-12,Yam,Kagio,Kirinyaga,80.0,50.0,500.0
+2023-01-16,Yam,Kagio,Kirinyaga,140.0,70.0,500.0
+2023-01-23,Yam,Kagio,Kirinyaga,150.0,70.0,500.0
+2023-01-26,Yam,Kagio,Kirinyaga,100.0,60.0,500.0
+2023-02-27,Yam,Kagio,Kirinyaga,140.0,80.0,600.0
+2023-06-29,Yam,Kagio,Kirinyaga,150.0,100.0,400.0
+2023-07-13,Yam,Kagio,Kirinyaga,150.0,100.0,0.0
+2023-08-25,Yam,Kagio,Kirinyaga,150.0,100.0,300.0
+2023-09-04,Yam,Kagio,Kirinyaga,150.0,100.0,300.0
+2023-10-05,Yam,Kagio,Kirinyaga,160.0,100.0,250.0
+2023-10-12,Yam,Kagio,Kirinyaga,160.0,100.0,0.0
+2023-11-02,Yam,Kagio,Kirinyaga,160.0,100.0,750.0
+2023-11-23,Yam,Kagio,Kirinyaga,150.0,100.0,1200.0
+2023-11-27,Yam,Kagio,Kirinyaga,160.0,100.0,750.0
+2023-12-07,Yam,Kagio,Kirinyaga,160.0,100.0,550.0
+2023-12-11,Yam,Kagio,Kirinyaga,160.0,100.0,350.0
+2023-12-18,Yam,Kagio,Kirinyaga,160.0,100.0,200.0
+2023-12-25,Yam,Kagio,Kirinyaga,160.0,100.0,200.0
+2024-01-18,Yam,Kagio,Kirinyaga,160.0,100.0,300.0
+2024-01-22,Yam,Kagio,Kirinyaga,160.0,100.0,350.0
+2024-02-08,Yam,Kagio,Kirinyaga,160.0,100.0,400.0
+2024-02-22,Yam,Kagio,Kirinyaga,160.0,100.0,500.0
+2024-03-11,Yam,Kagio,Kirinyaga,160.0,100.0,400.0
+2024-03-21,Yam,Kagio,Kirinyaga,160.0,100.0,300.0
+2024-04-08,Yam,Kagio,Kirinyaga,160.0,100.0,400.0
+2024-04-11,Yam,Kagio,Kirinyaga,160.0,100.0,350.0
+2024-04-18,Yam,Kagio,Kirinyaga,160.0,100.0,400.0
+2024-05-02,Yam,Kagio,Kirinyaga,160.0,100.0,200.0
+2024-07-04,Yam,Kagio,Kirinyaga,160.0,100.0,150.0
+2024-07-08,Yam,Kagio,Kirinyaga,160.0,100.0,200.0
+2024-07-11,Yam,Kagio,Kirinyaga,160.0,120.0,200.0
+2024-08-15,Yam,Kagio,Kirinyaga,160.0,100.0,350.0
+2024-08-23,Yam,Kagio,Kirinyaga,160.0,100.0,350.0
+2024-08-30,Yam,Kagio,Kirinyaga,140.0,80.0,250.0
+2024-09-10,Yam,Kagio,Kirinyaga,150.0,100.0,300.0
+2024-09-19,Yam,Kagio,Kirinyaga,160.0,120.0,300.0
+2024-10-08,Yam,Kagio,Kirinyaga,150.0,100.0,300.0
+2025-05-16,Yam,Kagio,Kirinyaga,160.0,120.0,150.0
+2025-05-23,Yam,Kagio,Kirinyaga,160.0,120.0,200.0
+2025-05-26,Yam,Kagio,Kirinyaga,170.0,120.0,250.0
+2025-06-03,Yam,Kagio,Kirinyaga,160.0,100.0,250.0
+2025-09-09,Yam,Kagio,Kirinyaga,150.0,120.0,200.0
+2022-09-06,Yam,Kagunduini,Muranga,150.0,100.0,500.0
+2023-01-27,Yam,Kagunduini,Muranga,150.0,100.0,0.0
+2023-01-31,Yam,Kagunduini,Muranga,150.0,100.0,0.0
+2021-05-24,Yam,Kajiado Market,Kajiado,116.67,80.0,58800.0
+2021-05-24,Yam,Kajiado Market,Kajiado,80.0,60.0,50.0
+2021-05-24,Yam,Kajiado Market,Kajiado,4.0,50.0,20.0
+2021-05-24,Yam,Kajiado Market,Kajiado,80.0,50.0,20.0
+2021-05-24,Yam,Kajiado Market,Kajiado,100.0,85.0,400.0
+2021-05-24,Yam,Kamukuywa,Bungoma,90.0,75.0,300.0
+2023-07-10,Yam,Kangemi Market,Nairobi,160.0,120.0,0.0
+2023-10-11,Yam,Kapsabet Market,Nandi,60.0,68.0,700.0
+2021-05-24,Yam,Karatina,Nyeri,70.0,70.0,0.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,70.0,0.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,70.0,80.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,70.0,150.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,90.0,120.0
+2021-05-24,Yam,Karatina,Nyeri,70.0,90.0,100.0
+2021-05-24,Yam,Karatina,Nyeri,70.0,60.0,0.0
+2021-05-24,Yam,Karatina,Nyeri,90.0,60.0,0.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,60.0,60.0
+2021-05-24,Yam,Karatina,Nyeri,100.0,80.0,60.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,60.0,100.0
+2021-05-24,Yam,Karatina,Nyeri,70.0,50.0,155.0
+2021-05-24,Yam,Karatina,Nyeri,100.0,60.0,150.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,70.0,100.0
+2021-05-24,Yam,Karatina,Nyeri,200.0,70.0,0.0
+2021-05-24,Yam,Karatina,Nyeri,80.0,70.0,150.0
+2021-06-17,Yam,Karatina,Nyeri,80.0,80.0,0.0
+2021-06-24,Yam,Karatina,Nyeri,100.0,80.0,0.0
+2021-07-06,Yam,Karatina,Nyeri,100.0,80.0,80.0
+2021-07-15,Yam,Karatina,Nyeri,100.0,80.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-07-20,Yam,Karatina,Nyeri,90.0,70.0,100.0
+2021-08-24,Yam,Karatina,Nyeri,100.0,70.0,20.0
+2021-09-07,Yam,Karatina,Nyeri,80.0,70.0,100.0
+2021-10-05,Yam,Karatina,Nyeri,85.0,80.0,70.0
+2021-10-12,Yam,Karatina,Nyeri,100.0,80.0,70.0
+2021-10-14,Yam,Karatina,Nyeri,100.0,80.0,50.0
+2021-10-26,Yam,Karatina,Nyeri,80.0,70.0,0.0
+2021-11-02,Yam,Karatina,Nyeri,80.0,70.0,100.0
+2021-11-09,Yam,Karatina,Nyeri,100.0,80.0,40.0
+2021-11-16,Yam,Karatina,Nyeri,100.0,80.0,150.0
+2021-11-30,Yam,Karatina,Nyeri,100.0,70.0,40.0
+2021-12-16,Yam,Karatina,Nyeri,100.0,80.0,35.0
+2022-01-04,Yam,Karatina,Nyeri,100.0,80.0,25.0
+2022-01-25,Yam,Karatina,Nyeri,100.0,80.0,100.0
+2022-02-15,Yam,Karatina,Nyeri,80.0,70.0,50.0
+2022-02-24,Yam,Karatina,Nyeri,80.0,60.0,150.0
+2022-03-15,Yam,Karatina,Nyeri,70.0,50.0,180.0
+2022-03-22,Yam,Karatina,Nyeri,100.0,80.0,50.0
+2022-04-12,Yam,Karatina,Nyeri,90.0,70.0,105.0
+2022-05-17,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2022-05-31,Yam,Karatina,Nyeri,110.0,80.0,60.0
+2022-05-31,Yam,Karatina,Nyeri,110.0,80.0,60.0
+2022-06-21,Yam,Karatina,Nyeri,100.0,80.0,50.0
+2022-07-26,Yam,Karatina,Nyeri,80.0,60.0,70.0
+2022-08-18,Yam,Karatina,Nyeri,80.0,60.0,55.0
+2022-08-25,Yam,Karatina,Nyeri,90.0,60.0,125.0
+2022-09-06,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2022-10-04,Yam,Karatina,Nyeri,100.0,80.0,30.0
+2022-12-29,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2022-12-29,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2023-01-05,Yam,Karatina,Nyeri,80.0,60.0,30.0
+2023-01-17,Yam,Karatina,Nyeri,100.0,80.0,30.0
+2023-01-31,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2023-04-13,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2023-05-18,Yam,Karatina,Nyeri,90.0,70.0,80.0
+2023-05-23,Yam,Karatina,Nyeri,100.0,80.0,20.0
+2023-05-30,Yam,Karatina,Nyeri,100.0,80.0,30.0
+2023-06-20,Yam,Karatina,Nyeri,120.0,80.0,100.0
+2023-08-01,Yam,Karatina,Nyeri,100.0,70.0,90.0
+2023-08-15,Yam,Karatina,Nyeri,100.0,80.0,60.0
+2023-10-31,Yam,Karatina,Nyeri,150.0,80.0,0.0
+2024-03-19,Yam,Karatina,Nyeri,100.0,80.0,35.0
+2024-04-09,Yam,Karatina,Nyeri,100.0,85.0,50.0
+2021-05-24,Yam,Kibiok,Nandi,60.0,40.0,300.0
+2021-05-24,Yam,Kibiok,Nandi,80.0,50.0,700.0
+2021-05-24,Yam,Kibiok,Nandi,70.0,50.0,300.0
+2021-05-24,Yam,Kibiok,Nandi,80.0,50.0,500.0
+2021-05-30,Yam,Kibiok,Nandi,70.0,50.0,300.0
+2022-04-07,Yam,Kimilili town,Bungoma,100.0,80.0,130.0
+2022-09-08,Yam,Kimilili town,Bungoma,200.0,130.0,70.0
+2022-09-15,Yam,Kimilili town,Bungoma,100.0,80.0,100.0
+2022-12-16,Yam,Kimilili town,Bungoma,90.0,50.0,120.0
+2022-12-16,Yam,Kimilili town,Bungoma,180.0,100.0,120.0
+2022-12-22,Yam,Kimilili town,Bungoma,75.0,50.0,150.0
+2023-05-14,Yam,Kiminini - Kitale,Trans-Nzoia,100.0,70.0,200.0
+2021-11-05,Yam,Kimumu,Uasin-Gishu,100.0,80.0,150.0
+2021-12-03,Yam,Kimumu,Uasin-Gishu,150.0,100.0,150.0
+2022-02-11,Yam,Kimumu,Uasin-Gishu,150.0,60.0,200.0
+2022-03-04,Yam,Kimumu,Uasin-Gishu,100.0,80.0,250.0
+2022-05-08,Yam,Kimumu,Uasin-Gishu,100.0,90.0,450.0
+2022-07-01,Yam,Kimumu,Uasin-Gishu,100.0,80.0,450.0
+2022-09-23,Yam,Kimumu,Uasin-Gishu,100.0,80.0,590.0
+2022-10-21,Yam,Kimumu,Uasin-Gishu,100.0,80.0,250.0
+2022-10-28,Yam,Kimumu,Uasin-Gishu,150.0,100.0,600.0
+2022-12-03,Yam,Kimumu,Uasin-Gishu,100.0,80.0,700.0
+2022-12-09,Yam,Kimumu,Uasin-Gishu,100.0,80.0,450.0
+2023-01-28,Yam,Kimumu,Uasin-Gishu,100.0,90.0,900.0
+2023-02-10,Yam,Kimumu,Uasin-Gishu,100.0,80.0,300.0
+2023-02-14,Yam,Kimumu,Uasin-Gishu,100.0,80.0,600.0
+2023-02-15,Yam,Kimumu,Uasin-Gishu,100.0,80.0,150.0
+2024-06-04,Yam,Kimumu - Bahati,Uasin-Gishu,120.0,100.0,420.0
+2024-06-05,Yam,Kimumu - Bahati,Uasin-Gishu,100.0,70.0,700.0
+2024-06-18,Yam,Kimumu - Bahati,Uasin-Gishu,120.0,80.0,530.0
+2025-06-26,Yam,Kipkaren,Kakamega,80.0,50.0,500.0
+2021-06-24,Yam,Kiria-ini Market,Muranga,150.0,50.0,500.0
+2021-09-20,Yam,Kiritiri,Embu,100.0,70.0,600.0
+2021-09-23,Yam,Kiritiri,Embu,100.0,50.0,300.0
+2021-09-27,Yam,Kiritiri,Embu,90.0,50.0,150.0
+2021-10-04,Yam,Kiritiri,Embu,100.0,60.0,60.0
+2021-10-14,Yam,Kiritiri,Embu,100.0,60.0,1500.0
+2021-10-18,Yam,Kiritiri,Embu,100.0,70.0,250.0
+2021-10-25,Yam,Kiritiri,Embu,100.0,70.0,850.0
+2021-10-28,Yam,Kiritiri,Embu,100.0,70.0,380.0
+2021-11-01,Yam,Kiritiri,Embu,90.0,70.0,380.0
+2021-11-04,Yam,Kiritiri,Embu,120.0,90.0,200.0
+2021-11-15,Yam,Kiritiri,Embu,90.0,70.0,560.0
+2021-11-22,Yam,Kiritiri,Embu,100.0,70.0,280.0
+2021-11-25,Yam,Kiritiri,Embu,100.0,70.0,1500.0
+2021-12-02,Yam,Kiritiri,Embu,100.0,80.0,300.0
+2021-12-09,Yam,Kiritiri,Embu,90.0,80.0,300.0
+2021-12-16,Yam,Kiritiri,Embu,100.0,80.0,1200.0
+2021-12-20,Yam,Kiritiri,Embu,90.0,60.0,380.0
+2021-12-23,Yam,Kiritiri,Embu,90.0,70.0,430.0
+2022-01-06,Yam,Kiritiri,Embu,100.0,70.0,630.0
+2022-01-10,Yam,Kiritiri,Embu,100.0,80.0,450.0
+2022-01-24,Yam,Kiritiri,Embu,90.0,70.0,500.0
+2022-01-27,Yam,Kiritiri,Embu,90.0,80.0,1600.0
+2022-01-31,Yam,Kiritiri,Embu,100.0,80.0,1600.0
+2022-02-07,Yam,Kiritiri,Embu,100.0,80.0,780.0
+2022-02-14,Yam,Kiritiri,Embu,90.0,60.0,400.0
+2022-02-17,Yam,Kiritiri,Embu,90.0,70.0,1300.0
+2022-02-21,Yam,Kiritiri,Embu,100.0,80.0,1300.0
+2022-02-28,Yam,Kiritiri,Embu,100.0,70.0,1600.0
+2022-03-03,Yam,Kiritiri,Embu,120.0,100.0,900.0
+2022-03-07,Yam,Kiritiri,Embu,100.0,80.0,600.0
+2022-03-10,Yam,Kiritiri,Embu,100.0,70.0,5800.0
+2022-03-14,Yam,Kiritiri,Embu,100.0,70.0,800.0
+2022-03-17,Yam,Kiritiri,Embu,100.0,80.0,1700.0
+2022-03-21,Yam,Kiritiri,Embu,120.0,80.0,1250.0
+2022-03-24,Yam,Kiritiri,Embu,100.0,90.0,2300.0
+2022-03-28,Yam,Kiritiri,Embu,100.0,70.0,2240.0
+2022-03-31,Yam,Kiritiri,Embu,100.0,80.0,1800.0
+2022-04-07,Yam,Kiritiri,Embu,100.0,80.0,2400.0
+2022-04-11,Yam,Kiritiri,Embu,100.0,80.0,1600.0
+2022-04-14,Yam,Kiritiri,Embu,100.0,80.0,800.0
+2022-04-25,Yam,Kiritiri,Embu,120.0,100.0,800.0
+2022-04-28,Yam,Kiritiri,Embu,100.0,80.0,300.0
+2022-05-05,Yam,Kiritiri,Embu,100.0,80.0,1300.0
+2022-05-12,Yam,Kiritiri,Embu,120.0,90.0,700.0
+2022-05-23,Yam,Kiritiri,Embu,100.0,80.0,100.0
+2022-05-25,Yam,Kiritiri,Embu,120.0,100.0,1000.0
+2022-05-30,Yam,Kiritiri,Embu,100.0,80.0,900.0
+2022-06-02,Yam,Kiritiri,Embu,120.0,100.0,2000.0
+2022-06-06,Yam,Kiritiri,Embu,120.0,90.0,600.0
+2022-06-13,Yam,Kiritiri,Embu,130.0,100.0,800.0
+2022-06-20,Yam,Kiritiri,Embu,120.0,90.0,400.0
+2022-06-27,Yam,Kiritiri,Embu,130.0,100.0,1000.0
+2022-07-07,Yam,Kiritiri,Embu,120.0,100.0,1000.0
+2022-07-14,Yam,Kiritiri,Embu,130.0,100.0,800.0
+2022-07-18,Yam,Kiritiri,Embu,140.0,120.0,800.0
+2022-07-21,Yam,Kiritiri,Embu,150.0,120.0,800.0
+2022-07-25,Yam,Kiritiri,Embu,130.0,100.0,1000.0
+2022-07-28,Yam,Kiritiri,Embu,150.0,130.0,1600.0
+2022-08-04,Yam,Kiritiri,Embu,130.0,100.0,1000.0
+2022-08-11,Yam,Kiritiri,Embu,150.0,120.0,800.0
+2022-09-01,Yam,Kiritiri,Embu,140.0,120.0,2200.0
+2022-09-15,Yam,Kiritiri,Embu,130.0,100.0,2400.0
+2022-09-19,Yam,Kiritiri,Embu,150.0,120.0,1800.0
+2022-09-22,Yam,Kiritiri,Embu,140.0,120.0,1600.0
+2022-09-26,Yam,Kiritiri,Embu,140.0,100.0,120.0
+2022-09-29,Yam,Kiritiri,Embu,150.0,120.0,1800.0
+2022-10-13,Yam,Kiritiri,Embu,140.0,120.0,1500.0
+2022-10-17,Yam,Kiritiri,Embu,160.0,140.0,1700.0
+2022-10-24,Yam,Kiritiri,Embu,160.0,140.0,1900.0
+2022-10-24,Yam,Kiritiri,Embu,160.0,140.0,1900.0
+2022-10-27,Yam,Kiritiri,Embu,150.0,130.0,1600.0
+2022-11-03,Yam,Kiritiri,Embu,150.0,120.0,1800.0
+2022-11-10,Yam,Kiritiri,Embu,140.0,120.0,1600.0
+2022-11-14,Yam,Kiritiri,Embu,150.0,120.0,1700.0
+2022-11-17,Yam,Kiritiri,Embu,140.0,100.0,600.0
+2022-12-08,Yam,Kiritiri,Embu,130.0,100.0,1200.0
+2022-12-08,Yam,Kiritiri,Embu,140.0,100.0,1400.0
+2022-12-19,Yam,Kiritiri,Embu,140.0,100.0,900.0
+2022-12-22,Yam,Kiritiri,Embu,140.0,120.0,200.0
+2023-01-02,Yam,Kiritiri,Embu,130.0,100.0,1100.0
+2023-01-12,Yam,Kiritiri,Embu,160.0,140.0,600.0
+2023-01-16,Yam,Kiritiri,Embu,150.0,120.0,700.0
+2023-02-27,Yam,Kiritiri,Embu,140.0,120.0,300.0
+2023-03-02,Yam,Kiritiri,Embu,160.0,120.0,1020.0
+2023-03-09,Yam,Kiritiri,Embu,160.0,140.0,1800.0
+2023-05-11,Yam,Kiritiri,Embu,160.0,140.0,800.0
+2022-09-23,Yam,Kirwara Market,Muranga,166.67,70.0,0.0
+2021-10-14,Yam,Kiserian crops market,Kajiado,100.0,70.0,400.0
+2022-07-21,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,70.0,600.0
+2023-06-13,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,90.0,200.0
+2023-06-22,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2023-08-18,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-05-16,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,200.0
+2025-05-21,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,100.0
+2025-05-22,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-05-26,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-05-29,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-06-05,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-06-10,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,100.0
+2025-06-12,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-06-19,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-06-26,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-06-30,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-03,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-08,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-10,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,200.0
+2025-07-15,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-17,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-24,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,200.0
+2025-07-25,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,100.0
+2025-07-28,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-07-29,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,90.0,100.0
+2025-07-31,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,200.0
+2025-07-31,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,200.0
+2025-08-12,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,70.0,100.0
+2025-08-14,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-08-19,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,100.0
+2025-08-21,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-08-28,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-02,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,70.0,200.0
+2025-09-03,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,100.0
+2025-09-04,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-05,Yam,Kitale Municipality Market,Trans-Nzoia,120.0,80.0,100.0
+2025-09-08,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-09,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-10,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-15,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2025-09-16,Yam,Kitale Municipality Market,Trans-Nzoia,100.0,80.0,200.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,300.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,150.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,300.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,300.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,400.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,300.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,300.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,400.0
+2021-05-24,Yam,Kitengela,Kajiado,100.0,85.0,1000.0
+2022-02-21,Yam,Kutus,Kirinyaga,65.04,48.78,190.0
+2022-04-11,Yam,Kutus,Kirinyaga,82.58,66.06,160.0
+2022-04-14,Yam,Kutus,Kirinyaga,122.14,76.34,130.0
+2022-04-21,Yam,Kutus,Kirinyaga,82.16,58.69,140.0
+2022-04-28,Yam,Kutus,Kirinyaga,97.56,65.04,75.0
+2022-04-28,Yam,Kutus,Kirinyaga,97.56,65.04,75.0
+2022-04-28,Yam,Kutus,Kirinyaga,97.56,65.04,75.0
+2022-05-02,Yam,Kutus,Kirinyaga,81.3,65.04,150.0
+2022-05-09,Yam,Kutus,Kirinyaga,140.35,93.57,120.0
+2022-06-09,Yam,Kutus,Kirinyaga,106.06,75.76,120.0
+2022-06-13,Yam,Kutus,Kirinyaga,107.44,74.38,180.0
+2022-06-16,Yam,Kutus,Kirinyaga,93.75,72.92,180.0
+2022-06-20,Yam,Kutus,Kirinyaga,124.89,71.36,138.0
+2022-08-04,Yam,Kutus,Kirinyaga,106.24,79.68,180.0
+2022-08-29,Yam,Kutus,Kirinyaga,48.48,42.42,180.0
+2022-09-08,Yam,Kutus,Kirinyaga,147.06,117.65,180.0
+2023-03-17,Yam,Lodwar Fresh Produce,Turkana,128.0,112.0,120.0
+2023-03-31,Yam,Lodwar Fresh Produce,Turkana,124.0,90.0,300.0
+2023-04-12,Yam,Lodwar Fresh Produce,Turkana,88.0,68.0,300.0
+2023-04-12,Yam,Lodwar Fresh Produce,Turkana,88.0,68.0,300.0
+2021-05-24,Yam,Mabera,Migori,200.0,77.78,180.0
+2021-05-24,Yam,Mabera,Migori,200.0,100.0,500.0
+2021-05-24,Yam,Mabera,Migori,100.0,61.11,2700.0
+2021-05-24,Yam,Mabera,Migori,100.0,140.0,300.0
+2021-05-24,Yam,Mabera,Migori,100.0,160.0,100.0
+2021-05-24,Yam,Mabera,Migori,400.0,160.0,180.0
+2021-05-24,Yam,Mabera,Migori,200.0,140.0,300.0
+2025-05-21,Yam,Makutano Embu,Embu,220.0,120.0,0.0
+2025-08-06,Yam,Makutano Embu,Embu,100.0,80.0,0.0
+2025-08-20,Yam,Makutano Embu,Embu,100.0,70.0,0.0
+2025-08-06,Yam,Makutano Kirinyaga,Kirinyaga,100.0,80.0,90.0
+2025-08-20,Yam,Makutano Kirinyaga,Kirinyaga,100.0,70.0,200.0
+2025-09-13,Yam,Makutano Kirinyaga,Kirinyaga,166.67,116.67,90.0
+2022-06-16,Yam,Marikiti,Mombasa,200.0,60.0,0.0
+2022-07-22,Yam,Marikiti,Mombasa,250.0,60.0,0.0
+2022-08-31,Yam,Marikiti,Mombasa,200.0,60.0,0.0
+2022-09-20,Yam,Marikiti,Mombasa,200.0,60.0,0.0
+2022-11-21,Yam,Marikiti,Mombasa,300.0,60.0,0.0
+2021-05-24,Yam,Maua,Meru,100.0,60.0,1400.0
+2023-08-22,Yam,Maua,Meru,70.0,60.0,1200.0
+2023-08-31,Yam,Maua,Meru,70.0,60.0,1200.0
+2023-09-14,Yam,Maua,Meru,70.0,60.0,1200.0
+2023-09-19,Yam,Maua,Meru,80.0,60.0,1200.0
+2023-09-26,Yam,Maua,Meru,70.0,60.0,1000.0
+2023-10-03,Yam,Maua,Meru,70.0,60.0,1400.0
+2023-10-31,Yam,Maua,Meru,100.0,70.0,1000.0
+2023-11-16,Yam,Maua,Meru,70.0,60.0,1000.0
+2023-12-07,Yam,Maua,Meru,70.0,64.0,1000.0
+2023-12-14,Yam,Maua,Meru,70.0,60.0,800.0
+2024-01-16,Yam,Maua,Meru,70.0,60.0,1500.0
+2024-01-23,Yam,Maua,Meru,70.0,60.0,1400.0
+2024-01-30,Yam,Maua,Meru,70.0,60.0,1400.0
+2024-02-08,Yam,Maua,Meru,70.0,60.0,1500.0
+2024-02-29,Yam,Maua,Meru,70.0,54.0,2000.0
+2024-03-12,Yam,Maua,Meru,80.0,64.0,1000.0
+2024-03-19,Yam,Maua,Meru,70.0,60.0,1500.0
+2024-04-09,Yam,Maua,Meru,70.0,60.0,1400.0
+2024-07-26,Yam,Maua,Meru,200.0,130.0,750.0
+2024-09-03,Yam,Maua,Meru,150.0,110.0,1200.0
+2024-09-10,Yam,Maua,Meru,200.0,130.0,900.0
+2024-09-18,Yam,Maua,Meru,200.0,130.0,1250.0
+2024-09-26,Yam,Maua,Meru,200.0,130.0,1250.0
+2024-10-08,Yam,Maua,Meru,200.0,130.0,800.0
+2025-05-23,Yam,Maua,Meru,180.0,120.0,1250.0
+2025-06-03,Yam,Maua,Meru,160.0,120.0,750.0
+2025-06-10,Yam,Maua,Meru,180.0,120.0,1250.0
+2025-06-10,Yam,Maua,Meru,180.0,120.0,1250.0
+2025-07-15,Yam,Maua,Meru,160.0,120.0,750.0
+2023-07-08,Yam,Mbale,Vihiga,146.63,160.0,350.0
+2022-06-28,Yam,Mogotio,Baringo,200.0,160.0,250.0
+2022-07-12,Yam,Mogotio,Baringo,71.43,30.0,150.0
+2021-09-15,Yam,Mowlem Market,Trans-Nzoia,100.0,55.0,100.0
+2022-08-06,Yam,Mpeketoni,Lamu,120.0,100.0,200.0
+2021-09-15,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-09-18,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-09-22,Yam,Mukuyu Market,Muranga,100.0,40.0,0.0
+2021-09-25,Yam,Mukuyu Market,Muranga,150.0,60.0,0.0
+2021-10-02,Yam,Mukuyu Market,Muranga,150.0,60.0,0.0
+2021-10-06,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-10-09,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-10-13,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-10-16,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2021-10-23,Yam,Mukuyu Market,Muranga,150.0,70.0,0.0
+2022-07-27,Yam,Mukuyu Market,Muranga,1203.0,70.0,0.0
+2022-08-03,Yam,Mukuyu Market,Muranga,150.0,80.0,0.0
+2022-08-31,Yam,Mukuyu Market,Muranga,130.0,80.0,0.0
+2022-09-07,Yam,Mukuyu Market,Muranga,200.0,100.0,0.0
+2022-09-14,Yam,Mukuyu Market,Muranga,150.0,100.0,0.0
+2022-10-05,Yam,Mukuyu Market,Muranga,200.0,100.0,0.0
+2023-07-27,Yam,Mukuyu Market,Muranga,250.0,100.0,0.0
+2024-09-18,Yam,Mukuyu Market,Muranga,100.0,100.0,0.0
+2021-09-27,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-10-01,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-10-06,Yam,Nairobi Wakulima,Nairobi,50.0,100.0,0.0
+2021-10-13,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-10-15,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-10-18,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-10-27,Yam,Nairobi Wakulima,Nairobi,80.0,100.0,0.0
+2021-10-29,Yam,Nairobi Wakulima,Nairobi,80.0,100.0,0.0
+2021-11-10,Yam,Nairobi Wakulima,Nairobi,80.0,100.0,0.0
+2021-11-12,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-11-15,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-11-17,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-11-24,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-11-26,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-11-29,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-01,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-14,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-22,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-24,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-29,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2021-12-31,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-01-03,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-01-05,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-01-17,Yam,Nairobi Wakulima,Nairobi,80.0,100.0,0.0
+2022-02-07,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-02-11,Yam,Nairobi Wakulima,Nairobi,100.0,100.0,0.0
+2022-02-14,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-02-16,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-02-21,Yam,Nairobi Wakulima,Nairobi,70.0,100.0,0.0
+2022-02-23,Yam,Nairobi Wakulima,Nairobi,85.0,100.0,0.0
+2022-03-11,Yam,Nairobi Wakulima,Nairobi,80.0,100.0,0.0
+2022-10-14,Yam,Nairobi Wakulima,Nairobi,100.0,100.0,0.0
+2023-07-05,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-07-10,Yam,Nairobi Wakulima,Nairobi,170.0,150.0,0.0
+2023-07-14,Yam,Nairobi Wakulima,Nairobi,150.0,100.0,0.0
+2023-07-18,Yam,Nairobi Wakulima,Nairobi,150.0,100.0,0.0
+2023-07-21,Yam,Nairobi Wakulima,Nairobi,100.0,50.0,1000.0
+2023-08-01,Yam,Nairobi Wakulima,Nairobi,150.0,100.0,0.0
+2023-08-02,Yam,Nairobi Wakulima,Nairobi,250.0,150.0,0.0
+2023-08-07,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-08,Yam,Nairobi Wakulima,Nairobi,250.0,150.0,0.0
+2023-08-09,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-14,Yam,Nairobi Wakulima,Nairobi,100.0,70.0,0.0
+2023-08-15,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-16,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-21,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-22,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-23,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-24,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-28,Yam,Nairobi Wakulima,Nairobi,200.0,150.0,0.0
+2023-08-29,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-08-30,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-08-31,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-09-04,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-09-05,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-09-06,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-11-06,Yam,Nairobi Wakulima,Nairobi,100.0,80.0,0.0
+2023-11-08,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-11-09,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2023-11-10,Yam,Nairobi Wakulima,Nairobi,160.0,140.0,0.0
+2023-11-14,Yam,Nairobi Wakulima,Nairobi,170.0,140.0,0.0
+2023-11-15,Yam,Nairobi Wakulima,Nairobi,160.0,130.0,0.0
+2023-11-16,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2023-11-17,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2023-11-20,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2023-11-21,Yam,Nairobi Wakulima,Nairobi,150.0,130.0,0.0
+2023-11-22,Yam,Nairobi Wakulima,Nairobi,130.0,100.0,0.0
+2023-11-23,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-11-28,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-12-06,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2023-12-14,Yam,Nairobi Wakulima,Nairobi,120.0,100.0,0.0
+2023-12-20,Yam,Nairobi Wakulima,Nairobi,150.0,120.0,0.0
+2024-01-09,Yam,Nairobi Wakulima,Nairobi,160.0,140.0,0.0
+2024-01-17,Yam,Nairobi Wakulima,Nairobi,160.0,140.0,0.0
+2024-01-23,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2024-01-26,Yam,Nairobi Wakulima,Nairobi,180.0,150.0,0.0
+2024-01-30,Yam,Nairobi Wakulima,Nairobi,170.0,150.0,0.0
+2024-02-05,Yam,Nairobi Wakulima,Nairobi,160.0,140.0,0.0
+2024-02-09,Yam,Nairobi Wakulima,Nairobi,170.0,150.0,0.0
+2024-02-16,Yam,Nairobi Wakulima,Nairobi,140.0,120.0,0.0
+2024-02-22,Yam,Nairobi Wakulima,Nairobi,160.0,140.0,0.0
+2024-02-26,Yam,Nairobi Wakulima,Nairobi,170.0,150.0,0.0
+2025-05-22,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2025-05-27,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2025-05-29,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2025-06-05,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2025-06-10,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2025-06-16,Yam,Nairobi Wakulima,Nairobi,100.0,60.0,0.0
+2021-09-10,Yam,Naivasha Market,Nakuru,100.0,80.0,1850.0
+2021-09-14,Yam,Naivasha Market,Nakuru,100.0,80.0,500.0
+2021-09-17,Yam,Naivasha Market,Nakuru,100.0,90.0,100.0
+2021-10-05,Yam,Naivasha Market,Nakuru,100.0,90.0,50.0
+2021-10-15,Yam,Naivasha Market,Nakuru,100.0,90.0,150.0
+2021-12-07,Yam,Naivasha Market,Nakuru,100.0,90.0,400.0
+2021-12-14,Yam,Naivasha Market,Nakuru,100.0,90.0,150.0
+2022-02-18,Yam,Naivasha Market,Nakuru,110.0,100.0,400.0
+2022-03-22,Yam,Naivasha Market,Nakuru,230.0,200.0,200.0
+2022-03-29,Yam,Naivasha Market,Nakuru,220.0,200.0,200.0
+2022-04-12,Yam,Naivasha Market,Nakuru,240.0,200.0,200.0
+2022-04-22,Yam,Naivasha Market,Nakuru,220.0,200.0,200.0
+2022-07-01,Yam,Naivasha Market,Nakuru,200.0,180.0,0.0
+2022-07-15,Yam,Naivasha Market,Nakuru,200.0,180.0,0.0
+2022-12-02,Yam,Naivasha Market,Nakuru,50.0,40.0,0.0
+2022-12-13,Yam,Naivasha Market,Nakuru,200.0,180.0,0.0
+2022-12-20,Yam,Naivasha Market,Nakuru,200.0,180.0,0.0
+2023-02-24,Yam,Naivasha Market,Nakuru,160.0,140.0,0.0
+2023-03-01,Yam,Naivasha Market,Nakuru,160.0,120.0,0.0
+2023-08-24,Yam,Naivasha Market,Nakuru,120.0,100.0,0.0
+2021-10-13,Yam,Nakuru Top Market,Nakuru,100.0,40.0,100.0
+2023-11-03,Yam,Nakuru Top Market,Nakuru,100.0,150.0,0.0
+2023-11-06,Yam,Nakuru Top Market,Nakuru,100.0,150.0,0.0
+2021-09-15,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,500.0
+2021-10-16,Yam,Nanyuki Open Air Market,Laikipia,200.0,150.0,250.0
+2021-10-20,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,300.0
+2021-10-23,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,200.0
+2021-10-27,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,200.0
+2021-10-30,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,200.0
+2021-11-06,Yam,Nanyuki Open Air Market,Laikipia,300.0,200.0,200.0
+2021-11-10,Yam,Nanyuki Open Air Market,Laikipia,200.0,150.0,200.0
+2021-11-13,Yam,Nanyuki Open Air Market,Laikipia,150.0,100.0,200.0
+2021-11-17,Yam,Nanyuki Open Air Market,Laikipia,200.0,150.0,200.0
+2021-12-04,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,500.0
+2021-12-11,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,1000.0
+2022-05-25,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,700.0
+2022-06-04,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,500.0
+2022-06-22,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,500.0
+2022-06-29,Yam,Nanyuki Open Air Market,Laikipia,300.0,200.0,500.0
+2022-07-09,Yam,Nanyuki Open Air Market,Laikipia,300.0,250.0,300.0
+2022-07-16,Yam,Nanyuki Open Air Market,Laikipia,300.0,250.0,500.0
+2022-09-10,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,400.0
+2022-09-24,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,400.0
+2022-10-08,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,400.0
+2022-11-19,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,500.0
+2023-03-18,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,300.0
+2023-03-29,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,400.0
+2023-04-12,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,300.0
+2023-05-13,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,500.0
+2023-06-21,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,300.0
+2023-07-19,Yam,Nanyuki Open Air Market,Laikipia,250.0,150.0,1000.0
+2023-08-02,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,500.0
+2023-08-02,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,500.0
+2023-08-26,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,300.0
+2023-09-02,Yam,Nanyuki Open Air Market,Laikipia,300.0,150.0,500.0
+2021-09-07,Yam,Nkubu,Meru,100.0,30.0,1000.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,150.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,150.0,80.0,200.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,150.0,80.0,250.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,150.0,80.0,50.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,150.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,120.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,200.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,100.0,70.0,100.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,100.0
+2021-05-24,Yam,Nyahururu Municipal Market,Laikipia,120.0,80.0,100.0
+2021-06-14,Yam,Nyahururu Municipal Market,Laikipia,150.0,100.0,100.0
+2021-08-27,Yam,Nyahururu Municipal Market,Laikipia,130.0,80.0,350.0
+2021-09-08,Yam,Nyahururu Municipal Market,Laikipia,400.0,22.22,180.0
+2021-09-15,Yam,Nyahururu Municipal Market,Laikipia,127.27,35.71,80.0
+2021-09-23,Yam,Nyahururu Municipal Market,Laikipia,214.29,144.93,60.0
+2021-09-28,Yam,Nyahururu Municipal Market,Laikipia,237.23,136.99,40.0
+2021-10-16,Yam,Nyahururu Municipal Market,Laikipia,306.75,181.82,40.0
+2021-11-09,Yam,Nyahururu Municipal Market,Laikipia,421.35,161.29,50.0
+2021-05-24,Yam,Nyeri open air,Nyeri,200.0,250.0,180.0
+2021-05-24,Yam,Nyeri open air,Nyeri,200.0,150.0,200.0
+2021-07-14,Yam,Nyeri open air,Nyeri,120.0,100.0,80.0
+2021-07-23,Yam,Nyeri open air,Nyeri,150.0,200.0,200.0
+2021-07-30,Yam,Nyeri open air,Nyeri,200.0,100.0,50.0
+2021-09-08,Yam,Nyeri open air,Nyeri,200.0,100.0,100.0
+2022-03-02,Yam,Nyeri open air,Nyeri,180.0,130.0,150.0
+2023-12-18,Yam,Othaya,Nyeri,100.0,70.0,100.0
+2021-09-17,Yam,Oyugis,Homa-bay,50.0,85.71,140.0
+2021-10-01,Yam,Oyugis,Homa-bay,50.0,85.71,420.0
+2021-10-15,Yam,Oyugis,Homa-bay,50.0,78.57,840.0
+2021-05-24,Yam,Rongo,Migori,50.0,41.67,480.0
+2022-09-08,Yam,Rumuruti Food Crops Market,Laikipia,425.35,6.61,300.0
+2025-09-10,Yam,Sabatia,Kakamega,111.11,100.0,20.0
+2022-02-05,Yam,Samburu,Kwale,150.0,100.0,100.0
+2022-02-12,Yam,Samburu,Kwale,150.0,100.0,200.0
+2022-02-26,Yam,Samburu,Kwale,150.0,100.0,200.0
+2022-03-05,Yam,Samburu,Kwale,150.0,100.0,200.0
+2022-03-12,Yam,Samburu,Kwale,150.0,100.0,300.0
+2021-05-24,Yam,Serem - Nandi,Nandi,150.0,55.56,0.0
+2021-05-24,Yam,Serem - Nandi,Nandi,150.0,25.0,100.0
+2021-09-13,Yam,Serem - Nandi,Nandi,50.0,25.0,0.0
+2021-11-10,Yam,Serem - Nandi,Nandi,75.0,60.0,1200.0
+2021-08-20,Yam,Siakago,Embu,100.0,55.56,350.0
+2021-09-17,Yam,Siakago,Embu,100.0,80.0,30.0
+2021-10-01,Yam,Siakago,Embu,120.0,100.0,30.0
+2021-10-08,Yam,Siakago,Embu,100.0,100.0,25.0
+2021-10-22,Yam,Siakago,Embu,120.0,100.0,60.0
+2021-10-29,Yam,Siakago,Embu,100.0,50.0,50.0
+2021-11-12,Yam,Siakago,Embu,100.0,50.0,20.0
+2021-12-10,Yam,Siakago,Embu,120.0,50.0,50.0
+2021-12-17,Yam,Siakago,Embu,100.0,50.0,30.0
+2022-01-07,Yam,Siakago,Embu,100.0,100.0,50.0
+2022-02-11,Yam,Siakago,Embu,120.0,100.0,50.0
+2022-02-18,Yam,Siakago,Embu,100.0,100.0,20.0
+2022-03-18,Yam,Siakago,Embu,100.0,100.0,25.0
+2022-03-25,Yam,Siakago,Embu,100.0,100.0,40.0
+2022-04-01,Yam,Siakago,Embu,100.0,100.0,50.0
+2022-04-22,Yam,Siakago,Embu,100.0,100.0,40.0
+2021-05-24,Yam,Siaya,Siaya,125.0,100.0,0.0
+2021-05-24,Yam,Siaya,Siaya,125.0,100.0,0.0
+2021-05-24,Yam,Tseikuru,Kitui,90.0,58.33,2000.0
+2021-05-24,Yam,Tseikuru,Kitui,62.5,50.0,1000.0
+2021-05-24,Yam,Tseikuru,Kitui,54.17,50.0,1000.0
+2021-05-24,Yam,Tseikuru,Kitui,58.33,50.0,1500.0
+2021-05-24,Yam,Tseikuru,Kitui,100.0,66.67,2000.0
+2022-06-01,Yam,Voi Livestock,Taita-Taveta,60.0,150.0,200.0
+2022-06-21,Yam,test market,0,200.0,150.0,30.0
+2022-06-21,Yam,test market,0,200.0,150.0,30.0
