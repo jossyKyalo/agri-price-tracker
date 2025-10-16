@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PriceService, CropPrice, CreatePriceEntry } from '../../services/price.service';
 import { CropService, Crop, Region } from '../../services/crop.service';
+import { ApiService } from '../../services/api.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-public-portal',
@@ -18,12 +21,12 @@ export class PublicPortalComponent implements OnInit {
   selectedRegion = '';
   isLoading = false;
   errorMessage = '';
-  
+
   // Stats
   totalCrops = 156;
   totalRegions = 47;
   lastUpdated = '2 mins ago';
-  
+
   // Price input form
   priceInput = {
     crop: '',
@@ -32,17 +35,18 @@ export class PublicPortalComponent implements OnInit {
     region: '',
     notes: ''
   };
-  
+
   allCrops: CropPrice[] = [];
   crops: Crop[] = [];
   regions: Region[] = [];
-  
+
   filteredCrops: CropPrice[] = [];
 
   constructor(
     private priceService: PriceService,
-    private cropService: CropService
-  ) {}
+    private cropService: CropService,
+    private apiService: ApiService
+  ) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -50,7 +54,7 @@ export class PublicPortalComponent implements OnInit {
 
   loadInitialData(): void {
     this.isLoading = true;
-    
+
     // Load crops, regions, and prices
     Promise.all([
       this.cropService.getCrops().toPromise(),
@@ -74,7 +78,7 @@ export class PublicPortalComponent implements OnInit {
     this.filteredCrops = this.allCrops.filter(crop => {
       const matchesSearch = crop.crop_name?.toLowerCase().includes(this.searchTerm.toLowerCase());
       const matchesRegion = !this.selectedRegion || crop.region_name?.toLowerCase().includes(this.selectedRegion.toLowerCase());
-      
+
       return matchesSearch && matchesRegion;
     });
   }
@@ -87,7 +91,7 @@ export class PublicPortalComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
- 
+
     const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
     const region = this.regions.find(r => r.name.toLowerCase().includes(this.priceInput.region.toLowerCase()));
 
@@ -108,7 +112,7 @@ export class PublicPortalComponent implements OnInit {
       next: (response) => {
         this.isLoading = false;
         alert('Price submitted successfully! It will be verified by our admin team.');
-        
+
         // Reset form
         this.priceInput = {
           crop: '',
@@ -124,4 +128,33 @@ export class PublicPortalComponent implements OnInit {
       }
     });
   }
+  getPrices(params?: any): Observable<{ prices: CropPrice[] }> {
+    return this.apiService.get<any>('/prices', { params }).pipe(
+      map((response: any) => ({
+        prices: response.data.map((item: any) => ({
+          name: item.crop_name,
+          region: item.region_name,
+          market: item.market_name,
+          currentPrice: item.current_price,
+          previousPrice: item.previous_price,
+          prediction: item.prediction,
+          lastUpdated: item.last_updated
+        }))
+      }))
+    );
+  }
+  getPredictionTrend(current: number, predicted: number): string {
+    if (predicted > current) return 'trend-up text-success';
+    if (predicted < current) return 'trend-down text-danger';
+    return 'trend-stable text-muted';
+  }
+
+  getPredictionChange(current: number, predicted: number): number {
+    return ((predicted - current) / current) * 100;
+  }
+
+  getPriceChange(current: number, previous: number): number {
+    return ((current - previous) / previous) * 100;
+  }
+
 }

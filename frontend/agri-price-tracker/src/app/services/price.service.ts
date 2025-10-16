@@ -18,6 +18,15 @@ export interface CropPrice {
   entry_date: string;
   created_at: string;
   updated_at: string;
+  name: string;
+  category: string;
+  currentPrice: number;
+  previousPrice: number;
+  trend: string;
+  region: string;
+  market: string;
+  lastUpdated: string;
+  prediction?: number;
 }
 
 export interface PriceQueryParams {

@@ -203,12 +203,12 @@
                       </div>
                       <div class="confidence">95% confidence</div>
                     </div>
-                    <div class="prediction-trend" [class]="getPredictionTrend(crop.currentPrice, crop.prediction)">
+                    <div class="prediction-trend" [class]="(crop.currentPrice !== undefined && crop.prediction !== undefined) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
                       <i class="fas" 
-                         [class.fa-arrow-up]="crop.prediction > crop.currentPrice"
-                         [class.fa-arrow-down]="crop.prediction < crop.currentPrice"
-                         [class.fa-minus]="crop.prediction === crop.currentPrice"></i>
-                      {{ getPredictionChange(crop.currentPrice, crop.prediction) }}%
+                         [class.fa-arrow-up]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
+                         [class.fa-arrow-down]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
+                         [class.fa-minus]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
+                      {{ getPredictionChange(crop.currentPrice ?? 0, crop.prediction ?? 0) }}%
                     </div>
                   </div>
                 </div>
