@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { query } from '../database/connection.js';
-import { logger } from '../utils/logger.js';
-import type { PredictionRequest, PredictionResponse } from '../types/index.js';
+import { query } from '../database/connection';
+import { logger } from '../utils/logger';
+import type { PredictionRequest, PredictionResponse } from '../types/index';
 
 export const generatePricePrediction = async (
   cropId: string,

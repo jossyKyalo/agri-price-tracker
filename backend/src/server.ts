@@ -5,24 +5,24 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 
-import { logger } from './utils/logger.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { rateLimiter } from './middleware/rateLimiter.js';
-import { requestLogger } from './middleware/requestLogger.js';
-import { connectDatabase } from './database/connection.js';
-import { startCronJobs } from './services/cronService.js';
+import { logger } from './utils/logger';
+import { errorHandler } from './middleware/errorHandler';
+import { rateLimiter } from './middleware/rateLimiter';
+import { requestLogger } from './middleware/requestLogger';
+import { connectDatabase } from './database/connection';
+import { startCronJobs } from './services/cronService';
 
 // Import routes
-import authRoutes from './routes/auth.js';
-import userRoutes from './routes/users.js';
-import cropRoutes from './routes/crops.js';
-import priceRoutes from './routes/prices.js';
-import adminRoutes from './routes/admin.js';
+import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
+import cropRoutes from './routes/crops';
+import priceRoutes from './routes/prices';
+import adminRoutes from './routes/admin';
 import smsRoutes from './routes/sms.js';
-import chatbotRoutes from './routes/chatbot.js';
-import kamisRoutes from './routes/kamis.js';
+import chatbotRoutes from './routes/chatbot';
+import kamisRoutes from './routes/kamis';
 import mlRoutes from './routes/ml.js';
-import analyticsRoutes from './routes/analytics.js';
+import analyticsRoutes from './routes/analytics';
 
 // Load environment variables
 dotenv.config();

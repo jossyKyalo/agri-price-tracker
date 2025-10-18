@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { query } from '../database/connection.js';
-import { logger } from '../utils/logger.js';
-import type { ChatMessage } from '../types/index.js';
+import { query } from '../database/connection';
+import { logger } from '../utils/logger';
+import type { ChatMessage } from '../types/index';
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');

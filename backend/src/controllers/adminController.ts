@@ -64,10 +64,9 @@ export const getAdminRequests = async (req: Request, res: Response, next: NextFu
       queryParams
     );
 
-    // Get total count
     const countResult = await query(
-      `SELECT COUNT(*) FROM admin_requests ${whereClause}`,
-      status ? [status] : []
+      'SELECT COUNT(*) FROM admin_requests WHERE status = $1',
+      [status]
     );
 
     const total = parseInt(countResult.rows[0].count);
@@ -180,10 +179,10 @@ export const getSystemHealth = async (req: Request, res: Response, next: NextFun
   try {
     // Check database connection
     const dbCheck = await query('SELECT NOW()');
-    
+
     // Check pending SMS
     const pendingSms = await query('SELECT COUNT(*) FROM sms_logs WHERE status = $1', ['pending']);
-    
+
     // Check failed SMS
     const failedSms = await query('SELECT COUNT(*) FROM sms_logs WHERE status = $1', ['failed']);
 

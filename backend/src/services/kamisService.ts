@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { query, transaction } from '../database/connection.js';
-import { logger } from '../utils/logger.js';
+import { query, transaction } from '../database/connection';
+import { logger } from '../utils/logger';
 
 interface KamisPriceData {
   commodity: string;

@@ -157,11 +157,11 @@ export const getSmsTemplates = async (req: Request, res: Response, next: NextFun
 
     const result = await query(
       `SELECT st.*, u.full_name as created_by_name
-       FROM sms_templates st
-       JOIN users u ON st.created_by = u.id
-       WHERE ${conditions.join(' AND ')}
-       ORDER BY st.created_at DESC`,
-      params
+   FROM sms_templates st
+   JOIN users u ON st.created_by = u.id
+   WHERE st.is_active = $1
+   ORDER BY st.created_at DESC`,
+      [true]
     );
 
     const response: ApiResponse<SmsTemplate[]> = {

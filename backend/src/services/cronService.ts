@@ -1,8 +1,8 @@
 import cron from 'node-cron';
-import { logger } from '../utils/logger.js';
-import { sendDailyPriceUpdate } from './smsService.js';
-import { syncKamisData } from './kamisService.js';
-import { generateDailyPredictions } from './mlService.js';
+import { logger } from '../utils/logger';
+import { sendDailyPriceUpdate } from './smsService';
+import { syncKamisData } from './kamisService';
+import { generateDailyPredictions } from './mlService';
 
 export const startCronJobs = (): void => {
   logger.info('Starting cron jobs...');
