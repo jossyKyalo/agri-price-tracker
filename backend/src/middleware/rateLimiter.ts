@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
-import { ApiError } from '../utils/apiError.js';
-import { logger } from '../utils/logger.js';
+import { ApiError } from '../utils/apiError';
+import { logger } from '../utils/logger';
 
 // Create rate limiters for different endpoints
 const rateLimiters = {

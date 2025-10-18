@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validate, schemas } from '../middleware/validation.js';
-import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth.js';
-import { smsRateLimiter } from '../middleware/rateLimiter.js';
+import { validate, schemas } from '../middleware/validation';
+import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
+import { smsRateLimiter } from '../middleware/rateLimiter';
 import {
   sendSms,
   getSmsLogs,
@@ -13,7 +13,7 @@ import {
   getSmsSubscriptions,
   unsubscribeSms,
   getSmsStats
-} from '../controllers/smsController.js';
+} from '../controllers/smsController';
 
 const router = Router();
 

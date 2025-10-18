@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { query, transaction } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import { generateToken, generateRefreshToken } from '../middleware/auth.js';
-import { logger } from '../utils/logger.js';
-import type { User, CreateUserRequest, LoginRequest, AuthResponse, ApiResponse } from '../types/index.js';
+import { query, transaction } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import { generateToken, generateRefreshToken } from '../middleware/auth';
+import { logger } from '../utils/logger';
+import type { User, CreateUserRequest, LoginRequest, AuthResponse, ApiResponse } from '../types/index';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

@@ -517,3 +517,295 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:55:47:5547"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:55:47:5547"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:55:47:5547"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:56:05 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:56:05:565"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:58:12 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:58:12:5812"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:58:17 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:58:17:5817"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:58:34 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:58:34:5834"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:58:42 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:58:42:5842"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:58:50 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:58:50:5850"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:59:05 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:59:05:595"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:59:22 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:59:22:5922"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:59:32 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:59:32:5932"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sat Oct 18 2025 23:59:36 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-18 23:59:36:5936"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRunning KAMIS data sync job\u001b[39m","timestamp":"2025-10-19 00:00:00:00"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 137ms: INSERT INTO kamis_sync_logs (sync_date, status) VALUES (CURRENT_DATE, $1) RETURNING id\u001b[39m","timestamp":"2025-10-19 00:00:00:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting KAMIS data synchronization\u001b[39m","timestamp":"2025-10-19 00:00:00:00"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 83ms: UPDATE kamis_sync_logs \u001b[39m\n\u001b[37m     SET records_processed = $1, records_inserted = $2, records_updated = $3, \u001b[39m\n\u001b[37m         status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP\u001b[39m\n\u001b[37m     WHERE id = $6\u001b[39m","timestamp":"2025-10-19 00:00:04:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:00:38 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:00:38:038"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:00:39:039"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:00:44 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:00:44:044"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:00:53 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:00:53:053"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:01:03 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:01:03:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:01:11 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:01:11:111"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:01:31 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:01:31:131"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:01:35 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:01:35:135"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:01:42 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:01:42:142"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:02:31 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:02:31:231"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:02:43 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:02:43:243"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:03:00 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:03:00:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:03:09 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:03:09:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:03:39 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:03:39:339"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:03:45 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:03:45:345"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:04:58 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:04:58:458"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:05:02 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:05:02:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:05:42 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:05:42:542"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:06:00 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:06:00:60"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:06:08 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:06:08:68"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:06:38 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:06:38:638"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:07:08 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:07:08:78"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Oct 19 2025 00:07:26 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-19 00:07:26:726"}

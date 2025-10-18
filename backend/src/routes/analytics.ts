@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth.js';
-import { query } from '../database/connection.js';
-import type { ApiResponse } from '../types/index.js';
+import { authenticate, requireAdmin } from '../middleware/auth';
+import { query } from '../database/connection';
+import type { ApiResponse } from '../types/index';
 
 const router = Router();
 

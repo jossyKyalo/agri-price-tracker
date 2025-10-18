@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validate, schemas, validateQuery, querySchemas } from '../middleware/validation.js';
-import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth.js';
-import { priceSubmissionRateLimiter } from '../middleware/rateLimiter.js';
+import { validate, schemas, validateQuery, querySchemas } from '../middleware/validation';
+import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
+import { priceSubmissionRateLimiter } from '../middleware/rateLimiter';
 import {
   getPrices,
   createPriceEntry,
@@ -10,7 +10,7 @@ import {
   getPendingVerifications,
   verifyPriceEntry,
   rejectPriceEntry
-} from '../controllers/priceController.js';
+} from '../controllers/priceController';
 
 const router = Router();
 

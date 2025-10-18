@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { validate, schemas } from '../middleware/validation.js';
-import { authenticate, requireAdmin, requireSuperAdmin } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation';
+import { authenticate, requireAdmin, requireSuperAdmin } from '../middleware/auth';
 import {
   createAdminRequest,
   getAdminRequests,

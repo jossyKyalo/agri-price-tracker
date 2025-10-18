@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { validate, schemas } from '../middleware/validation.js';
-import { authenticate, requireAdmin } from '../middleware/auth.js';
-import { query } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import type { ApiResponse } from '../types/index.js';
+import { validate, schemas } from '../middleware/validation';
+import { authenticate, requireAdmin } from '../middleware/auth';
+import { query } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import type { ApiResponse } from '../types/index';
 
 const router = Router();
 

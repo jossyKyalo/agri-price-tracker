@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { query } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import { logger } from '../utils/logger.js';
-import { generateChatResponse } from '../services/geminiService.js';
-import type { ChatRequest, ChatMessage, ChatConversation, ApiResponse } from '../types/index.js';
+import { query } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import { logger } from '../utils/logger';
+import { generateChatResponse } from '../services/geminiService';
+import type { ChatRequest, ChatMessage, ChatConversation, ApiResponse } from '../types/index';
 
 export const sendMessage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

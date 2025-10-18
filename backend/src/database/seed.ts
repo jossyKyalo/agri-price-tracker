@@ -1,5 +1,5 @@
 import { query } from './connection.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger';
 import bcrypt from 'bcryptjs';
 
 export const seedDatabase = async (): Promise<void> => {

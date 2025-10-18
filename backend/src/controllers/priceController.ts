@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { query, transaction } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import { logger } from '../utils/logger.js';
-import type { PriceEntry, CreatePriceEntry, PriceQueryParams, ApiResponse } from '../types/index.js';
+import { query, transaction } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import { logger } from '../utils/logger';
+import type { PriceEntry, CreatePriceEntry, PriceQueryParams, ApiResponse } from '../types/index';
 
 export const getPrices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

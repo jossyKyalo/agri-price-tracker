@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { query, transaction } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import { logger } from '../utils/logger.js';
-import type { AdminRequest, CreateAdminRequest, ApiResponse, PaginationParams } from '../types/index.js';
+import { query, transaction } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import { logger } from '../utils/logger';
+import type { AdminRequest, CreateAdminRequest, ApiResponse, PaginationParams } from '../types/index';
 
 export const createAdminRequest = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

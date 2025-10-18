@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { query, transaction } from '../database/connection.js';
-import { ApiError } from '../utils/apiError.js';
-import { logger } from '../utils/logger.js';
-import { sendSmsMessage, sendBulkSms } from '../services/smsService.js';
-import type { SendSmsRequest, SmsTemplate, SmsLog, SmsSubscription, ApiResponse } from '../types/index.js';
+import { query, transaction } from '../database/connection';
+import { ApiError } from '../utils/apiError';
+import { logger } from '../utils/logger';
+import { sendSmsMessage, sendBulkSms } from '../services/smsService';
+import type { SendSmsRequest, SmsTemplate, SmsLog, SmsSubscription, ApiResponse } from '../types/index';
 
 export const sendSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validate, schemas } from '../middleware/validation.js';
-import { optionalAuth, authenticate, requireAdmin } from '../middleware/auth.js';
-import { chatRateLimiter } from '../middleware/rateLimiter.js';
+import { validate, schemas } from '../middleware/validation';
+import { optionalAuth, authenticate, requireAdmin } from '../middleware/auth';
+import { chatRateLimiter } from '../middleware/rateLimiter';
 import {
   sendMessage,
   getConversation,

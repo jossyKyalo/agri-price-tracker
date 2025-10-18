@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validate, schemas } from '../middleware/validation.js';
-import { authRateLimiter } from '../middleware/rateLimiter.js';
-import { authenticate } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation';
+import { authRateLimiter } from '../middleware/rateLimiter';
+import { authenticate } from '../middleware/auth';
 import {
   register,
   login,

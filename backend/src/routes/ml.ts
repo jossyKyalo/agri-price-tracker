@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth.js';
-import { generatePricePrediction, getPredictions } from '../services/mlService.js';
-import type { ApiResponse } from '../types/index.js';
+import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
+import { generatePricePrediction, getPredictions } from '../services/mlService';
+import type { ApiResponse } from '../types/index';
 
 const router = Router();
 
