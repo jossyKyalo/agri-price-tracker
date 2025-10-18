@@ -93,3 +93,8 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3001/api/v1\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3001/health\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: undefined\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
+{"level":"\u001b[33mwarn\u001b[39m","message":"\u001b[33mSKIP_DB is true - skipping database connection and cron jobs\u001b[39m","timestamp":"2025-10-18 22:58:59:5859"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 36075\u001b[39m","timestamp":"2025-10-18 22:58:59:5859"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:36075/api/v1\u001b[39m","timestamp":"2025-10-18 22:58:59:5859"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:36075/health\u001b[39m","timestamp":"2025-10-18 22:58:59:5859"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: undefined\u001b[39m","timestamp":"2025-10-18 22:58:59:5859"}
