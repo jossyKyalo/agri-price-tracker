@@ -1,0 +1,49 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { query } from './connection.js';
+import { logger } from '../utils/logger.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+export const runMigrations = async () => {
+    try {
+        logger.info('Starting database migrations...');
+        // Read and execute schema.sql
+        const schemaPath = join(__dirname, 'schema.sql');
+        const schema = readFileSync(schemaPath, 'utf8');
+        // Split by semicolon and execute each statement
+        const statements = schema
+            .split(';')
+            .map(stmt => stmt.trim())
+            .filter(stmt => stmt.length > 0);
+        for (const statement of statements) {
+            try {
+                await query(statement);
+            }
+            catch (error) {
+                // Ignore "already exists" errors
+                if (!error.message.includes('already exists')) {
+                    throw error;
+                }
+            }
+        }
+        logger.info('Database migrations completed successfully');
+    }
+    catch (error) {
+        logger.error('Migration failed:', error);
+        throw error;
+    }
+};
+// Run migrations if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    runMigrations()
+        .then(() => {
+        logger.info('Migrations completed');
+        process.exit(0);
+    })
+        .catch((error) => {
+        logger.error('Migration failed:', error);
+        process.exit(1);
+    });
+}
+//# sourceMappingURL=migrate.js.map

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { ApiError } from '../utils/apiError';
+import { ApiError } from '../utils/apiError.js';
 
 // Generic validation middleware
 export const validate = (schema: Joi.ObjectSchema) => {

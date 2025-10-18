@@ -5,14 +5,24 @@ import type { SmsLog } from '../types/index.js';
 import dotenv from "dotenv";
 dotenv.config();
 
+// Lazily initialize Africa's Talking client to avoid startup crashes when not configured
+let lazySmsClient: ReturnType<typeof africastalking>["SMS"] | null = null;
 
-// Initialize Africa's Talking
-const at = africastalking({
-  apiKey: process.env.AFRICASTALKING_API_KEY as string,
-  username: process.env.AFRICASTALKING_USERNAME as string,
-});
+const getSmsClient = (): ReturnType<typeof africastalking>["SMS"] | null => {
+  if (lazySmsClient) return lazySmsClient;
 
-const sms = at.SMS;
+  const apiKey = process.env.AFRICASTALKING_API_KEY;
+  const username = process.env.AFRICASTALKING_USERNAME;
+
+  if (!apiKey || !username) {
+    logger.warn('Africa\'s Talking not configured; SMS sending is disabled');
+    return null;
+  }
+
+  const at = africastalking({ apiKey, username });
+  lazySmsClient = at.SMS;
+  return lazySmsClient;
+};
 
 /**
  * Send a single SMS
@@ -24,18 +34,29 @@ export const sendSmsMessage = async (
   sentBy?: string
 ): Promise<SmsLog> => {
   try {
-    // Send SMS via Africa's Talking
-    const response = await sms.send({
-      to: [recipient],
-      message,
-      from: process.env.AFRICASTALKING_SHORTCODE || '',  
-    });
+    const smsClient = getSmsClient();
+    let status = 'pending';
+    let messageId: string | null = null;
+
+    if (smsClient) {
+      // Send SMS via Africa's Talking
+      const response = await smsClient.send({
+        to: [recipient],
+        message,
+        from: process.env.AFRICASTALKING_SHORTCODE || '',  
+      });
+
+      const smsData: any = response.Recipients ?? response; // SDK shape can vary
+      status = smsData.status ?? 'sent';
+      messageId = smsData.messageId ?? smsData[0]?.messageId ?? null;
+    } else {
+      // When not configured, simulate send for non-production to avoid crashes
+      status = process.env.NODE_ENV === 'production' ? 'failed' : 'simulated';
+      messageId = null;
+      logger.info(`SMS simulated to ${recipient}: ${message}`);
+    }
 
  
-    const smsData = response.Recipients;
-    const status = smsData.status;
-    const messageId = smsData.messageId;
-
     // Log SMS in database
     const result = await query(
       `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, sent_at)

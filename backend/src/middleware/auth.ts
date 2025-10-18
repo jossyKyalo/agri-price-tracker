@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { query } from '../database/connection';
-import { ApiError } from '../utils/apiError';
-import { logger } from '../utils/logger';
-import type { User } from '../types/index';
+import { query } from '../database/connection.js';
+import { ApiError } from '../utils/apiError.js';
+import { logger } from '../utils/logger.js';
+import type { User } from '../types/index.js';
  
 declare global {
   namespace Express {

@@ -83,3 +83,13 @@
 {"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 727ms: SELECT id, email, password_hash, full_name, phone, role, region, organization, \u001b[39m\n\u001b[37m              is_active, email_verified, last_login, created_at, updated_at\u001b[39m\n\u001b[37m       FROM users WHERE email = $1\u001b[39m","timestamp":"2025-10-18 22:54:23:5423"}
 {"ip":"::1","level":"\u001b[33mwarn\u001b[39m","message":"\u001b[33mPOST /api/v1/auth/login - 401 - Invalid credentials\u001b[39m","timestamp":"2025-10-18 22:54:23:5423"}
 {"duration":"749ms","ip":"::1","level":"\u001b[35mhttp\u001b[39m","message":"\u001b[35mPOST /api/v1/auth/login - 401\u001b[39m","statusCode":401,"timestamp":"2025-10-18 22:54:23:5423"}
+{"level":"\u001b[33mwarn\u001b[39m","message":"\u001b[33mSKIP_DB is true - skipping database connection and cron jobs\u001b[39m","timestamp":"2025-10-18 20:57:20:5720"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-18 20:57:20:5720"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-18 20:57:20:5720"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-18 20:57:20:5720"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: undefined\u001b[39m","timestamp":"2025-10-18 20:57:20:5720"}
+{"level":"\u001b[33mwarn\u001b[39m","message":"\u001b[33mSKIP_DB is true - skipping database connection and cron jobs\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3001\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3001/api/v1\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3001/health\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: undefined\u001b[39m","timestamp":"2025-10-18 21:58:03:583"}

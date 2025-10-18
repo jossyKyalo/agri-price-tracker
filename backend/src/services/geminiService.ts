@@ -3,9 +3,19 @@ import { query } from '../database/connection.js';
 import { logger } from '../utils/logger.js';
 import type { ChatMessage } from '../types/index.js';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+// Lazily initialize Gemini AI to avoid startup failures when not configured
+let lazyModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = null;
+
+const getModel = () => {
+  if (lazyModel) return lazyModel;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  lazyModel = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  return lazyModel;
+};
 
 export const generateChatResponse = async (
   userMessage: string,
@@ -77,9 +87,15 @@ Now, as AgriBot, respond helpfully using the Kenyan context and available data.
 `;
 
 
-    const result = await model.generateContent(systemPrompt);
-    const response = result.response;
-    const text = response.text();
+    const model = getModel();
+    if (!model) {
+      logger.warn('Gemini API key not configured; returning fallback response');
+      return generateFallbackResponse(userMessage);
+    }
+
+    const result = await model.generateContent(systemPrompt as any);
+    const response: any = result.response;
+    const text = response.text?.() ?? String(response);
 
     logger.info('Gemini AI response generated successfully');
     return text;

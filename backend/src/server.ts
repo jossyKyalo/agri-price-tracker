@@ -117,13 +117,17 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Start server
 const startServer = async () => {
   try {
-    // Connect to database
-    await connectDatabase();
-    logger.info('Database connected successfully');
+    // Optionally skip DB connection for local/frontend-only runs
+    if (process.env.SKIP_DB === 'true') {
+      logger.warn('SKIP_DB is true - skipping database connection and cron jobs');
+    } else {
+      await connectDatabase();
+      logger.info('Database connected successfully');
 
-    // Start cron jobs
-    startCronJobs();
-    logger.info('Cron jobs started');
+      // Start cron jobs
+      startCronJobs();
+      logger.info('Cron jobs started');
+    }
 
     // Start HTTP server
     server.listen(PORT, () => {
