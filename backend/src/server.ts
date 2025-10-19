@@ -23,6 +23,7 @@ import chatbotRoutes from './routes/chatbot';
 import kamisRoutes from './routes/kamis';
 import mlRoutes from './routes/ml.js';
 import analyticsRoutes from './routes/analytics';
+import regionRoutes from './routes/region';
 
 // Load environment variables
 dotenv.config();
@@ -79,6 +80,7 @@ app.use(`/api/${API_VERSION}/chatbot`, chatbotRoutes);
 app.use(`/api/${API_VERSION}/kamis`, kamisRoutes);
 app.use(`/api/${API_VERSION}/ml`, mlRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
+app.use(`/api/${API_VERSION}/regions`, regionRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
