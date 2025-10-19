@@ -21,6 +21,7 @@ import chatbotRoutes from './routes/chatbot.js';
 import kamisRoutes from './routes/kamis.js';
 import mlRoutes from './routes/ml.js';
 import analyticsRoutes from './routes/analytics.js';
+import regionRoutes from './routes/regions.js';
 // Load environment variables
 dotenv.config();
 const app = express();
@@ -67,6 +68,7 @@ app.use(`/api/${API_VERSION}/chatbot`, chatbotRoutes);
 app.use(`/api/${API_VERSION}/kamis`, kamisRoutes);
 app.use(`/api/${API_VERSION}/ml`, mlRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
+app.use(`/api/${API_VERSION}/regions`, regionRoutes);
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({
