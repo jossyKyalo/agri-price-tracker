@@ -1,346 +1,197 @@
-  <div class="public-portal-container">
-      <div class="container">
-        <div class="portal-header">
-          <h1><i class="fas fa-chart-line"></i> Farmer Portal</h1>
-          <p class="text-muted">Real-time crop prices, AI predictions, and price input for farmers</p>
+<div class="public-portal-container">
+  <div class="container">
+    <div class="portal-header">
+      <h1><i class="fas fa-chart-line"></i> Farmer Portal</h1>
+      <p class="text-muted">Real-time crop prices, AI predictions, and price input for farmers</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-seedling" style="color: var(--success);"></i>
         </div>
-
-        <!-- Quick Stats -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-seedling" style="color: var(--success);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ totalCrops }}</h3>
-              <p>Crops Tracked</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-map-marker-alt" style="color: var(--info);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ totalRegions }}</h3>
-              <p>Regions Covered</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-clock" style="color: var(--warning);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ lastUpdated }}</h3>
-              <p>Last Update</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-brain" style="color: var(--secondary-green);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>95%</h3>
-              <p>AI Accuracy</p>
-            </div>
-          </div>
+        <div class="stat-info">
+          <h3>{{ totalCrops }}</h3>
+          <p>Crops Tracked</p>
         </div>
+      </div>
 
-        <!-- Main Content Tabs -->
-        <div class="portal-tabs">
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'prices'"
-            (click)="activeTab = 'prices'">
-            <i class="fas fa-chart-bar"></i>
-            Current Prices
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'predictions'"
-            (click)="activeTab = 'predictions'">
-            <i class="fas fa-brain"></i>
-            AI Predictions
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'input'"
-            (click)="activeTab = 'input'">
-            <i class="fas fa-plus-circle"></i>
-            Input Prices
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'sms'"
-            (click)="activeTab = 'sms'">
-            <i class="fas fa-sms"></i>
-            SMS Alerts
-          </button>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-map-marker-alt" style="color: var(--info);"></i>
         </div>
+        <div class="stat-info">
+          <h3>{{ totalRegions }}</h3>
+          <p>Regions Covered</p>
+        </div>
+      </div>
 
-        <!-- Current Prices Tab -->
-        <div *ngIf="activeTab === 'prices'" class="tab-content">
-          <!-- Search and Filters -->
-          <div class="card mb-3">
-            <div class="card-body">
-              <div class="search-filters">
-                <div class="search-group">
-                  <label class="form-label">Search Crop</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Search for crops..."
-                    [(ngModel)]="searchTerm"
-                    (input)="filterCrops()">
-                </div>
-                
-                <div class="filter-group">
-                  <label class="form-label">Category</label>
-                  <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterCrops()">
-                    <option value="">All Categories</option>
-                    <option value="cereals">Cereals</option>
-                    <option value="vegetables">Vegetables</option>
-                    <option value="fruits">Fruits</option>
-                    <option value="legumes">Legumes</option>
-                  </select>
-                </div>
-                
-                <div class="filter-group">
-                  <label class="form-label">Region</label>
-                  <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
-                    <option value="">All Regions</option>
-                    <option value="central">Central Kenya</option>
-                    <option value="western">Western Kenya</option>
-                    <option value="eastern">Eastern Kenya</option>
-                    <option value="rift-valley">Rift Valley</option>
-                    <option value="coast">Coast</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-clock" style="color: var(--warning);"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ lastUpdated }}</h3>
+          <p>Last Update</p>
+        </div>
+      </div>
 
-          <!-- Price Table -->
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-table"></i> Current Market Prices</h3>
-              <span class="data-source">Data from KAMIS Platform & Farmers</span>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-brain" style="color: var(--secondary-green);"></i>
+        </div>
+        <div class="stat-info">
+          <h3>95%</h3>
+          <p>AI Accuracy</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Tabs -->
+    <div class="portal-tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'prices'" (click)="activeTab = 'prices'">
+        <i class="fas fa-chart-bar"></i>
+        Current Prices
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'predictions'" (click)="activeTab = 'predictions'">
+        <i class="fas fa-brain"></i>
+        AI Predictions
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'input'" (click)="activeTab = 'input'">
+        <i class="fas fa-plus-circle"></i>
+        Input Prices
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
+        <i class="fas fa-sms"></i>
+        SMS Alerts
+      </button>
+    </div>
+
+    <!-- Current Prices Tab -->
+    <div *ngIf="activeTab === 'prices'" class="tab-content">
+      <!-- Search and Filters -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="search-filters">
+            <div class="search-group">
+              <label class="form-label">Search Crop</label>
+              <input type="text" class="form-control" placeholder="Search for crops..." [(ngModel)]="searchTerm"
+                (input)="filterCrops()">
             </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="price-table">
-                  <thead>
-                    <tr>
-                      <th>Crop</th>
-                      <th>Category</th>
-                      <th>Current Price</th>
-                      <th>Trend</th>
-                      <th>Region</th>
-                      <th>Market</th>
-                      <th>Last Updated</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let crop of filteredCrops">
-                      <td>
-                        <div class="crop-cell">
-                          <strong>{{ crop.name }}</strong>
-                        </div>
-                      </td>
-                      <td>
-                        <span class="badge badge-info">{{ crop.category }}</span>
-                      </td>
-                      <td>
-                        <div class="price-cell">
-                          <strong>KSh {{ crop.currentPrice }}/kg</strong>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="trend-cell" [class]="crop.trend">
-                          <i class="fas" 
-                             [class.fa-arrow-up]="crop.trend === 'up'"
-                             [class.fa-arrow-down]="crop.trend === 'down'"
-                             [class.fa-minus]="crop.trend === 'stable'"></i>
-                          <span *ngIf="crop.trend !== 'stable'">
-                            {{ getPriceChange(crop.currentPrice, crop.previousPrice) }}%
-                          </span>
-                        </div>
-                      </td>
-                      <td>{{ crop.region }}</td>
-                      <td>{{ crop.market }}</td>
-                      <td>
-                        <small class="text-muted">{{ crop.lastUpdated }}</small>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+
+            <div class="filter-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterCrops()">
+                <option value="">All Categories</option>
+                <option value="cereals">Cereals</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="fruits">Fruits</option>
+                <option value="legumes">Legumes</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="form-label">Region</label>
+              <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
+                <option value="">All Regions</option>
+                <option value="central">Central Kenya</option>
+                <option value="western">Western Kenya</option>
+                <option value="eastern">Eastern Kenya</option>
+                <option value="rift-valley">Rift Valley</option>
+                <option value="coast">Coast</option>
+              </select>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- AI Predictions Tab -->
-        <div *ngIf="activeTab === 'predictions'" class="tab-content">
-          <div class="predictions-grid">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-brain"></i> 7-Day Price Predictions</h3>
-                <span class="badge badge-info">Powered by Machine Learning</span>
-              </div>
-              <div class="card-body">
-                <div class="prediction-list">
-                  <div *ngFor="let crop of filteredCrops" class="prediction-item">
-                    <div class="prediction-info">
-                      <div class="crop-name">{{ crop.name }}</div>
-                      <div class="current-price">Current: KSh {{ crop.currentPrice }}/kg</div>
+      <!-- Price Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-table"></i> Current Market Prices</h3>
+          <span class="data-source">Data from KAMIS Platform & Farmers</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="price-table">
+              <thead>
+                <tr>
+                  <th>Crop</th>
+                  <th>Category</th>
+                  <th>Current Price</th>
+                  <th>Trend</th>
+                  <th>Region</th>
+                  <th>Market</th>
+                  <th>Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let crop of filteredCrops">
+                  <td>
+                    <div class="crop-cell">
+                      <strong>{{ crop.name }}</strong>
                     </div>
-                    <div class="prediction-data">
-                      <div class="predicted-price">
-                        <strong>KSh {{ crop.prediction }}/kg</strong>
-                        <small>7-day prediction</small>
-                      </div>
-                      <div class="confidence">95% confidence</div>
+                  </td>
+                  <td>
+                    <span class="badge badge-info">{{ crop.category }}</span>
+                  </td>
+                  <td>
+                    <div class="price-cell">
+                      <strong>KSh {{ crop.currentPrice }}/kg</strong>
                     </div>
-                    <div class="prediction-trend" [class]="(crop.currentPrice !== undefined && crop.prediction !== undefined) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
-                      <i class="fas" 
-                         [class.fa-arrow-up]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
-                         [class.fa-arrow-down]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
-                         [class.fa-minus]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
-                      {{ getPredictionChange(crop.currentPrice, crop.prediction ?? 0) }}%
+                  </td>
+                  <td>
+                    <div class="trend-cell" [class]="crop.trend">
+                      <i class="fas" [class.fa-arrow-up]="crop.trend === 'up'"
+                        [class.fa-arrow-down]="crop.trend === 'down'" [class.fa-minus]="crop.trend === 'stable'"></i>
+                      <span *ngIf="crop.trend !== 'stable'">
+                        {{ getPriceChange(crop.currentPrice, crop.previousPrice) }}%
+                      </span>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </td>
+                  <td>{{ crop.region }}</td>
+                  <td>{{ crop.market }}</td>
+                  <td>
+                    <small class="text-muted">{{ crop.lastUpdated }}</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Price Input Tab -->
-        <div *ngIf="activeTab === 'input'" class="tab-content">
-          <div class="input-grid">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-plus-circle"></i> Submit Local Prices</h3>
-              </div>
-              <div class="card-body">
-                <form (ngSubmit)="submitPrice()" #priceForm="ngForm">
-                  <div class="form-group">
-                    <label class="form-label">Crop</label>
-                    <select class="form-select" [(ngModel)]="priceInput.crop" name="crop" required>
-                      <option value="">Select Crop</option>
-                      <option value="maize">Maize</option>
-                      <option value="beans">Beans</option>
-                      <option value="tomatoes">Tomatoes</option>
-                      <option value="potatoes">Potatoes</option>
-                      <option value="onions">Onions</option>
-                      <option value="bananas">Bananas</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Price (KSh/kg)</label>
-                    <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" required>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Your Location</label>
-                    <input type="text" class="form-control" [(ngModel)]="priceInput.location" name="location" 
-                           placeholder="e.g., Nakuru Market" required>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Region</label>
-                    <select class="form-select" [(ngModel)]="priceInput.region" name="region" required>
-                      <option value="">Select Region</option>
-                      <option value="central">Central Kenya</option>
-                      <option value="western">Western Kenya</option>
-                      <option value="eastern">Eastern Kenya</option>
-                      <option value="rift-valley">Rift Valley</option>
-                      <option value="coast">Coast</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Additional Notes (Optional)</label>
-                    <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes"
-                              placeholder="Quality, quantity, market conditions, etc."></textarea>
-                  </div>
-                  
-                  <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid">
-                    <i class="fas fa-paper-plane"></i>
-                    Submit Price
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-info-circle"></i> Why Submit Prices?</h3>
-              </div>
-              <div class="card-body">
-                <div class="info-list">
-                  <div class="info-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Help other farmers get accurate local pricing</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Improve AI prediction accuracy</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>All submissions are verified by admins</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="fas fa-users"></i>
-                    <span>Build a stronger farming community</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <!-- AI Predictions Tab -->
+    <div *ngIf="activeTab === 'predictions'" class="tab-content">
+      <div class="predictions-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-brain"></i> 7-Day Price Predictions</h3>
+            <span class="badge badge-info">Powered by Machine Learning</span>
           </div>
-        </div>
-
-        <!-- SMS Alerts Tab -->
-        <div *ngIf="activeTab === 'sms'" class="tab-content">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
-            </div>
-            <div class="card-body">
-              <div class="sms-subscription">
-                <div class="sms-info">
-                  <h4>Get price alerts on your phone</h4>
-                  <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.</p>
-                  <ul>
-                    <li>Daily price updates</li>
-                    <li>Price spike alerts</li>
-                    <li>Market opportunity notifications</li>
-                    <li>Weather-related price warnings</li>
-                  </ul>
+          <div class="card-body">
+            <div class="prediction-list">
+              <div *ngFor="let crop of filteredCrops" class="prediction-item">
+                <div class="prediction-info">
+                  <div class="crop-name">{{ crop.name }}</div>
+                  <div class="current-price">Current: KSh {{ crop.currentPrice }}/kg</div>
                 </div>
-                <div class="sms-form">
-                  <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" placeholder="+254 700 000 000">
+                <div class="prediction-data">
+                  <div class="predicted-price">
+                    <strong>KSh {{ crop.prediction }}/kg</strong>
+                    <small>7-day prediction</small>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label">Select Crops (max 5)</label>
-                    <div class="crop-checkboxes">
-                      <label><input type="checkbox"> Maize</label>
-                      <label><input type="checkbox"> Beans</label>
-                      <label><input type="checkbox"> Tomatoes</label>
-                      <label><input type="checkbox"> Potatoes</label>
-                      <label><input type="checkbox"> Onions</label>
-                    </div>
-                  </div>
-                  <button class="btn btn-primary">
-                    <i class="fas fa-bell"></i>
-                    Subscribe to SMS Alerts
-                  </button>
+                  <div class="confidence">95% confidence</div>
+                </div>
+                <div class="prediction-trend"
+                  [class]="(crop.currentPrice !== undefined && crop.prediction !== undefined) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
+                  <i class="fas"
+                    [class.fa-arrow-up]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
+                    [class.fa-arrow-down]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
+                    [class.fa-minus]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
+                  {{ getPredictionChange(crop.currentPrice, crop.prediction ?? 0) }}%
                 </div>
               </div>
             </div>
@@ -348,3 +199,145 @@
         </div>
       </div>
     </div>
+
+    <!-- Price Input Tab -->
+    <div *ngIf="activeTab === 'input'" class="tab-content">
+      <div class="input-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-plus-circle"></i> Submit Local Prices</h3>
+          </div>
+          <div class="card-body">
+            <form (ngSubmit)="submitPrice()" #priceForm="ngForm">
+              <div class="form-group">
+                <label class="form-label">Crop</label>
+                <select class="form-select" [(ngModel)]="priceInput.crop" name="crop" required>
+                  <option value="">Select Crop</option>
+                  <option *ngFor="let crop of crops" [value]="crop.name">{{ crop.name }}</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Price (KSh/kg)</label>
+                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0"
+                  step="0.01" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Your Location</label>
+                <input type="text" class="form-control" [(ngModel)]="priceInput.location" name="location"
+                  placeholder="e.g., Nakuru Market">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Region</label>
+                <select class="form-select" [(ngModel)]="priceInput.region" name="region" required>
+                  <option value="">Select Region</option>
+                  <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Additional Notes (Optional)</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes"
+                  placeholder="Quality, quantity, market conditions, etc."></textarea>
+              </div>
+
+              <!-- Error message display -->
+              <div *ngIf="errorMessage" class="alert alert-danger">
+                {{ errorMessage }}
+              </div>
+
+              <!-- Debug info -->
+              <div class="alert alert-info mb-3">
+                <small>
+                  Form Valid: {{ priceForm.valid }}<br>
+                  Crop: {{ priceInput.crop || 'empty' }}<br>
+                  Price: {{ priceInput.price || 'empty' }}<br>
+                  Region: {{ priceInput.region || 'empty' }}<br>
+                  Loading: {{ isLoading }}
+                </small>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
+                <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
+                  [class.fa-spin]="isLoading"></i>
+                {{ isLoading ? 'Submitting...' : 'Submit Price' }}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-info-circle"></i> Why Submit Prices?</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-list">
+              <div class="info-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Help other farmers get accurate local pricing</span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Improve AI prediction accuracy</span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>All submissions are verified by admins</span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-users"></i>
+                <span>Build a stronger farming community</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS Alerts Tab -->
+    <div *ngIf="activeTab === 'sms'" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
+        </div>
+        <div class="card-body">
+          <div class="sms-subscription">
+            <div class="sms-info">
+              <h4>Get price alerts on your phone</h4>
+              <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.
+              </p>
+              <ul>
+                <li>Daily price updates</li>
+                <li>Price spike alerts</li>
+                <li>Market opportunity notifications</li>
+                <li>Weather-related price warnings</li>
+              </ul>
+            </div>
+            <div class="sms-form">
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" placeholder="+254 700 000 000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Select Crops (max 5)</label>
+                <div class="crop-checkboxes">
+                  <label><input type="checkbox"> Maize</label>
+                  <label><input type="checkbox"> Beans</label>
+                  <label><input type="checkbox"> Tomatoes</label>
+                  <label><input type="checkbox"> Potatoes</label>
+                  <label><input type="checkbox"> Onions</label>
+                </div>
+              </div>
+              <button class="btn btn-primary">
+                <i class="fas fa-bell"></i>
+                Subscribe to SMS Alerts
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

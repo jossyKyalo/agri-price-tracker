@@ -82,10 +82,39 @@ export class PublicPortalComponent implements OnInit {
       return matchesSearch && matchesRegion;
     });
   }
+   loadCrops() {
+    this.cropService.getCrops().subscribe({
+      next: (response: any) => {
+        this.crops = response.data || response;
+        console.log('Crops loaded:', this.crops);  
+      },
+      error: (error) => {
+        console.error('Error loading crops:', error);
+        this.errorMessage = 'Failed to load crops';
+      }
+    });
+  }
+
+  loadRegions() {
+    this.cropService.getRegions().subscribe({
+      next: (response: any) => {
+        this.regions = response.data || response;
+        console.log('Regions loaded:', this.regions);  
+      },
+      error: (error) => {
+        console.error('Error loading regions:', error);
+        this.errorMessage = 'Failed to load regions';
+      }
+    });
+  }
 
   submitPrice() {
+    console.log('Submit button clicked!');
+    console.log('Form data:', this.priceInput);
+
     if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
       this.errorMessage = 'Please fill in all required fields';
+      console.log('Validation failed'); 
       return;
     }
 
@@ -123,6 +152,7 @@ export class PublicPortalComponent implements OnInit {
         };
       },
       error: (error) => {
+        console.error('Error submitting price:', error); 
         this.isLoading = false;
         this.errorMessage = error.userMessage || 'Failed to submit price. Please try again.';
       }
