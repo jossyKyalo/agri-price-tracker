@@ -1,9 +1,12 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import path from 'path';
 import Papa from 'papaparse';
 import pool from '../database/connection';
 
-const DATA_FILE = path.join(__dirname, '../data/kamis-prices.csv');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_FILE = path.join(__dirname, '../ml-model-service/data/raw/kamis_data.csv');
 
 interface KamisRecord {
   Commodity: string;
@@ -374,7 +377,7 @@ const importKamisData = async () => {
     console.log(`  Retail prices: ${retailCount}`);
     console.log(`  Skipped: ${skipped}`);
  
-    console.log('\n✅ KAMIS data import completed successfully!');
+    console.log('\n KAMIS data import completed successfully!');
     console.log('═══════════════════════════════════════════');
     
     const stats = await Promise.all([
