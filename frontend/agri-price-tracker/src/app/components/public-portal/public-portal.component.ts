@@ -6,6 +6,8 @@ import { CropService, Crop, Region } from '../../services/crop.service';
 import { ApiService } from '../../services/api.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-portal',
@@ -15,6 +17,16 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./public-portal.component.css']
 })
 export class PublicPortalComponent implements OnInit {
+  private baseUrl = environment.apiUrl;
+
+  isLoggedIn = false;
+
+  registration = {
+    name: '',
+    phone: '',
+    region: ''
+  };
+
   activeTab = 'prices';
   searchTerm = '';
   selectedCategory = '';
@@ -43,6 +55,7 @@ export class PublicPortalComponent implements OnInit {
   filteredCrops: CropPrice[] = [];
 
   constructor(
+    private http: HttpClient,
     private priceService: PriceService,
     private cropService: CropService,
     private apiService: ApiService
@@ -50,6 +63,9 @@ export class PublicPortalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadInitialData();
+    this.loadCrops();
+    this.loadRegions();
+    this.checkAuth();
   }
 
   loadInitialData(): void {
@@ -82,11 +98,11 @@ export class PublicPortalComponent implements OnInit {
       return matchesSearch && matchesRegion;
     });
   }
-   loadCrops() {
+  loadCrops() {
     this.cropService.getCrops().subscribe({
       next: (response: any) => {
         this.crops = response.data || response;
-        console.log('Crops loaded:', this.crops);  
+        console.log('Crops loaded:', this.crops);
       },
       error: (error) => {
         console.error('Error loading crops:', error);
@@ -99,11 +115,53 @@ export class PublicPortalComponent implements OnInit {
     this.cropService.getRegions().subscribe({
       next: (response: any) => {
         this.regions = response.data || response;
-        console.log('Regions loaded:', this.regions);  
+        console.log('Regions loaded:', this.regions);
       },
       error: (error) => {
         console.error('Error loading regions:', error);
         this.errorMessage = 'Failed to load regions';
+      }
+    });
+  }
+  checkAuth() {
+    const token = localStorage.getItem('farmer_token');
+    this.isLoggedIn = !!token;
+  }
+  quickRegister() {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.http.post(`${this.baseUrl}/auth/register/farmer`, {
+      full_name: this.registration.name,
+      phone: this.registration.phone,
+      region: this.registration.region || null
+    }).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+
+        // Save token and user info
+        localStorage.setItem('farmer_token', response.data.token);
+        localStorage.setItem('farmer_name', response.data.user.full_name);
+        localStorage.setItem('temp_password', response.data.tempPassword);
+
+        this.isLoggedIn = true;
+
+        // Show password in alert
+        alert(
+          `Registration Successful!\n\n` +
+          `Welcome ${response.data.user.full_name}!\n\n` +
+          `Your temporary password: ${response.data.tempPassword}\n\n` +
+          `⚠️ IMPORTANT: Save this password!\n` +
+          `You'll need it to login next time.\n\n` +
+          `Phone: ${response.data.user.phone}`
+        );
+
+        // Reset form
+        this.registration = { name: '', phone: '', region: '' };
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.error || 'Registration failed. Please try again.';
       }
     });
   }
@@ -114,7 +172,7 @@ export class PublicPortalComponent implements OnInit {
 
     if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
       this.errorMessage = 'Please fill in all required fields';
-      console.log('Validation failed'); 
+      console.log('Validation failed');
       return;
     }
 
@@ -136,6 +194,10 @@ export class PublicPortalComponent implements OnInit {
       price: this.priceInput.price,
       notes: this.priceInput.notes
     };
+    const token = localStorage.getItem('farmer_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
 
     this.priceService.createPriceEntry(priceData).subscribe({
       next: (response) => {
@@ -152,7 +214,7 @@ export class PublicPortalComponent implements OnInit {
         };
       },
       error: (error) => {
-        console.error('Error submitting price:', error); 
+        console.error('Error submitting price:', error);
         this.isLoading = false;
         this.errorMessage = error.userMessage || 'Failed to submit price. Please try again.';
       }

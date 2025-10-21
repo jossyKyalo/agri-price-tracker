@@ -18,7 +18,7 @@ const router = Router();
 router.get('/', optionalAuth, validateQuery(querySchemas.priceQuery), getPrices);
 
 // Authenticated routes
-router.post('/', authenticate, priceSubmissionRateLimiter, validate(schemas.createPriceEntry), createPriceEntry);
+router.post('/',authenticate, priceSubmissionRateLimiter, validate(schemas.createPriceEntry), createPriceEntry);
 
 // Admin routes
 router.get('/pending', authenticate, requireAdmin, getPendingVerifications);
