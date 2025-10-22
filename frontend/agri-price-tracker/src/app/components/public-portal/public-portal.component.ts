@@ -20,11 +20,18 @@ export class PublicPortalComponent implements OnInit {
   private baseUrl = environment.apiUrl;
 
   isLoggedIn = false;
+  showLogin = false;
+  farmerName = '';
 
   registration = {
     name: '',
     phone: '',
     region: ''
+  };
+
+  login = {
+    phone: '',
+    password: ''
   };
 
   activeTab = 'prices';
@@ -125,7 +132,9 @@ export class PublicPortalComponent implements OnInit {
   }
   checkAuth() {
     const token = localStorage.getItem('farmer_token');
+    const name = localStorage.getItem('farmer_name');
     this.isLoggedIn = !!token;
+    this.farmerName = name || '';
   }
   quickRegister() {
     this.isLoading = true;
@@ -145,7 +154,7 @@ export class PublicPortalComponent implements OnInit {
         localStorage.setItem('temp_password', response.data.tempPassword);
 
         this.isLoggedIn = true;
-
+        this.farmerName = response.data.user.full_name;
         // Show password in alert
         alert(
           `Registration Successful!\n\n` +
@@ -165,7 +174,42 @@ export class PublicPortalComponent implements OnInit {
       }
     });
   }
+  farmerLogin() {
+    this.isLoading = true;
+    this.errorMessage = '';
 
+    this.http.post(`${this.baseUrl}/auth/login/farmer`, {
+      phone: this.login.phone,
+      password: this.login.password
+    }).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+
+        localStorage.setItem('farmer_token', response.data.token);
+        localStorage.setItem('farmer_name', response.data.user.full_name);
+
+        this.isLoggedIn = true;
+        this.farmerName = response.data.user.full_name;
+
+        alert(`✅ Welcome back, ${response.data.user.full_name}!`);
+
+        this.login = { phone: '', password: '' };
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
+      }
+    });
+  }
+  logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('farmer_token');
+      localStorage.removeItem('farmer_name');
+      this.isLoggedIn = false;
+      this.farmerName = '';
+      alert('✅ You have been logged out successfully');
+    }
+  }
   submitPrice() {
     console.log('Submit button clicked!');
     console.log('Form data:', this.priceInput);
