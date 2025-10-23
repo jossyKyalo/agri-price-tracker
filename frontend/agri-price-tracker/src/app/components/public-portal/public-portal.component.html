@@ -268,8 +268,15 @@
 
               <div class="form-group">
                 <label class="form-label">Password *</label>
-                <input type="password" class="form-control" [(ngModel)]="login.password" name="loginPassword"
-                  placeholder="Enter your password" required>
+                <div class="password-input-wrapper">
+                  <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="login.password" name="loginPassword"
+                    placeholder="Enter your password" required>
+                  <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                    <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                  </button>
+                </div>
+                <small class="text-muted">Click the eye icon to show/hide password</small>
               </div>
               <div *ngIf="errorMessage" class="alert alert-danger">
                 <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}

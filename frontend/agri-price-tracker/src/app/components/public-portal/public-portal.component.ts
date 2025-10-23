@@ -22,6 +22,7 @@ export class PublicPortalComponent implements OnInit {
   isLoggedIn = false;
   showLogin = false;
   farmerName = '';
+  showPassword = false;
 
   registration = {
     name: '',
