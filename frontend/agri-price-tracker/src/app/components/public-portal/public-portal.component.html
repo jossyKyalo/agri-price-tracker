@@ -356,17 +356,6 @@
                 {{ errorMessage }}
               </div>
 
-              <!-- Debug info -->
-              <div class="alert alert-info mb-3">
-                <small>
-                  Form Valid: {{ priceForm.valid }}<br>
-                  Crop: {{ priceInput.crop || 'empty' }}<br>
-                  Price: {{ priceInput.price || 'empty' }}<br>
-                  Region: {{ priceInput.region || 'empty' }}<br>
-                  Loading: {{ isLoading }}
-                </small>
-              </div>
-
               <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
                 <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
                   [class.fa-spin]="isLoading"></i>
