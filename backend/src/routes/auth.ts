@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { validate, schemas } from '../middleware/validation';
 import { authRateLimiter } from '../middleware/rateLimiter';
 import { authenticate } from '../middleware/auth';
