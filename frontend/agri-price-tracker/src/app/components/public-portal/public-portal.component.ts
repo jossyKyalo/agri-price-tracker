@@ -240,13 +240,14 @@ export class PublicPortalComponent implements OnInit {
     };
     const token = localStorage.getItem('farmer_token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
 
-    this.priceService.createPriceEntry(priceData).subscribe({
+     this.http.post(`${this.baseUrl}/prices/submit`, priceData, { headers }).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert('Price submitted successfully! It will be verified by our admin team.');
+        alert('✅ Price submitted successfully! It will be verified by our admin team.');
 
         // Reset form
         this.priceInput = {

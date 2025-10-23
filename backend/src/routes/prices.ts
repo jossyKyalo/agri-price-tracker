@@ -17,6 +17,8 @@ const router = Router();
 // Public routes (with optional auth)
 router.get('/', optionalAuth, validateQuery(querySchemas.priceQuery), getPrices);
 
+router.post('/submit', createPriceEntry); 
+
 // Authenticated routes
 router.post('/',authenticate, priceSubmissionRateLimiter, validate(schemas.createPriceEntry), createPriceEntry);
 
