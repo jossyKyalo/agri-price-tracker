@@ -16,6 +16,7 @@ export class AdminLoginComponent {
 
   isLoading = false;
   errorMessage = '';
+  showPassword= false;
 
   loginData = {
     email: '',
