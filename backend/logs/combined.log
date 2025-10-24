@@ -1708,3 +1708,12 @@
 {"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 1046ms: UPDATE chat_conversations \u001b[39m\n\u001b[37m       SET messages = $1, context = $2, updated_at = CURRENT_TIMESTAMP\u001b[39m\n\u001b[37m       WHERE id = $3\u001b[39m","timestamp":"2025-10-24 18:49:04:494"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mChat message processed for session: session_1761320839979_keddxl332\u001b[39m","timestamp":"2025-10-24 18:49:04:494"}
 {"duration":"38051ms","ip":"::1","level":"\u001b[35mhttp\u001b[39m","message":"\u001b[35mPOST /message - 200\u001b[39m","statusCode":200,"timestamp":"2025-10-24 18:49:04:494"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Fri Oct 24 2025 18:50:47 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-10-24 18:50:47:5047"}

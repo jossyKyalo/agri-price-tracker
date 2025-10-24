@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+import { catchError, timeout, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface ApiResponse<T = any> {
@@ -60,6 +60,7 @@ export class ApiService {
       params: httpParams
     }).pipe(
       timeout(this.timeoutMs),
+      retry(1),
       catchError(this.handleError)
     );
   }
@@ -69,6 +70,7 @@ export class ApiService {
       headers: this.getHeaders()
     }).pipe(
       timeout(this.timeoutMs),
+      retry(1),
       catchError(this.handleError)
     );
   }
@@ -78,6 +80,7 @@ export class ApiService {
       headers: this.getHeaders()
     }).pipe(
       timeout(this.timeoutMs),
+      retry(1),
       catchError(this.handleError)
     );
   }
@@ -87,6 +90,7 @@ export class ApiService {
       headers: this.getHeaders()
     }).pipe(
       timeout(this.timeoutMs),
+      retry(1),
       catchError(this.handleError)
     );
   }
