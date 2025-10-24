@@ -1,9 +1,25 @@
-  <div class="admin-dashboard-container">
-      <div class="container">
-        <div class="dashboard-header">
+<div class="admin-dashboard-container">
+  <div class="container">
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="header-left">
           <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
           <p class="text-muted">System administration and price data management</p>
         </div>
+        <div class="header-right">
+          <div class="admin-info">
+            <span class="admin-name">
+              <i class="fas fa-user-circle"></i>
+              {{ adminName }}
+            </span>
+            <button class="btn btn-outline-danger" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
         <!-- Admin Stats -->
         <div class="stats-grid">

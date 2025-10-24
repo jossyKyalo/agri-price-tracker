@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SmsInterfaceComponent } from '../sms-interface/sms-interface.component';
 import { AdminService } from '../../services/admin.service';
 import { PriceService } from '../../services/price.service';
@@ -39,6 +40,7 @@ export class AdminDashboardComponent implements OnInit {
   activeTab = 'requests';
   isLoading = false;
   errorMessage = '';
+  adminName = '';
   
   // Stats
   pendingRequests = 0;
@@ -64,11 +66,23 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private priceService: PriceService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    this.loadAdminInfo();
     this.loadDashboardData();
+  }
+
+  loadAdminInfo() {
+    // Get admin info from localStorage or auth service
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.adminName = user.full_name || user.email || 'Admin';
+    } else {
+      this.adminName = localStorage.getItem('admin_name') || 'Admin';
+    }
   }
 
   loadDashboardData() {
@@ -271,6 +285,19 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
+    if (confirm('Are you sure you want to logout?')) {
+      // Clear auth data
+      this.authService.logout();
+      
+      // Clear localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('admin_name');
+      localStorage.removeItem('user');
+      
+      // Show success message
+      alert('✅ You have been logged out successfully');
+      
+      window.location.reload();
+    }
   }
 }
