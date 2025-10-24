@@ -108,14 +108,21 @@ Now, as AgriBot, respond helpfully using the Kenyan context and available data.
 const getCurrentPriceContext = async (): Promise<string> => {
   try {
     const result = await query(`
-      SELECT c.name as crop_name, pe.price, r.name as region_name, pe.entry_date
+      SELECT c.name AS crop_name, pe.price, r.name AS region_name, pe.entry_date
       FROM price_entries pe
       JOIN crops c ON pe.crop_id = c.id
       JOIN regions r ON pe.region_id = r.id
-      WHERE pe.is_verified = true 
-        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
-      ORDER BY pe.entry_date DESC, pe.price DESC
-      LIMIT 20
+      WHERE pe.is_verified = true
+      AND (c.name, r.name, pe.entry_date) IN (
+        SELECT c2.name, r2.name, MAX(pe2.entry_date)
+        FROM price_entries pe2
+        JOIN crops c2 ON pe2.crop_id = c2.id
+        JOIN regions r2 ON pe2.region_id = r2.id
+        WHERE pe2.is_verified = true
+        GROUP BY c2.name, r2.name
+      )
+      ORDER BY pe.entry_date DESC;
+
     `);
 
     if (result.rows.length === 0) {

@@ -12,8 +12,8 @@ const dbConfig = {
   database: process.env.DB_NAME || 'agri_price_tracker',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD ,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  max: 10, // Maximum number of clients in the pool
+  idleTimeoutMillis: 10000, // Close idle clients after 30 seconds
   connectionTimeoutMillis: 10000, // Return an error after 2 seconds if connection could not be established
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 };
