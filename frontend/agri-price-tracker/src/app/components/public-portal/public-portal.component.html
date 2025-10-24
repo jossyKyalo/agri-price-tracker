@@ -191,7 +191,7 @@
                     [class.fa-arrow-up]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
                     [class.fa-arrow-down]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
                     [class.fa-minus]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
-                  {{ getPredictionChange(crop.currentPrice, crop.prediction ?? 0) }}%
+                  {{ getPredictionChange(crop.currentPrice, crop.prediction ) }}%
                 </div>
               </div>
             </div>

@@ -9,6 +9,19 @@ import { map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
+interface DisplayCrop {
+  id: string;
+  name: string;
+  category: string;
+  currentPrice: number;
+  previousPrice: number;
+  trend: 'up' | 'down' | 'stable';
+  region: string;
+  market: string;
+  lastUpdated: string;
+  prediction: number;
+}
+
 @Component({
   selector: 'app-public-portal',
   standalone: true,
@@ -43,9 +56,9 @@ export class PublicPortalComponent implements OnInit {
   errorMessage = '';
 
   // Stats
-  totalCrops = 156;
-  totalRegions = 47;
-  lastUpdated = '2 mins ago';
+  totalCrops = 0;
+  totalRegions = 0;
+  lastUpdated = 'Loading...';
 
   // Price input form
   priceInput = {
@@ -56,11 +69,10 @@ export class PublicPortalComponent implements OnInit {
     notes: ''
   };
 
-  allCrops: CropPrice[] = [];
+  allCrops: DisplayCrop[] = [];
   crops: Crop[] = [];
   regions: Region[] = [];
-
-  filteredCrops: CropPrice[] = [];
+  filteredCrops: DisplayCrop[] = [];
 
   constructor(
     private http: HttpClient,
@@ -70,51 +82,26 @@ export class PublicPortalComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadInitialData();
+    this.checkAuth();
+    this.loadData();
+  }
+
+  loadData(): void {
+    this.isLoading = true;
     this.loadCrops();
     this.loadRegions();
-    this.checkAuth();
+    this.loadPrices();
   }
 
-  loadInitialData(): void {
-    this.isLoading = true;
-
-    // Load crops, regions, and prices
-    Promise.all([
-      this.cropService.getCrops().toPromise(),
-      this.cropService.getRegions().toPromise(),
-      this.priceService.getPrices({ limit: 50 }).toPromise()
-    ]).then(([crops, regions, pricesResponse]) => {
-      this.crops = crops || [];
-      this.regions = regions || [];
-      this.allCrops = pricesResponse?.prices || [];
-      this.totalCrops = this.crops.length;
-      this.filterCrops();
-      this.isLoading = false;
-    }).catch(error => {
-      console.error('Error loading data:', error);
-      this.errorMessage = 'Failed to load data. Please try again.';
-      this.isLoading = false;
-    });
-  }
-
-  filterCrops() {
-    this.filteredCrops = this.allCrops.filter(crop => {
-      const matchesSearch = crop.crop_name?.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesRegion = !this.selectedRegion || crop.region_name?.toLowerCase().includes(this.selectedRegion.toLowerCase());
-
-      return matchesSearch && matchesRegion;
-    });
-  }
   loadCrops() {
     this.cropService.getCrops().subscribe({
       next: (response: any) => {
-        this.crops = response.data || response;
+        this.crops = response.data || response || [];
+        this.totalCrops = this.crops.length;
         console.log('Crops loaded:', this.crops);
       },
       error: (error) => {
         console.error('Error loading crops:', error);
-        this.errorMessage = 'Failed to load crops';
       }
     });
   }
@@ -122,21 +109,104 @@ export class PublicPortalComponent implements OnInit {
   loadRegions() {
     this.cropService.getRegions().subscribe({
       next: (response: any) => {
-        this.regions = response.data || response;
+        this.regions = response.data || response || [];
+        this.totalRegions = this.regions.length;
         console.log('Regions loaded:', this.regions);
       },
       error: (error) => {
         console.error('Error loading regions:', error);
-        this.errorMessage = 'Failed to load regions';
       }
     });
   }
+
+  loadPrices() {
+    this.priceService.getPrices({ limit: 100 }).subscribe({
+      next: (response: any) => {
+        console.log('Raw prices response:', response);
+        
+        const pricesData = response.data || response.prices || [];
+        
+        // Transform API data to DisplayCrop format
+        this.allCrops = pricesData.map((item: any) => {
+          const currentPrice = parseFloat(item.price || item.current_price || 0);
+          const previousPrice = currentPrice > 0 ? currentPrice * 0.95 : 0; // Mock previous price
+          
+          return {
+            id: item.id || item.crop_id,
+            name: item.crop_name || item.name || 'Unknown',
+            category: item.category || 'general',
+            currentPrice: currentPrice,
+            previousPrice: previousPrice,
+            trend: this.calculateTrend(currentPrice, previousPrice),
+            region: item.region_name || item.region || 'Unknown',
+            market: item.market_name || item.market || 'Unknown',
+            lastUpdated: this.formatDate(item.entry_date || item.created_at || new Date()),
+            prediction: currentPrice * 1.05 // Mock prediction
+          } as DisplayCrop;
+        });
+
+        this.filteredCrops = this.allCrops;
+        this.isLoading = false;
+        
+        if (this.allCrops.length > 0) {
+          this.lastUpdated = this.allCrops[0].lastUpdated;
+        }
+
+        console.log('Transformed crops:', this.allCrops);
+      },
+      error: (error) => {
+        console.error('Error loading prices:', error);
+        this.isLoading = false;
+        this.allCrops = [];
+        this.filteredCrops = [];
+      }
+    });
+  }
+
+  calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
+    if (current > previous) return 'up';
+    if (current < previous) return 'down';
+    return 'stable';
+  }
+
+  formatDate(date: string | Date): string {
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins} mins ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return d.toLocaleDateString();
+  }
+
+  filterCrops() {
+    this.filteredCrops = this.allCrops.filter(crop => {
+      const matchesSearch = !this.searchTerm || 
+        crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      const matchesCategory = !this.selectedCategory || 
+        crop.category === this.selectedCategory;
+      
+      const matchesRegion = !this.selectedRegion || 
+        crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
+
+      return matchesSearch && matchesCategory && matchesRegion;
+    });
+
+    console.log('Filtered crops:', this.filteredCrops);
+  }
+
   checkAuth() {
     const token = localStorage.getItem('farmer_token');
     const name = localStorage.getItem('farmer_name');
     this.isLoggedIn = !!token;
     this.farmerName = name || '';
   }
+
   quickRegister() {
     this.isLoading = true;
     this.errorMessage = '';
@@ -148,25 +218,22 @@ export class PublicPortalComponent implements OnInit {
     }).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-
-        // Save token and user info
         localStorage.setItem('farmer_token', response.data.token);
         localStorage.setItem('farmer_name', response.data.user.full_name);
-        localStorage.setItem('temp_password', response.data.tempPassword);
-
         this.isLoggedIn = true;
         this.farmerName = response.data.user.full_name;
-        // Show password in alert
+        
         alert(
-          `Registration Successful!\n\n` +
+          `✅ Registration Successful!\n\n` +
           `Welcome ${response.data.user.full_name}!\n\n` +
-          `Your temporary password: ${response.data.tempPassword}\n\n` +
-          `⚠️ IMPORTANT: Save this password!\n` +
-          `You'll need it to login next time.\n\n` +
-          `Phone: ${response.data.user.phone}`
+          `═══════════════════════════════\n` +
+          `📱 Phone: ${response.data.user.phone}\n` +
+          `🔑 Password: ${response.data.tempPassword}\n` +
+          `═══════════════════════════════\n\n` +
+          `⚠️ SAVE THIS PASSWORD!\n` +
+          `You'll need it to login next time.`
         );
 
-        // Reset form
         this.registration = { name: '', phone: '', region: '' };
       },
       error: (error) => {
@@ -175,6 +242,7 @@ export class PublicPortalComponent implements OnInit {
       }
     });
   }
+
   farmerLogin() {
     this.isLoading = true;
     this.errorMessage = '';
@@ -185,15 +253,11 @@ export class PublicPortalComponent implements OnInit {
     }).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-
         localStorage.setItem('farmer_token', response.data.token);
         localStorage.setItem('farmer_name', response.data.user.full_name);
-
         this.isLoggedIn = true;
         this.farmerName = response.data.user.full_name;
-
         alert(`✅ Welcome back, ${response.data.user.full_name}!`);
-
         this.login = { phone: '', password: '' };
       },
       error: (error) => {
@@ -202,6 +266,7 @@ export class PublicPortalComponent implements OnInit {
       }
     });
   }
+
   logout() {
     if (confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('farmer_token');
@@ -211,13 +276,13 @@ export class PublicPortalComponent implements OnInit {
       alert('✅ You have been logged out successfully');
     }
   }
+
   submitPrice() {
     console.log('Submit button clicked!');
     console.log('Form data:', this.priceInput);
 
     if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
       this.errorMessage = 'Please fill in all required fields';
-      console.log('Validation failed');
       return;
     }
 
@@ -239,60 +304,41 @@ export class PublicPortalComponent implements OnInit {
       price: this.priceInput.price,
       notes: this.priceInput.notes
     };
+
     const token = localStorage.getItem('farmer_token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
 
-     this.http.post(`${this.baseUrl}/prices/submit`, priceData, { headers }).subscribe({
+    this.http.post(`${this.baseUrl}/prices/submit`, priceData, { headers }).subscribe({
       next: (response) => {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
-
-        // Reset form
-        this.priceInput = {
-          crop: '',
-          price: 0,
-          location: '',
-          region: '',
-          notes: ''
-        };
+        this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
+        this.loadPrices(); // Reload prices after submission
       },
       error: (error) => {
         console.error('Error submitting price:', error);
         this.isLoading = false;
-        this.errorMessage = error.userMessage || 'Failed to submit price. Please try again.';
+        this.errorMessage = error.error?.error || 'Failed to submit price. Please try again.';
       }
     });
   }
-  getPrices(params?: any): Observable<{ prices: CropPrice[] }> {
-    return this.apiService.get<any>('/prices', { params }).pipe(
-      map((response: any) => ({
-        prices: response.data.map((item: any) => ({
-          name: item.crop_name,
-          region: item.region_name,
-          market: item.market_name,
-          currentPrice: item.current_price,
-          previousPrice: item.previous_price,
-          prediction: item.prediction,
-          lastUpdated: item.last_updated
-        }))
-      }))
-    );
-  }
+
   getPredictionTrend(current: number, predicted: number): string {
-    if (predicted > current) return 'trend-up text-success';
-    if (predicted < current) return 'trend-down text-danger';
-    return 'trend-stable text-muted';
+    if (predicted > current) return 'up';
+    if (predicted < current) return 'down';
+    return 'stable';
   }
 
   getPredictionChange(current: number, predicted: number): number {
-    return ((predicted - current) / current) * 100;
+    if (!current) return 0;
+    return Math.round(((predicted - current) / current) * 100);
   }
 
   getPriceChange(current: number, previous: number): number {
-    return ((current - previous) / previous) * 100;
+    if (!previous) return 0;
+    return Math.round(((current - previous) / previous) * 100);
   }
-
 }
