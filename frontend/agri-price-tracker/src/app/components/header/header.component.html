@@ -8,62 +8,50 @@
           <small class="brand-subtitle">Transparent Agricultural Pricing</small>
         </div>
       </div>
-      
+
       <div class="navbar-menu" [class.active]="isMenuOpen">
-        <a href="#" class="nav-link" 
-           [class.active]="currentPage === 'home'"
-           (click)="switchPage('home')">
+        <a href="#" class="nav-link" [class.active]="currentPage === 'home'" (click)="switchPage('home')">
           <i class="fas fa-home"></i>
           Home
         </a>
-        
-        <a href="#" class="nav-link"
-           [class.active]="currentPage === 'public'"
-           (click)="switchPage('public')">
+
+        <a href="#" class="nav-link" [class.active]="currentPage === 'public'" (click)="switchPage('public')">
           <i class="fas fa-chart-line"></i>
           Public Portal
         </a>
-        
-        <a href="#" class="nav-link"
-           [class.active]="currentPage === 'admin'"
-           (click)="handleAdminAccess()"
-           *ngIf="!isAdmin">
+
+        <a href="#" class="nav-link" [class.active]="currentPage === 'admin'" (click)="handleAdminAccess()"
+          *ngIf="!isAdmin">
           <i class="fas fa-sign-in-alt"></i>
           Admin Login
         </a>
-        
-        <a href="#" class="nav-link"
-           [class.active]="currentPage === 'admin'"
-           (click)="switchPage('admin')"
-           *ngIf="isAdmin">
+
+        <a href="#" class="nav-link" [class.active]="currentPage === 'admin'" (click)="switchPage('admin')"
+          *ngIf="isAdmin">
           <i class="fas fa-cog"></i>
           Admin Dashboard
         </a>
-        
-        <button class="btn btn-register" 
-                (click)="registerAdmin()"
-                *ngIf="!isAdmin">
+
+        <button class="btn btn-register" (click)="registerAdmin()" *ngIf="!isAdmin">
           <i class="fas fa-user-plus"></i>
           Register as Admin
         </button>
       </div>
-      
+
       <div class="navbar-actions">
-        <!-- Admin Info & Logout -->
-        <div class="user-status" *ngIf="isAdmin">
-          <span class="status-badge admin">
+        <!-- Compact Admin Info & Logout -->
+        <div *ngIf="isAdmin" class="user-status-compact">
+          <span class="admin-badge-compact">
             <i class="fas fa-shield-alt"></i>
-            <span class="admin-name">{{ adminName }}</span>
+            <span class="admin-name-text">{{ adminName }}</span>
           </span>
           <button class="btn btn-logout" (click)="adminLogout()">
             <i class="fas fa-sign-out-alt"></i>
             <span class="logout-text">Logout</span>
           </button>
         </div>
-        
-        <button 
-          class="mobile-menu-toggle"
-          (click)="toggleMenu()">
+
+        <button class="mobile-menu-toggle" (click)="toggleMenu()">
           <i class="fas" [class.fa-bars]="!isMenuOpen" [class.fa-times]="isMenuOpen"></i>
         </button>
       </div>

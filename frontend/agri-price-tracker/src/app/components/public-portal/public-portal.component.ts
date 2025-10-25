@@ -4,8 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PriceService, CropPrice, CreatePriceEntry } from '../../services/price.service';
 import { CropService, Crop, Region } from '../../services/crop.service';
 import { ApiService } from '../../services/api.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoginRequest } from '../../services/auth.service';
@@ -37,6 +36,7 @@ export class PublicPortalComponent implements OnInit {
   showLogin = false;
   farmerName = '';
   showPassword = false;
+  isAdmin= false;
 
   registration = {
     name: '',
@@ -79,7 +79,8 @@ export class PublicPortalComponent implements OnInit {
     private http: HttpClient,
     private priceService: PriceService,
     private cropService: CropService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -201,11 +202,30 @@ export class PublicPortalComponent implements OnInit {
     console.log('Filtered crops:', this.filteredCrops);
   }
 
-  checkAuth() {
-    const token = localStorage.getItem('farmer_token');
-    const name = localStorage.getItem('farmer_name');
-    this.isLoggedIn = !!token;
-    this.farmerName = name || '';
+    checkAuth() {
+    // Check if logged in as admin
+    const adminUser = this.authService.getCurrentUser();
+    if (adminUser && (adminUser.role === 'admin' || adminUser.role === 'super_admin')) {
+      this.isLoggedIn = true;
+      this.isAdmin = true;
+      this.farmerName = adminUser.full_name || 'Admin';
+      return;
+    }
+
+    // Check if logged in as farmer
+    const farmerToken = localStorage.getItem('farmer_token');
+    const farmerName = localStorage.getItem('farmer_name');
+    if (farmerToken && farmerName) {
+      this.isLoggedIn = true;
+      this.isAdmin = false;
+      this.farmerName = farmerName;
+      return;
+    }
+
+    // Not logged in
+    this.isLoggedIn = false;
+    this.isAdmin = false;
+    this.farmerName = '';
   }
 
   quickRegister() {
@@ -281,14 +301,27 @@ export class PublicPortalComponent implements OnInit {
   });
 }
 
-  logout() {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('farmer_token');
-      localStorage.removeItem('farmer_name');
-      this.isLoggedIn = false;
-      this.farmerName = '';
-      alert('✅ You have been logged out successfully');
+logoutPortal() {
+    if (confirm('Are you sure you want to logout from the portal?')) {
+      if (this.isAdmin) {
+        alert('ℹ️ To fully logout, use the logout button in the header.');
+        return;
+      } else {
+       
+        localStorage.removeItem('farmer_token');
+        localStorage.removeItem('farmer_name');
+        
+        this.isLoggedIn = false;
+        this.isAdmin = false;
+        this.farmerName = '';
+        
+        alert('✅ You have been logged out successfully');
+      }
     }
+  }
+
+  logout() {
+     this.logoutPortal()
   }
 
   submitPrice() {
@@ -319,7 +352,9 @@ export class PublicPortalComponent implements OnInit {
       notes: this.priceInput.notes
     };
 
-    const token = localStorage.getItem('farmer_token');
+    const token = this.isAdmin 
+      ? localStorage.getItem('authToken') 
+      : localStorage.getItem('farmer_token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'

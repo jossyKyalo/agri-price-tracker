@@ -177,7 +177,7 @@
   font-size: 0.9rem;
 }
 
-/* Reuse existing styles from previous component */
+ 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -232,8 +232,8 @@
 }
 
 .bg-success-light {
-  background-color: #d4edda;
-  border-color: #c3e6cb;
+   background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-left: 4px solid #28a745;
 }
 
 .btn-block {
@@ -295,6 +295,100 @@
 .password-toggle-btn i {
   font-size: 1.1rem;
 }
+.admin-notice-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notice-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.notice-icon {
+  font-size: 2rem;
+  color: #3b82f6;
+}
+
+.notice-text {
+  flex: 1;
+}
+
+.notice-text h5 {
+  margin: 0 0 0.25rem 0;
+  color: #1e40af;
+  font-size: 1rem;
+}
+
+.notice-text p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.btn-logout-portal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+  border: none;
+  color: var(--white);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(74, 124, 89, 0.3);
+  white-space: nowrap;
+}
+
+.btn-logout-portal:hover {
+  background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);
+}
+
+.btn-logout-portal:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(74, 124, 89, 0.3);
+}
+
+.btn-logout-portal i {
+  font-size: 0.95rem;
+}
+
+.bg-admin-notice {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  border-left: 4px solid #3b82f6;
+}
+
+.bg-admin-notice .card-body {
+  padding: 1.5rem;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.text-primary {
+  color: #3b82f6;
+}
+
+.fa-2x {
+  font-size: 2rem;
+}
 
 @media (max-width: 768px) {
   .search-filters {
@@ -317,5 +411,31 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+   .admin-notice-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notice-left {
+    width: 100%;
+  }
+
+  .btn-logout-portal {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notice-icon {
+    font-size: 1.5rem;
+  }
+
+  .notice-text h5 {
+    font-size: 0.9rem;
+  }
+
+  .notice-text p {
+    font-size: 0.85rem;
   }
 }

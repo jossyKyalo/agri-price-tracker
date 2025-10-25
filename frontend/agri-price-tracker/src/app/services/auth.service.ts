@@ -106,6 +106,9 @@ export class AuthService {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('currentUser');
       localStorage.removeItem('userRole');
+
+      localStorage.removeItem('farmer_token');
+      localStorage.removeItem('farmer_name');
     }
     this.currentUserSubject.next(null);
   }
