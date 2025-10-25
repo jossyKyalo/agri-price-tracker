@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { LoginRequest } from '../../services/auth.service';
 
 interface DisplayCrop {
   id: string;
@@ -244,28 +245,41 @@ export class PublicPortalComponent implements OnInit {
   }
 
   farmerLogin() {
-    this.isLoading = true;
-    this.errorMessage = '';
+  this.isLoading = true;
+  this.errorMessage = '';
 
-    this.http.post(`${this.baseUrl}/auth/login/farmer`, {
-      phone: this.login.phone,
-      password: this.login.password
-    }).subscribe({
-      next: (response: any) => {
-        this.isLoading = false;
-        localStorage.setItem('farmer_token', response.data.token);
-        localStorage.setItem('farmer_name', response.data.user.full_name);
-        this.isLoggedIn = true;
-        this.farmerName = response.data.user.full_name;
-        alert(`✅ Welcome back, ${response.data.user.full_name}!`);
-        this.login = { phone: '', password: '' };
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
-      }
-    });
-  }
+  const loginRequest: LoginRequest = {
+    email: `farmer${this.login.phone.replace(/[^\d]/g, '')}@agriprice.local`,
+    password: this.login.password
+  };
+
+  // Use the farmer login endpoint
+  this.http.post(`${this.baseUrl}/auth/login/farmer`, {
+    phone: this.login.phone,
+    password: this.login.password
+  }).subscribe({
+    next: (response: any) => {
+      this.isLoading = false;
+      
+      // Store using consistent keys
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+      localStorage.setItem('farmer_token', response.data.token);
+      localStorage.setItem('farmer_name', response.data.user.full_name);
+      
+      this.isLoggedIn = true;
+      this.farmerName = response.data.user.full_name;
+      
+      alert(`✅ Welcome back, ${response.data.user.full_name}!`);
+
+      this.login = { phone: '', password: '' };
+    },
+    error: (error) => {
+      this.isLoading = false;
+      this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
+    }
+  });
+}
 
   logout() {
     if (confirm('Are you sure you want to logout?')) {

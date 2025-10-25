@@ -16,7 +16,7 @@ export class AdminLoginComponent {
 
   isLoading = false;
   errorMessage = '';
-  showPassword= false;
+  showPassword = false;
 
   loginData = {
     email: '',
@@ -47,6 +47,8 @@ export class AdminLoginComponent {
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
         this.isLoading = false;
+        
+        // Emit login event to close modal
         this.login.emit();
         
         // Reset form
@@ -55,10 +57,14 @@ export class AdminLoginComponent {
           password: '',
           rememberMe: false
         };
+        this.showPassword = false;
+        
+        // Show success message
+        alert(`✅ Welcome back, ${response.user.full_name}!`);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.userMessage || 'Login failed. Please check your credentials.';
+        this.errorMessage = error.userMessage || error.error?.message || 'Login failed. Please check your credentials.';
       }
     });
   }

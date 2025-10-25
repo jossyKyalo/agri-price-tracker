@@ -29,7 +29,6 @@ import { AdminLoginComponent } from './components/admin-login/admin-login.compon
     <div class="app-container">
       <app-header 
         [currentPage]="currentPage" 
-        [isAdmin]="isAdmin"
         (pageChange)="switchPage($event)"
         (adminRegister)="showAdminRegistration()"
         (adminLogin)="showAdminLogin()">

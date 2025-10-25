@@ -1,347 +1,210 @@
 <div class="admin-dashboard-container">
   <div class="container">
     <div class="dashboard-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
-          <p class="text-muted">System administration and price data management</p>
+      <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
+      <p class="text-muted">System administration and price data management</p>
+    </div>
+
+
+    <!-- Admin Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users" style="color: var(--info);"></i>
         </div>
-        <div class="header-right">
-          <div class="admin-info">
-            <span class="admin-name">
-              <i class="fas fa-user-circle"></i>
-              {{ adminName }}
-            </span>
-            <button class="btn btn-outline-danger" (click)="logout()">
-              <i class="fas fa-sign-out-alt"></i>
-              Logout
-            </button>
-          </div>
+        <div class="stat-info">
+          <h3>{{ pendingRequests }}</h3>
+          <p>Pending Requests</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle" style="color: var(--success);"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalAdmins }}</h3>
+          <p>Active Admins</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-database" style="color: var(--warning);"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ todayEntries }}</h3>
+          <p>Today's Entries</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-sync-alt" style="color: var(--secondary-green);"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ kamisSync }}</h3>
+          <p>KAMIS Sync</p>
         </div>
       </div>
     </div>
 
-        <!-- Admin Stats -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-users" style="color: var(--info);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ pendingRequests }}</h3>
-              <p>Pending Requests</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-check-circle" style="color: var(--success);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ totalAdmins }}</h3>
-              <p>Active Admins</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-database" style="color: var(--warning);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ todayEntries }}</h3>
-              <p>Today's Entries</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-sync-alt" style="color: var(--secondary-green);"></i>
-            </div>
-            <div class="stat-info">
-              <h3>{{ kamisSync }}</h3>
-              <p>KAMIS Sync</p>
-            </div>
-          </div>
+    <!-- Admin Tabs -->
+    <div class="admin-tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'requests'" (click)="activeTab = 'requests'">
+        <i class="fas fa-user-plus"></i>
+        Admin Requests
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'prices'" (click)="activeTab = 'prices'">
+        <i class="fas fa-plus-circle"></i>
+        Manage Prices
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
+        <i class="fas fa-sms"></i>
+        SMS Management
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'monitoring'" (click)="activeTab = 'monitoring'">
+        <i class="fas fa-chart-bar"></i>
+        System Monitoring
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'kamis'" (click)="activeTab = 'kamis'">
+        <i class="fas fa-download"></i>
+        KAMIS Integration
+      </button>
+    </div>
+
+    <!-- Admin Requests Tab -->
+    <div *ngIf="activeTab === 'requests'" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-user-plus"></i> Admin Access Requests</h3>
         </div>
-
-        <!-- Admin Tabs -->
-        <div class="admin-tabs">
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'requests'"
-            (click)="activeTab = 'requests'">
-            <i class="fas fa-user-plus"></i>
-            Admin Requests
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'prices'"
-            (click)="activeTab = 'prices'">
-            <i class="fas fa-plus-circle"></i>
-            Manage Prices
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'sms'"
-            (click)="activeTab = 'sms'">
-            <i class="fas fa-sms"></i>
-            SMS Management
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'monitoring'"
-            (click)="activeTab = 'monitoring'">
-            <i class="fas fa-chart-bar"></i>
-            System Monitoring
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'kamis'"
-            (click)="activeTab = 'kamis'">
-            <i class="fas fa-download"></i>
-            KAMIS Integration
-          </button>
-        </div>
-
-        <!-- Admin Requests Tab -->
-        <div *ngIf="activeTab === 'requests'" class="tab-content">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-user-plus"></i> Admin Access Requests</h3>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Phone</th>
-                      <th>Region</th>
-                      <th>Organization</th>
-                      <th>Request Date</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let request of adminRequests">
-                      <td>{{ request.full_name }}</td>
-                      <td>{{ request.email }}</td>
-                      <td>{{ request.phone }}</td>
-                      <td>{{ request.region }}</td>
-                      <td>{{ request.organization }}</td>
-                      <td>{{ formatDate(request.created_at) }}</td>
-                      <td>
-                        <span class="badge" 
-                              [class.badge-warning]="request.status === 'pending'"
-                              [class.badge-success]="request.status === 'approved'"
-                              [class.badge-danger]="request.status === 'rejected'">
-                          {{ request.status }}
-                        </span>
-                      </td>
-                      <td>
-                        <div class="action-buttons" *ngIf="request.status === 'pending'">
-                          <button class="btn btn-success btn-sm" (click)="approveRequest(request.id)">
-                            <i class="fas fa-check"></i>
-                            Approve
-                          </button>
-                          <button class="btn btn-danger btn-sm" (click)="rejectRequest(request.id)">
-                            <i class="fas fa-times"></i>
-                            Reject
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Manage Prices Tab -->
-        <div *ngIf="activeTab === 'prices'" class="tab-content">
-          <div class="price-management-grid">
-            <!-- Price Entry Form -->
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-plus-circle"></i> Add New Price Entry</h3>
-              </div>
-              <div class="card-body">
-                <form (ngSubmit)="submitPriceEntry()" #priceForm="ngForm">
-                  <div class="form-group">
-                    <label class="form-label">Crop</label>
-                    <select class="form-select" [(ngModel)]="newPriceEntry.crop" name="crop" required>
-                      <option value="">Select Crop</option>
-                      <option value="maize">Maize</option>
-                      <option value="beans">Beans</option>
-                      <option value="tomatoes">Tomatoes</option>
-                      <option value="potatoes">Potatoes</option>
-                      <option value="onions">Onions</option>
-                      <option value="bananas">Bananas</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Price (KSh/kg)</label>
-                    <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" required>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Region</label>
-                    <select class="form-select" [(ngModel)]="newPriceEntry.region" name="region" required>
-                      <option value="">Select Region</option>
-                      <option value="central">Central Kenya</option>
-                      <option value="western">Western Kenya</option>
-                      <option value="eastern">Eastern Kenya</option>
-                      <option value="rift-valley">Rift Valley</option>
-                      <option value="coast">Coast</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label class="form-label">Market</label>
-                    <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market" required>
-                  </div>
-                  
-                  <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid">
-                    <i class="fas fa-save"></i>
-                    Save Price Entry
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            <!-- Pending Verifications -->
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-clock"></i> Pending Verifications</h3>
-              </div>
-              <div class="card-body">
-                <div class="verification-list">
-                  <div *ngFor="let entry of pendingVerifications" class="verification-item">
-                    <div class="entry-info">
-                      <strong>{{ entry.crop_name }}</strong>
-                      <span class="price">KSh {{ entry.price }}/kg</span>
-                      <small class="text-muted">{{ entry.region_name }} - {{ entry.market_name }}</small>
-                      <small class="text-muted">Submitted by: {{ entry.entered_by_name }}</small>
-                      <small class="text-muted">{{ formatDate(entry.entry_date) }}</small>
-                    </div>
-                    <div class="verification-actions">
-                      <button class="btn btn-success btn-sm" (click)="verifyEntry(entry.id)">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Region</th>
+                  <th>Organization</th>
+                  <th>Request Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let request of adminRequests">
+                  <td>{{ request.full_name }}</td>
+                  <td>{{ request.email }}</td>
+                  <td>{{ request.phone }}</td>
+                  <td>{{ request.region }}</td>
+                  <td>{{ request.organization }}</td>
+                  <td>{{ formatDate(request.created_at) }}</td>
+                  <td>
+                    <span class="badge" [class.badge-warning]="request.status === 'pending'"
+                      [class.badge-success]="request.status === 'approved'"
+                      [class.badge-danger]="request.status === 'rejected'">
+                      {{ request.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons" *ngIf="request.status === 'pending'">
+                      <button class="btn btn-success btn-sm" (click)="approveRequest(request.id)">
                         <i class="fas fa-check"></i>
-                        Verify
+                        Approve
                       </button>
-                      <button class="btn btn-danger btn-sm" (click)="rejectEntry(entry.id)">
+                      <button class="btn btn-danger btn-sm" (click)="rejectRequest(request.id)">
                         <i class="fas fa-times"></i>
                         Reject
                       </button>
                     </div>
-                  </div>
-                </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Prices Tab -->
+    <div *ngIf="activeTab === 'prices'" class="tab-content">
+      <div class="price-management-grid">
+        <!-- Price Entry Form -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-plus-circle"></i> Add New Price Entry</h3>
+          </div>
+          <div class="card-body">
+            <form (ngSubmit)="submitPriceEntry()" #priceForm="ngForm">
+              <div class="form-group">
+                <label class="form-label">Crop</label>
+                <select class="form-select" [(ngModel)]="newPriceEntry.crop" name="crop" required>
+                  <option value="">Select Crop</option>
+                  <option value="maize">Maize</option>
+                  <option value="beans">Beans</option>
+                  <option value="tomatoes">Tomatoes</option>
+                  <option value="potatoes">Potatoes</option>
+                  <option value="onions">Onions</option>
+                  <option value="bananas">Bananas</option>
+                </select>
               </div>
-            </div>
+
+              <div class="form-group">
+                <label class="form-label">Price (KSh/kg)</label>
+                <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Region</label>
+                <select class="form-select" [(ngModel)]="newPriceEntry.region" name="region" required>
+                  <option value="">Select Region</option>
+                  <option value="central">Central Kenya</option>
+                  <option value="western">Western Kenya</option>
+                  <option value="eastern">Eastern Kenya</option>
+                  <option value="rift-valley">Rift Valley</option>
+                  <option value="coast">Coast</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Market</label>
+                <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid">
+                <i class="fas fa-save"></i>
+                Save Price Entry
+              </button>
+            </form>
           </div>
         </div>
 
-        <!-- SMS Management Tab -->
-        <div *ngIf="activeTab === 'sms'" class="tab-content">
-          <app-sms-interface></app-sms-interface>
-        </div>
-
-        <!-- System Monitoring Tab -->
-        <div *ngIf="activeTab === 'monitoring'" class="tab-content">
-          <div class="monitoring-grid">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-chart-bar"></i> System Health</h3>
-              </div>
-              <div class="card-body">
-                <div class="health-metrics">
-                  <div class="metric">
-                    <span class="metric-label">Database Status</span>
-                    <span class="metric-value healthy">
-                      <i class="fas fa-circle"></i>
-                      Healthy
-                    </span>
-                  </div>
-                  <div class="metric">
-                    <span class="metric-label">API Response Time</span>
-                    <span class="metric-value">125ms</span>
-                  </div>
-                  <div class="metric">
-                    <span class="metric-label">Active Users</span>
-                    <span class="metric-value">2,847</span>
-                  </div>
-                  <div class="metric">
-                    <span class="metric-label">SMS Queue</span>
-                    <span class="metric-value">43 pending</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
-              </div>
-              <div class="card-body">
-                <div class="alert alert-warning">
-                  <i class="fas fa-clock"></i>
-                  KAMIS data sync delayed by 2 hours
-                </div>
-                <div class="alert alert-info">
-                  <i class="fas fa-info-circle"></i>
-                  Scheduled maintenance tonight at 2 AM
-                </div>
-                <div class="alert alert-success">
-                  <i class="fas fa-check-circle"></i>
-                  All SMS services operational
-                </div>
-              </div>
-            </div>
+        <!-- Pending Verifications -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-clock"></i> Pending Verifications</h3>
           </div>
-        </div>
-
-        <!-- KAMIS Integration Tab -->
-        <div *ngIf="activeTab === 'kamis'" class="tab-content">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-download"></i> KAMIS Platform Integration</h3>
-            </div>
-            <div class="card-body">
-              <div class="kamis-controls">
-                <div class="sync-status">
-                  <h4>Data Synchronization Status</h4>
-                  <div class="sync-info">
-                    <div class="sync-item">
-                      <span>Last Sync:</span>
-                      <span>{{ lastKamisSync }}</span>
-                    </div>
-                    <div class="sync-item">
-                      <span>Records Synced:</span>
-                      <span>{{ kamisRecords }}</span>
-                    </div>
-                    <div class="sync-item">
-                      <span>Status:</span>
-                      <span class="status-badge success">Active</span>
-                    </div>
-                  </div>
+          <div class="card-body">
+            <div class="verification-list">
+              <div *ngFor="let entry of pendingVerifications" class="verification-item">
+                <div class="entry-info">
+                  <strong>{{ entry.crop_name }}</strong>
+                  <span class="price">KSh {{ entry.price }}/kg</span>
+                  <small class="text-muted">{{ entry.region_name }} - {{ entry.market_name }}</small>
+                  <small class="text-muted">Submitted by: {{ entry.entered_by_name }}</small>
+                  <small class="text-muted">{{ formatDate(entry.entry_date) }}</small>
                 </div>
-                
-                <div class="sync-actions">
-                  <button class="btn btn-primary" (click)="syncKamisData()">
-                    <i class="fas fa-sync-alt"></i>
-                    Sync Now
+                <div class="verification-actions">
+                  <button class="btn btn-success btn-sm" (click)="verifyEntry(entry.id)">
+                    <i class="fas fa-check"></i>
+                    Verify
                   </button>
-                  <button class="btn btn-secondary">
-                    <i class="fas fa-cog"></i>
-                    Configure Sync
-                  </button>
-                  <button class="btn btn-warning">
-                    <i class="fas fa-download"></i>
-                    Manual Import
+                  <button class="btn btn-danger btn-sm" (click)="rejectEntry(entry.id)">
+                    <i class="fas fa-times"></i>
+                    Reject
                   </button>
                 </div>
               </div>
@@ -350,3 +213,109 @@
         </div>
       </div>
     </div>
+
+    <!-- SMS Management Tab -->
+    <div *ngIf="activeTab === 'sms'" class="tab-content">
+      <app-sms-interface></app-sms-interface>
+    </div>
+
+    <!-- System Monitoring Tab -->
+    <div *ngIf="activeTab === 'monitoring'" class="tab-content">
+      <div class="monitoring-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-chart-bar"></i> System Health</h3>
+          </div>
+          <div class="card-body">
+            <div class="health-metrics">
+              <div class="metric">
+                <span class="metric-label">Database Status</span>
+                <span class="metric-value healthy">
+                  <i class="fas fa-circle"></i>
+                  Healthy
+                </span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">API Response Time</span>
+                <span class="metric-value">125ms</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Active Users</span>
+                <span class="metric-value">2,847</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">SMS Queue</span>
+                <span class="metric-value">43 pending</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-warning">
+              <i class="fas fa-clock"></i>
+              KAMIS data sync delayed by 2 hours
+            </div>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              Scheduled maintenance tonight at 2 AM
+            </div>
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i>
+              All SMS services operational
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAMIS Integration Tab -->
+    <div *ngIf="activeTab === 'kamis'" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-download"></i> KAMIS Platform Integration</h3>
+        </div>
+        <div class="card-body">
+          <div class="kamis-controls">
+            <div class="sync-status">
+              <h4>Data Synchronization Status</h4>
+              <div class="sync-info">
+                <div class="sync-item">
+                  <span>Last Sync:</span>
+                  <span>{{ lastKamisSync }}</span>
+                </div>
+                <div class="sync-item">
+                  <span>Records Synced:</span>
+                  <span>{{ kamisRecords }}</span>
+                </div>
+                <div class="sync-item">
+                  <span>Status:</span>
+                  <span class="status-badge success">Active</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sync-actions">
+              <button class="btn btn-primary" (click)="syncKamisData()">
+                <i class="fas fa-sync-alt"></i>
+                Sync Now
+              </button>
+              <button class="btn btn-secondary">
+                <i class="fas fa-cog"></i>
+                Configure Sync
+              </button>
+              <button class="btn btn-warning">
+                <i class="fas fa-download"></i>
+                Manual Import
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

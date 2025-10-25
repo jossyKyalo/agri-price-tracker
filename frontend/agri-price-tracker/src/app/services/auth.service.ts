@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
@@ -43,14 +44,21 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private apiService: ApiService) {
-    this.loadStoredUser();
+  constructor(
+    private apiService: ApiService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadStoredUser();
+    }
   }
 
   private loadStoredUser(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const token = localStorage.getItem('authToken');
     const userStr = localStorage.getItem('currentUser');
-    
+
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr);
@@ -66,10 +74,12 @@ export class AuthService {
     return this.apiService.post<AuthResponse>('/auth/login', credentials).pipe(
       map(response => response.data!),
       tap(authResponse => {
-        localStorage.setItem('authToken', authResponse.token);
-        localStorage.setItem('refreshToken', authResponse.refreshToken);
-        localStorage.setItem('currentUser', JSON.stringify(authResponse.user));
-        localStorage.setItem('userRole', authResponse.user.role);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('authToken', authResponse.token);
+          localStorage.setItem('refreshToken', authResponse.refreshToken);
+          localStorage.setItem('currentUser', JSON.stringify(authResponse.user));
+          localStorage.setItem('userRole', authResponse.user.role);
+        }
         this.currentUserSubject.next(authResponse.user);
       })
     );
@@ -79,20 +89,24 @@ export class AuthService {
     return this.apiService.post<AuthResponse>('/auth/register', userData).pipe(
       map(response => response.data!),
       tap(authResponse => {
-        localStorage.setItem('authToken', authResponse.token);
-        localStorage.setItem('refreshToken', authResponse.refreshToken);
-        localStorage.setItem('currentUser', JSON.stringify(authResponse.user));
-        localStorage.setItem('userRole', authResponse.user.role);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('authToken', authResponse.token);
+          localStorage.setItem('refreshToken', authResponse.refreshToken);
+          localStorage.setItem('currentUser', JSON.stringify(authResponse.user));
+          localStorage.setItem('userRole', authResponse.user.role);
+        }
         this.currentUserSubject.next(authResponse.user);
       })
     );
   }
 
   logout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userRole');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userRole');
+    }
     this.currentUserSubject.next(null);
   }
 
@@ -101,6 +115,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
     return !!localStorage.getItem('authToken');
   }
 
@@ -119,7 +134,9 @@ export class AuthService {
     return this.apiService.put<User>('/auth/profile', profileData).pipe(
       map(response => response.data!),
       tap(user => {
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('currentUser', JSON.stringify(user));
+        }
         this.currentUserSubject.next(user);
       })
     );
