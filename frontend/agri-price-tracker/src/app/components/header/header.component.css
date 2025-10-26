@@ -173,7 +173,7 @@
    align-items: center;
    gap: 0.5rem;
    padding: 0.6rem 1.2rem;
-   background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+   background: linear-gradient(135deg, var(--harvest-gold), #e6956a);
    border: none;
    color: var(--white);
    border-radius: 8px;
@@ -185,7 +185,7 @@
  }
 
  .btn-logout:hover {
-   background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+   background:  #ff9999;
    transform: translateY(-2px);
    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);
  }
