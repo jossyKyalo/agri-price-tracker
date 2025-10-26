@@ -186,6 +186,7 @@
 
  .btn-logout:hover {
    background:  #ff9999;
+   color: #990000;
    transform: translateY(-2px);
    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);
  }
