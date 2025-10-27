@@ -5,7 +5,6 @@
       <p class="text-muted">System administration and price data management</p>
     </div>
 
-
     <!-- Admin Stats -->
     <div class="stats-grid">
       <div class="stat-card">
@@ -140,43 +139,34 @@
           <div class="card-body">
             <form (ngSubmit)="submitPriceEntry()" #priceForm="ngForm">
               <div class="form-group">
-                <label class="form-label">Crop</label>
-                <select class="form-select" [(ngModel)]="newPriceEntry.crop" name="crop" required>
-                  <option value="">Select Crop</option>
-                  <option value="maize">Maize</option>
-                  <option value="beans">Beans</option>
-                  <option value="tomatoes">Tomatoes</option>
-                  <option value="potatoes">Potatoes</option>
-                  <option value="onions">Onions</option>
-                  <option value="bananas">Bananas</option>
+                <label class="form-label">Crop *</label>
+                <select class="form-select" [(ngModel)]="newPriceEntry.crop_id" name="crop_id" required [disabled]="loadingCrops">
+                  <option value="">{{ loadingCrops ? 'Loading crops...' : 'Select Crop' }}</option>
+                  <option *ngFor="let crop of crops" [value]="crop.id">{{ crop.name }}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Price (KSh/kg)</label>
-                <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" required>
+                <label class="form-label">Price (KSh/kg) *</label>
+                <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" min="0" step="0.01" required>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Region</label>
-                <select class="form-select" [(ngModel)]="newPriceEntry.region" name="region" required>
-                  <option value="">Select Region</option>
-                  <option value="central">Central Kenya</option>
-                  <option value="western">Western Kenya</option>
-                  <option value="eastern">Eastern Kenya</option>
-                  <option value="rift-valley">Rift Valley</option>
-                  <option value="coast">Coast</option>
+                <label class="form-label">Region *</label>
+                <select class="form-select" [(ngModel)]="newPriceEntry.region_id" name="region_id" required [disabled]="loadingRegions">
+                  <option value="">{{ loadingRegions ? 'Loading regions...' : 'Select Region' }}</option>
+                  <option *ngFor="let region of regions" [value]="region.id">{{ region.name }}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Market</label>
-                <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market" required>
+                <label class="form-label">Market *</label>
+                <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market" placeholder="e.g., Kiambu Market" required>
               </div>
 
-              <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid">
+              <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
                 <i class="fas fa-save"></i>
-                Save Price Entry
+                {{ isLoading ? 'Saving...' : 'Save Price Entry' }}
               </button>
             </form>
           </div>
@@ -185,7 +175,7 @@
         <!-- Pending Verifications -->
         <div class="card">
           <div class="card-header">
-            <h3><i class="fas fa-clock"></i> Pending Verifications</h3>
+            <h3><i class="fas fa-clock"></i> Pending Verifications ({{ pendingVerifications.length }})</h3>
           </div>
           <div class="card-body">
             <div class="verification-list">
@@ -208,6 +198,10 @@
                   </button>
                 </div>
               </div>
+              <div *ngIf="pendingVerifications.length === 0" class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>No pending verifications</p>
+              </div>
             </div>
           </div>
         </div>
@@ -225,28 +219,32 @@
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-chart-bar"></i> System Health</h3>
+            <small class="text-muted">Last updated: {{ formatDate(systemHealth.last_updated) }}</small>
           </div>
           <div class="card-body">
             <div class="health-metrics">
               <div class="metric">
                 <span class="metric-label">Database Status</span>
-                <span class="metric-value healthy">
+                <span class="metric-value" [ngClass]="getHealthStatusClass()">
                   <i class="fas fa-circle"></i>
-                  Healthy
+                  {{ systemHealth.database_status | titlecase }}
                 </span>
               </div>
               <div class="metric">
                 <span class="metric-label">API Response Time</span>
-                <span class="metric-value">125ms</span>
+                <span class="metric-value">{{ systemHealth.api_response_time }}ms</span>
               </div>
               <div class="metric">
                 <span class="metric-label">Active Users</span>
-                <span class="metric-value">2,847</span>
+                <span class="metric-value">{{ systemHealth.active_users | number }}</span>
               </div>
               <div class="metric">
                 <span class="metric-label">SMS Queue</span>
-                <span class="metric-value">43 pending</span>
+                <span class="metric-value">{{ systemHealth.sms_queue }} pending</span>
               </div>
+            </div>
+            <div class="refresh-info">
+              <small><i class="fas fa-sync-alt"></i> Auto-refreshes every 30 seconds</small>
             </div>
           </div>
         </div>
@@ -256,17 +254,19 @@
             <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
           </div>
           <div class="card-body">
-            <div class="alert alert-warning">
-              <i class="fas fa-clock"></i>
-              KAMIS data sync delayed by 2 hours
+            <div *ngFor="let alert of systemAlerts" [ngClass]="getAlertClass(alert.type)" class="alert">
+              <i class="fas" 
+                 [ngClass]="{
+                   'fa-clock': alert.type === 'warning',
+                   'fa-info-circle': alert.type === 'info',
+                   'fa-check-circle': alert.type === 'success',
+                   'fa-exclamation-circle': alert.type === 'danger'
+                 }"></i>
+              {{ alert.message }}
             </div>
-            <div class="alert alert-info">
-              <i class="fas fa-info-circle"></i>
-              Scheduled maintenance tonight at 2 AM
-            </div>
-            <div class="alert alert-success">
+            <div *ngIf="systemAlerts.length === 0" class="empty-state">
               <i class="fas fa-check-circle"></i>
-              All SMS services operational
+              <p>No system alerts</p>
             </div>
           </div>
         </div>
@@ -290,28 +290,37 @@
                 </div>
                 <div class="sync-item">
                   <span>Records Synced:</span>
-                  <span>{{ kamisRecords }}</span>
+                  <span>{{ kamisRecords | number }}</span>
                 </div>
                 <div class="sync-item">
                   <span>Status:</span>
-                  <span class="status-badge success">Active</span>
+                  <span class="status-badge" [ngClass]="kamisSync === 'Active' ? 'success' : 'warning'">
+                    {{ kamisSync }}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div class="sync-actions">
-              <button class="btn btn-primary" (click)="syncKamisData()">
-                <i class="fas fa-sync-alt"></i>
-                Sync Now
+              <button class="btn btn-primary" (click)="syncKamisData()" [disabled]="isSyncing">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isSyncing"></i>
+                {{ isSyncing ? 'Syncing...' : 'Sync Now' }}
               </button>
-              <button class="btn btn-secondary">
+              <button class="btn btn-secondary" (click)="configureSync()">
                 <i class="fas fa-cog"></i>
                 Configure Sync
               </button>
-              <button class="btn btn-warning">
-                <i class="fas fa-download"></i>
+              <button class="btn btn-warning" (click)="manualImport()">
+                <i class="fas fa-upload"></i>
                 Manual Import
               </button>
+            </div>
+
+            <div class="kamis-info">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>About KAMIS Integration:</strong> This feature automatically synchronizes market price data from the Kenya Agricultural Market Information System (KAMIS) to keep your database updated with official market prices.
+              </div>
             </div>
           </div>
         </div>

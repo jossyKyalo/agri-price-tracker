@@ -24,18 +24,18 @@ export class ApiService {
   private readonly baseUrl = environment.apiUrl;
   private readonly timeoutMs = environment.apiTimeout;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken');
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-    
+
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     return headers;
   }
 
@@ -46,7 +46,7 @@ export class ApiService {
 
   get<T>(endpoint: string, params?: any): Observable<ApiResponse<T>> {
     let httpParams = new HttpParams();
-    
+
     if (params) {
       Object.keys(params).forEach(key => {
         if (params[key] !== null && params[key] !== undefined) {
@@ -66,6 +66,13 @@ export class ApiService {
   }
 
   post<T>(endpoint: string, data: any): Observable<ApiResponse<T>> {
+    let headers = this.getHeaders();
+ 
+    if (typeof FormData !== 'undefined' && data instanceof FormData) { 
+      if (headers.has('Content-Type')) {
+        headers = headers.delete('Content-Type');
+      }
+    }
     return this.http.post<ApiResponse<T>>(`${this.baseUrl}${endpoint}`, data, {
       headers: this.getHeaders()
     }).pipe(

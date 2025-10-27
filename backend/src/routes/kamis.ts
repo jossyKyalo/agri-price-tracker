@@ -1,10 +1,45 @@
 import { Router } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth';
-import { syncKamisData, getKamisSyncStatus, manualKamisSync } from '../services/kamisService';
+import { syncKamisData, getKamisSyncStatus, manualKamisSync, processKamisFile } from '../services/kamisService';
 import { query } from '../database/connection';
 import type { ApiResponse } from '../types/index';
+import multer from 'multer';
 
 const router = Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } 
+});
+
+router.post('/upload', authenticate, requireAdmin, upload.single('file'), async (req, res, next) => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      const err: ApiResponse = {
+        success: false,
+        message: 'No file uploaded'
+      };
+      res.status(400).json(err);
+      return
+    }
+
+    const filename = req.file.originalname || 'uploaded_file';
+    const buffer = req.file.buffer;
+
+     
+    const result = await processKamisFile(buffer, filename);
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'KAMIS file processed',
+      data: result
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Get KAMIS sync status (admin only)
 router.get('/status', authenticate, requireAdmin, async (req, res, next) => {

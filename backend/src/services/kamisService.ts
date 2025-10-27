@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { query, transaction } from '../database/connection';
 import { logger } from '../utils/logger';
+import fs from 'fs';
+import path from 'path';
+import { parse as csvParseSync } from 'csv-parse/sync';
+import XLSX from 'xlsx';
 
 interface KamisPriceData {
   commodity: string;
@@ -14,13 +18,13 @@ interface KamisPriceData {
 
 export const syncKamisData = async (): Promise<void> => {
   const syncId = await startSyncLog();
-  
+
   try {
     logger.info('Starting KAMIS data synchronization');
-    
+
     // Fetch data from KAMIS API
     const kamisData = await fetchKamisData();
-    
+
     if (!kamisData || kamisData.length === 0) {
       await updateSyncLog(syncId, 0, 0, 0, 'completed', 'No data received from KAMIS API');
       return;
@@ -72,13 +76,13 @@ const fetchKamisData = async (): Promise<KamisPriceData[]> => {
     if (error.response?.status === 429) {
       throw new Error('KAMIS API rate limit exceeded');
     }
-    
+
     logger.error('KAMIS API error:', error.response?.data || error.message);
     throw new Error(`KAMIS API error: ${error.response?.status || error.message}`);
   }
 };
 
-const processKamisItem = async (client: any, item: KamisPriceData): Promise<{inserted: boolean, updated: boolean}> => {
+const processKamisItem = async (client: any, item: KamisPriceData): Promise<{ inserted: boolean, updated: boolean }> => {
   try {
     // Find or create crop
     const cropResult = await client.query(
@@ -195,9 +199,155 @@ export const getKamisSyncStatus = async (): Promise<any> => {
   const result = await query(
     'SELECT * FROM kamis_sync_logs ORDER BY started_at DESC LIMIT 1'
   );
-  
-  return result.rows[0] || null;
+
+  if (result.rows.length === 0) {
+    return {
+      last_sync: null,
+      records_synced: 0,
+      is_active: false
+    };
+  }
+  const row = result.rows[0];
+  return {
+    last_sync: row.started_at,
+    records_synced: row.records_imported || 0,
+    is_active: row.status === 'completed'
+  };
 };
+
+export async function processKamisFile(buffer: Buffer, filename: string) {
+  // Determine extension
+  const ext = (path.extname(filename) || '').toLowerCase();
+
+  let rows: any[] = [];
+
+  try {
+    if (ext === '.xlsx' || ext === '.xls') {
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const firstSheetName = workbook.SheetNames[0];
+      if (!firstSheetName) {
+        throw new Error('Uploaded workbook contains no sheets');
+      }
+      const sheet = workbook.Sheets[firstSheetName];
+      if (!sheet) {
+        throw new Error('Uploaded workbook first sheet could not be read');
+      }
+      rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
+    } else {
+      // Treat as CSV
+      const text = buffer.toString('utf8');
+      rows = csvParseSync(text, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true
+      });
+    }
+  } catch (err) {
+    throw new Error('Failed to parse uploaded file: ' + String(err));
+  }
+
+  
+  const inserted: number[] = [];
+  let insertedCount = 0;
+  let skippedCount = 0;
+  let errorCount = 0;
+
+   
+  const client = await query('BEGIN').catch(e => { throw e; });
+
+  try {
+     
+    await query('BEGIN');
+
+    for (const rawRow of rows) {
+      try {
+        // Lowercase keys map
+        const row: any = {};
+        for (const k of Object.keys(rawRow)) {
+          row[k.toLowerCase().trim()] = rawRow[k];
+        }
+
+        // find values by possible column names
+        const cropName = (row.crop || row.crop_name || row['commodity'] || row['crop name'] || '').toString().trim();
+        const regionName = (row.region || row.region_name || row['county'] || row['district'] || '').toString().trim();
+        const marketName = (row.market || row.market_name || row['market name'] || '').toString().trim();
+        const priceVal = row.price ?? row['unit price'] ?? row['price_kg'] ?? row['value'];
+        const entryDateRaw = row.entry_date || row.date || row['report_date'] || row['entry date'];
+
+        if (!cropName || !regionName || priceVal == null || !entryDateRaw) {
+          // skip if mandatory fields missing
+          skippedCount++;
+          continue;
+        }
+
+        // normalize date to YYYY-MM-DD
+        const entryDate = (new Date(entryDateRaw)).toISOString().slice(0, 10);
+
+        // 1) Resolve crop_id
+        let cropRes = await query('SELECT id FROM crops WHERE LOWER(name) = LOWER($1) LIMIT 1', [cropName]);
+        let cropId: string;
+        if (cropRes.rows.length > 0) {
+          cropId = cropRes.rows[0].id;
+        } else {
+          // Insert new crop, return id
+          const insertCrop = await query('INSERT INTO crops(name, created_at) VALUES ($1, NOW()) RETURNING id', [cropName]);
+          cropId = insertCrop.rows[0].id;
+        }
+
+        // 2) Resolve region_id
+        let regionRes = await query('SELECT id FROM regions WHERE LOWER(name) = LOWER($1) LIMIT 1', [regionName]);
+        let regionId: string;
+        if (regionRes.rows.length > 0) {
+          regionId = regionRes.rows[0].id;
+        } else {
+          const insertRegion = await query('INSERT INTO regions(name, created_at) VALUES ($1, NOW()) RETURNING id', [regionName]);
+          regionId = insertRegion.rows[0].id;
+        }
+
+        // 3) Check duplicate by crop_id + region_id + entry_date
+        const dupCheck = await query(
+          'SELECT id FROM price_entries WHERE crop_id = $1 AND region_id = $2 AND DATE(entry_date) = $3 LIMIT 1',
+          [cropId, regionId, entryDate]
+        );
+
+        if (dupCheck.rows.length > 0) {
+          // duplicate found -> skip (policy: skip duplicates)
+          skippedCount++;
+          continue;
+        }
+
+        // 4) Insert price entry
+        await query(
+          `INSERT INTO price_entries
+           (crop_id, region_id, market_name, price, entry_date, source, created_at, is_verified)
+           VALUES ($1,$2,$3,$4,$5,'kamis', NOW(), false)`,
+          [cropId, regionId, marketName || null, parseFloat(String(priceVal)), entryDate]
+        );
+
+        insertedCount++;
+      } catch (rowErr) {
+        console.error('Error processing row:', rowErr);
+        errorCount++;
+        // continue with next row
+      }
+    }
+
+    // commit
+    await query('COMMIT');
+  } catch (txErr) {
+    console.error('Transaction failed:', txErr);
+    await query('ROLLBACK');
+    throw txErr;
+  }
+
+  return {
+    inserted: insertedCount,
+    skipped: skippedCount,
+    errors: errorCount,
+    processed: rows.length
+  };
+}
+
 
 export const manualKamisSync = async (): Promise<void> => {
   logger.info('Manual KAMIS sync triggered');

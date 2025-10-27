@@ -15,6 +15,13 @@ export interface AdminRequest {
   created_at: string;
 }
 
+export interface SystemAlert {
+  id: string;
+  type: 'info' | 'warning' | 'success' | 'danger';
+  message: string;
+  created_at: string;
+}
+
 export interface CreateAdminRequest {
   full_name: string;
   email: string;
@@ -72,6 +79,39 @@ export class AdminService {
   getSystemHealth(): Observable<any> {
     return this.apiService.get<any>('/admin/health').pipe(
       map(response => response.data!)
+    );
+  }
+
+  getKamisStatus(): Observable<any> {
+    return this.apiService.get<any>('/kamis/status').pipe(
+      map(response => response.data!)
+    );
+  }
+
+  syncKamisData(): Observable<any> {
+    return this.apiService.post<any>('/kamis/sync', {}).pipe(
+      map(response => response.data || {})
+    );
+  }
+
+  getKamisLogs(page: number = 1, limit: number = 20): Observable<{logs: any[], pagination: any}> {
+    return this.apiService.get<any[]>('/kamis/logs', { page, limit }).pipe(
+      map(response => ({
+        logs: response.data || [],
+        pagination: response.pagination
+      }))
+    );
+  }
+
+  uploadKamisFile(formData: FormData): Observable<any> {
+     return this.apiService.post<any>('/kamis/upload', formData).pipe(
+      map(response => response.data || {})
+    );
+  }
+
+  getSystemAlerts(): Observable<SystemAlert[]> {
+    return this.apiService.get<SystemAlert[]>('/admin/alerts').pipe(
+      map(response => response.data || [])
     );
   }
 }

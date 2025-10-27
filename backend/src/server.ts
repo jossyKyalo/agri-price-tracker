@@ -24,6 +24,7 @@ import kamisRoutes from './routes/kamis';
 import mlRoutes from './routes/ml.js';
 import analyticsRoutes from './routes/analytics';
 import regionRoutes from './routes/region';
+import alertsRoutes from './routes/alerts';
 
 // Load environment variables
 dotenv.config();
@@ -81,6 +82,7 @@ app.use(`/api/${API_VERSION}/kamis`, kamisRoutes);
 app.use(`/api/${API_VERSION}/ml`, mlRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
 app.use(`/api/${API_VERSION}/regions`, regionRoutes);
+app.use(`/api/${API_VERSION}/admin/alerts`, alertsRoutes)
 
 // 404 handler
 app.use('*', (req, res) => {
