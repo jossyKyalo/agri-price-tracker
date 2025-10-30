@@ -100,6 +100,7 @@ export interface PriceEntry {
   region_id: string;
   region_name?: string;
   market_id?: string;
+  market?: string;
   market_name?: string;
   price: number;
   unit: string;
@@ -119,6 +120,7 @@ export interface CreatePriceEntry {
   crop_id: string;
   region_id: string;
   market_id?: string;
+  market?: string;
   price: number;
   unit?: string;
   source: 'kamis' | 'farmer' | 'admin';
@@ -273,6 +275,7 @@ export interface PriceQueryParams extends PaginationParams {
   crop_id?: string;
   region_id?: string;
   market_id?: string;
+  market?: string;
   source?: string;
   verified?: boolean;
   date_from?: string;

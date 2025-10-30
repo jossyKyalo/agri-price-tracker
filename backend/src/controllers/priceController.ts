@@ -12,6 +12,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       crop_id,
       region_id,
       market_id,
+      market,
       source,
       verified,
       date_from,
@@ -25,7 +26,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     const params: any[] = [];
     let paramIndex = 1;
 
-    // Build WHERE conditions
+    // WHERE conditions
     if (crop_id) {
       conditions.push(`pe.crop_id = $${paramIndex++}`);
       params.push(crop_id);
@@ -38,6 +39,11 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       conditions.push(`pe.market_id = $${paramIndex++}`);
       params.push(market_id);
     }
+    if (market) {
+      conditions.push(`pe.market ILIKE $${paramIndex++}`);
+      params.push(market);
+    }
+
     if (source) {
       conditions.push(`pe.source = $${paramIndex++}`);
       params.push(source);
@@ -62,6 +68,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
 
     const result = await query(
       `SELECT pe.*, 
+              pe.market as manual_market_name,
               c.name as crop_name,
               r.name as region_name,
               m.name as market_name,
@@ -112,6 +119,7 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
       crop_id,
       region_id,
       market_id,
+      market,
       price,
       unit = 'kg',
       source = 'farmer',
@@ -122,10 +130,10 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     const enteredBy = req.user?.id;
 
     const result = await query(
-      `INSERT INTO price_entries (crop_id, region_id, market_id, price, unit, source, entered_by, notes, entry_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING id, crop_id, region_id, market_id, price, unit, source, notes, entry_date, created_at`,
-      [crop_id, region_id, market_id, price, unit, source, enteredBy, notes, entry_date || new Date()]
+      `INSERT INTO price_entries (crop_id, region_id, market_id, market, price, unit, source, entered_by, notes, entry_date)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING id, crop_id, region_id, market_id, market, price, unit, source, notes, entry_date, created_at`,
+      [crop_id, region_id, market_id, market, price, unit, source, enteredBy, notes, entry_date || new Date()]
     );
 
     logger.info(`New price entry created: ${crop_id} - ${price} by ${req.user?.email || 'system'}`);
