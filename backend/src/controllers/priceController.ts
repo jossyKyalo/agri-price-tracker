@@ -118,8 +118,8 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     const {
       crop_id,
       region_id,
-      market_id,
-      market,
+      market,          
+      market_id,       
       price,
       unit = 'kg',
       source = 'farmer',
@@ -128,15 +128,37 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     }: CreatePriceEntry = req.body;
 
     const enteredBy = req.user?.id;
+    let resolvedMarketId = market_id;
 
+    // If market_id not provided but market name is
+    if (!resolvedMarketId && market) {
+      const existingMarket = await query(
+        `SELECT id FROM markets WHERE LOWER(name) = LOWER($1) AND region_id = $2 LIMIT 1`,
+        [market, region_id]
+      );
+
+      if (existingMarket.rows.length > 0) {
+        resolvedMarketId = existingMarket.rows[0].id;
+      } else {
+        const insertMarket = await query(
+          `INSERT INTO markets (name, region_id, is_active) VALUES ($1, $2, true) RETURNING id`,
+          [market, region_id]
+        );
+        resolvedMarketId = insertMarket.rows[0].id;
+        logger.info(`New market added to DB: ${market} (Region: ${region_id})`);
+      }
+    }
+
+    //Insert into price_entries
     const result = await query(
-      `INSERT INTO price_entries (crop_id, region_id, market_id, market, price, unit, source, entered_by, notes, entry_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-       RETURNING id, crop_id, region_id, market_id, market, price, unit, source, notes, entry_date, created_at`,
-      [crop_id, region_id, market_id, market, price, unit, source, enteredBy, notes, entry_date || new Date()]
+      `INSERT INTO price_entries (
+          crop_id, region_id, market_id, price, unit, source, entered_by, notes, entry_date
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, crop_id, region_id, market_id, price, unit, source, notes, entry_date, created_at`,
+      [crop_id, region_id, resolvedMarketId, price, unit, source, enteredBy, notes, entry_date || new Date()]
     );
 
-    logger.info(`New price entry created: ${crop_id} - ${price} by ${req.user?.email || 'system'}`);
+    logger.info(` Price entry added for crop ${crop_id} at market ${resolvedMarketId} by ${req.user?.email || 'system'}`);
 
     const response: ApiResponse<PriceEntry> = {
       success: true,
@@ -149,6 +171,7 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
 
 export const updatePriceEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
