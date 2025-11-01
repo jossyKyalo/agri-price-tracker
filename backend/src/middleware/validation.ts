@@ -85,6 +85,7 @@ export const schemas = {
     crop_id: Joi.string().uuid().required(),
     region_id: Joi.string().uuid().required(),
     market_id: Joi.string().uuid().optional(),
+    market: Joi.string().optional(),  
     price: Joi.number().positive().required(),
     unit: Joi.string().max(20).optional(),
     source: Joi.string().valid('kamis', 'farmer', 'admin').optional(),
