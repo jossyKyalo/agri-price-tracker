@@ -10,6 +10,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { AdminRegistrationComponent } from './components/admin-registration/admin-registration.component';
 import { ChatbotWidgetComponent } from './components/chatbot-widget/chatbot-widget.component';
 import { AdminLoginComponent } from './components/admin-login/admin-login.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,7 @@ import { AdminLoginComponent } from './components/admin-login/admin-login.compon
     AdminRegistrationComponent,
     ChatbotWidgetComponent,
     AdminLoginComponent,
+    ResetPasswordComponent,
   ],
   template: `
     <div class="app-container">
@@ -35,18 +37,20 @@ import { AdminLoginComponent } from './components/admin-login/admin-login.compon
       </app-header>
       
       <main class="main-content">
+
+        <app-reset-password *ngIf="showResetPasswordPage"></app-reset-password>
         <!-- Home Page -->
         <app-home 
-          *ngIf="currentPage === 'home'"
+          *ngIf="currentPage === 'home' && !showResetPasswordPage"
           (navigateToSection)="switchToPublicPortalSection($event)"
           (navigateToPage)="switchPage(getPageFromEvent($event))">
         </app-home>
         
         <!-- Public Portal (Farmer Dashboard) -->
-        <app-public-portal *ngIf="currentPage === 'public'"></app-public-portal>
+        <app-public-portal *ngIf="currentPage === 'public' && !showResetPasswordPage"></app-public-portal>
         
         <!-- Admin Dashboard (includes SMS interface) -->
-        <app-admin-dashboard *ngIf="currentPage === 'admin' && isAdmin"></app-admin-dashboard>
+        <app-admin-dashboard *ngIf="currentPage === 'admin' && isAdmin && !showResetPasswordPage"></app-admin-dashboard>
         
         <!-- Admin Registration Modal -->
         <app-admin-registration 
@@ -95,6 +99,7 @@ export class AppComponent implements OnInit {
   isAdmin = false;
   showAdminRegModal = false;
   showAdminLoginModal = false;
+  showResetPasswordPage = false;
 
   constructor(
     private router: Router,
@@ -104,10 +109,34 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     // Check if user is admin (only in browser environment)
     this.checkAdminStatus();
+    // check for the URL path
+    this.checkCurrentPath();
+  }
+
+  checkCurrentPath() {
+    if (!isPlatformBrowser(this.platformId)) return;
+ 
+    const path = window.location.pathname;
+
+    if (path === '/reset-password') {
+        this.showResetPasswordPage = true;
+        this.currentPage = 'reset'; 
+        
+        
+        this.showAdminRegModal = false;
+        this.showAdminLoginModal = false;
+    } else {
+        this.showResetPasswordPage = false;
+    }
   }
 
   switchPage(page: string) {
     this.currentPage = page;
+    this.showResetPasswordPage = false;
+
+    if (isPlatformBrowser(this.platformId)) {
+        this.router.navigate(['/']); 
+    }
   }
 
   getPageFromEvent(event: any): string {

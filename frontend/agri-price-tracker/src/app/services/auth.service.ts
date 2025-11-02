@@ -41,6 +41,12 @@ export interface PasswordResetRequest {
   email: string;
 }
 
+export interface PasswordResetData {
+  token: string;
+  email: string;
+  new_password: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -123,6 +129,12 @@ export class AuthService {
       map(response => response.data)  
     );
   }
+
+  resetPassword(data: PasswordResetData): Observable<any> {
+  return this.apiService.post<any>('/auth/reset-password', data).pipe(
+    map(response => response.data!)
+  );
+}
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
