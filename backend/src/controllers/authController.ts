@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { query, transaction } from '../database/connection';
 import { ApiError } from '../utils/apiError';
 import { generateToken, generateRefreshToken } from '../middleware/auth';
 import { logger } from '../utils/logger';
+import { sendEmail } from '../services/emailService';
 import type { User, CreateUserRequest, LoginRequest, AuthResponse, ApiResponse } from '../types/index';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -201,6 +203,128 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
     };
 
     res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new ApiError('Email is required', 400);
+    }
+
+    const userResult = await query('SELECT id, full_name FROM users WHERE email = $1', [email]);
+    const user = userResult.rows[0];
+
+    // Generic response for security
+    const genericResponse: ApiResponse = {
+      success: true,
+      message: 'If an account with that email exists, a password reset link has been sent.',
+    };
+
+    if (!user) {
+      logger.warn(`Password reset requested for non-existent email: ${email}`);
+      // Return the generic success response even if the user wasn't found
+      res.json(genericResponse);
+      return;
+    }
+
+    await transaction(async (client) => {
+      // Generate unique token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      // Token expires in 1 hour
+      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000);
+
+      await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [user.id]);
+      await client.query(
+        `INSERT INTO password_reset_tokens (user_id, token, expires_at) 
+                 VALUES ($1, $2, $3)`,
+        [user.id, resetToken, tokenExpiration]
+      );
+
+       
+      const resetUrl = `${process.env.CORS_ORIGIN}/reset-password?token=${resetToken}&email=${email}`;
+
+      const emailContent = {
+        to: email,
+        subject: '🔑 Password Reset Request for AgriPrice System',
+        text: `Dear ${user.full_name},\n\nYou requested a password reset. Please click the following link to reset your password: ${resetUrl}\n\nThis link will expire in one hour. If you did not request this, please ignore this email.`,
+        html: `<p>Dear ${user.full_name},</p>
+                       <p>You requested a password reset. Click the link below to set a new password:</p>
+                       <p><a href="${resetUrl}"><strong>Reset My Password</strong></a></p>
+                       <p>This link will expire in one hour.</p>
+                       <p>If you did not request this, please ignore this email.</p>`,
+      };
+
+      await sendEmail(emailContent);
+
+      logger.info(`Password reset email sent for user: ${email}`);
+    });
+    res.json(genericResponse);
+
+  } catch (error) { 
+    logger.error('Error during forgot password process:', error);
+
+    const securityMaskedResponse: ApiResponse = {
+      success: true,
+      message: 'If an account with that email exists, a password reset link has been sent.',
+    };
+    res.json(securityMaskedResponse);
+  }
+};
+
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try { 
+    const { token, email, new_password } = req.body;
+
+    if (!token || !email || !new_password) {
+      throw new ApiError('Token, email, and new password are required', 400);
+    }
+ 
+    const tokenResult = await query(
+      `SELECT t.user_id, t.expires_at 
+             FROM password_reset_tokens t
+             JOIN users u ON t.user_id = u.id
+             WHERE t.token = $1 AND u.email = $2`,
+      [token, email]
+    );
+
+    if (tokenResult.rows.length === 0) { 
+      throw new ApiError('Invalid or already used password reset token', 400);
+    }
+
+    const resetTokenRecord = tokenResult.rows[0];
+    const userId = resetTokenRecord.user_id;
+ 
+    if (new Date(resetTokenRecord.expires_at).getTime() < Date.now()) { 
+      await query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
+      throw new ApiError('Password reset token has expired', 400);
+    }
+ 
+    const newPasswordHash = await bcrypt.hash(new_password, 12);
+ 
+    await transaction(async (client) => { 
+      await client.query(
+        'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [newPasswordHash, userId]
+      );
+ 
+      await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
+    });
+
+    logger.info(`Password successfully reset for user ID: ${userId}`);
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Password has been successfully reset. You can now log in.',
+    };
+
+    res.json(response);
+
   } catch (error) {
     next(error);
   }

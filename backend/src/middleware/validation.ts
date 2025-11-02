@@ -6,16 +6,16 @@ import { ApiError } from '../utils/apiError';
 export const validate = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const { error } = schema.validate(req.body, { abortEarly: false });
-    
+
     if (error) {
       const errorMessage = error.details
         .map(detail => detail.message)
         .join(', ');
-      
+
       next(new ApiError(`Validation error: ${errorMessage}`, 400));
       return;
     }
-    
+
     next();
   };
 };
@@ -47,6 +47,17 @@ export const schemas = {
   changePassword: Joi.object({
     current_password: Joi.string().required(),
     new_password: Joi.string().min(6).required()
+  }),
+
+
+  forgotPassword: Joi.object({
+    email: Joi.string().email().required(),
+  }),
+
+  resetPassword: Joi.object({
+    token: Joi.string().required(),
+    email: Joi.string().email().required(),
+    new_password: Joi.string().min(8).required(),
   }),
 
   // Admin request schemas
@@ -85,7 +96,7 @@ export const schemas = {
     crop_id: Joi.string().uuid().required(),
     region_id: Joi.string().uuid().required(),
     market_id: Joi.string().uuid().optional(),
-    market: Joi.string().optional(),  
+    market: Joi.string().optional(),
     price: Joi.number().positive().required(),
     unit: Joi.string().max(20).optional(),
     source: Joi.string().valid('kamis', 'farmer', 'admin').optional(),
@@ -171,16 +182,16 @@ export const schemas = {
 export const validateQuery = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const { error } = schema.validate(req.query, { abortEarly: false });
-    
+
     if (error) {
       const errorMessage = error.details
         .map(detail => detail.message)
         .join(', ');
-      
+
       next(new ApiError(`Query validation error: ${errorMessage}`, 400));
       return;
     }
-    
+
     next();
   };
 };

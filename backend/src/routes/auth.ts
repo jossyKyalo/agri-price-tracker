@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { validate, schemas } from '../middleware/validation';
 import { authRateLimiter } from '../middleware/rateLimiter';
 import { authenticate } from '../middleware/auth';
-import {register,login,refreshToken,getProfile,updateProfile,changePassword} from '../controllers/authController.js';
+import {register,login,forgotPassword,resetPassword,refreshToken,getProfile,updateProfile,changePassword} from '../controllers/authController.js';
 import { logger } from '../utils/logger';
 
 dotenv.config();
@@ -255,6 +255,10 @@ router.post('/login/farmer', async (req, res) => {
 // Public routes
 router.post('/register', authRateLimiter, validate(schemas.register), register);
 router.post('/login', authRateLimiter, validate(schemas.login), login);
+
+router.post('/forgot-password', authRateLimiter, validate(schemas.forgotPassword), forgotPassword);
+router.post('/reset-password', authRateLimiter, validate(schemas.resetPassword), resetPassword);
+
 router.post('/refresh', authRateLimiter, refreshToken);
 
 // Protected routes
