@@ -37,6 +37,10 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -111,6 +115,13 @@ export class AuthService {
       localStorage.removeItem('farmer_name');
     }
     this.currentUserSubject.next(null);
+  }
+
+  requestPasswordReset(email: string): Observable<any> {
+    const requestBody: PasswordResetRequest = { email };
+    return this.apiService.post<any>('/auth/forgot-password', requestBody).pipe(
+      map(response => response.data)  
+    );
   }
 
   getCurrentUser(): User | null {

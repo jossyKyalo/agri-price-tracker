@@ -4133,3 +4133,17 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-11-02 05:46:13:4613"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-11-02 05:46:13:4613"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-11-02 05:46:13:4613"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Sun Nov 02 2025 05:46:30 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-11-02 05:46:30:4630"}
+{"body":{"email":"josephine04kyalo@gmail.com"},"ip":"::1","level":"\u001b[35mhttp\u001b[39m","message":"\u001b[35mPOST /api/v1/auth/forgot-password\u001b[39m","query":{},"timestamp":"2025-11-02 05:49:00:490","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 329ms: SELECT id, full_name FROM users WHERE email = $1\u001b[39m","timestamp":"2025-11-02 05:49:00:490"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mEmail sent to josephine04kyalo@gmail.com: <98f2b21c-b3af-db93-3c9c-0b8829096b9b@gmail.com>\u001b[39m","timestamp":"2025-11-02 05:49:07:497"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPassword reset email sent for user: josephine04kyalo@gmail.com\u001b[39m","timestamp":"2025-11-02 05:49:07:497"}
+{"duration":"7697ms","ip":"::1","level":"\u001b[35mhttp\u001b[39m","message":"\u001b[35mPOST /forgot-password - 200\u001b[39m","statusCode":200,"timestamp":"2025-11-02 05:49:07:497"}

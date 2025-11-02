@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, LoginRequest } from '../../services/auth.service';
+import { AuthService, LoginRequest, PasswordResetRequest } from '../../services/auth.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -18,6 +18,10 @@ export class AdminLoginComponent {
   errorMessage = '';
   showPassword = false;
 
+  isForgotPasswordMode = false;
+  resetEmail = '';              
+  resetMessage = '';
+
   loginData = {
     email: '',
     password: '',
@@ -27,6 +31,8 @@ export class AdminLoginComponent {
   constructor(private authService: AuthService) {}
 
   closeModal() {
+    this.isForgotPasswordMode = false;  
+    this.resetMessage = '';
     this.close.emit();
   }
 
@@ -69,16 +75,47 @@ export class AdminLoginComponent {
     });
   }
 
+  showForgotPassword() {
+    this.isForgotPasswordMode = true;
+    this.errorMessage = '';  
+    this.resetMessage = ''; 
+    this.loginData.email = '';  
+  }
+
+  backToLogin() {
+    this.isForgotPasswordMode = false;
+    this.resetMessage = '';  
+    this.errorMessage = '';
+    this.resetEmail = '';  
+  }
+
+  requestPasswordReset() {
+    if (!this.resetEmail || !this.resetEmail.includes('@')) {
+      this.resetMessage = 'Please enter a valid email address.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.resetMessage = '';
+
+    this.authService.requestPasswordReset(this.resetEmail).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.resetMessage = `If an account with ${this.resetEmail} exists, a password reset link has been sent. Please check your inbox.`;
+        this.resetEmail = '';  
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.resetMessage = error.error?.message || 'Failed to send reset link. Please try again later.';
+      }
+    });
+  }
+
   switchToRegistration() {
     this.close.emit();
-    // Trigger admin registration modal
     setTimeout(() => {
       const event = new CustomEvent('showAdminRegistration');
       window.dispatchEvent(event);
     }, 100);
-  }
-
-  forgotPassword() {
-    alert('Password reset functionality would be implemented here. Please contact system administrator.');
   }
 }
