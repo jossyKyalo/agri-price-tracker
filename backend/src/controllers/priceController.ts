@@ -68,7 +68,6 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
 
     const result = await query(
       `SELECT pe.*, 
-              pe.market as manual_market_name,
               c.name as crop_name,
               r.name as region_name,
               m.name as market_name,
