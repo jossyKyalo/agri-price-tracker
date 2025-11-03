@@ -11,11 +11,9 @@ export const runMigrations = async (): Promise<void> => {
   try {
     logger.info('Starting database migrations...');
     
-    // Read and execute schema.sql
     const schemaPath = join(__dirname, 'schema.sql');
     const schema = readFileSync(schemaPath, 'utf8');
     
-    // Split by semicolon and execute each statement
     const statements = schema
       .split(';')
       .map(stmt => stmt.trim())
@@ -39,7 +37,6 @@ export const runMigrations = async (): Promise<void> => {
   }
 };
 
-// Run migrations if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   runMigrations()
     .then(() => {

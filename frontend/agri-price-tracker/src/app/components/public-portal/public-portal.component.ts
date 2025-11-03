@@ -365,7 +365,7 @@ logoutPortal() {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
         this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
-        this.loadPrices(); // Reload prices after submission
+        this.loadPrices(); 
       },
       error: (error) => {
         console.error('Error submitting price:', error);
