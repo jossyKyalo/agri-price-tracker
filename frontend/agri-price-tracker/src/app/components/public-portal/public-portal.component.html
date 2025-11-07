@@ -208,11 +208,14 @@
             <i class="fas" [class.fa-user-plus]="!showLogin" [class.fa-sign-in-alt]="showLogin"></i>
             {{ showLogin ? 'Login to Submit Prices' : 'Register to Submit Prices' }}
           </h3>
+          <h3 *ngIf="isForgotPasswordMode">
+            <i class="fas fa-key"></i> Reset Farmer Password
+          </h3>
         </div>
         <div class="card-body">
 
           <!-- Registration Form -->
-          <div *ngIf="!showLogin">
+          <div *ngIf="!showLogin && !isForgotPasswordMode">
             <p class="text-muted">Create a free account to submit prices and help your community</p>
 
             <form (ngSubmit)="quickRegister()" #regForm="ngForm">
@@ -250,7 +253,8 @@
             <hr>
             <p class="text-center mb-0">
               Already have an account?
-              <a href="javascript:void(0)" (click)="showLogin = true" class="text-primary">
+              <a href="javascript:void(0)" (click)="showLogin = true; isForgotPasswordMode = false; errorMessage = ''"
+                class="text-primary">
                 <strong>Login here</strong>
               </a>
             </p>
@@ -288,180 +292,217 @@
                 {{ isLoading ? 'Logging in...' : 'Login' }}
               </button>
             </form>
+            <p class="text-center mt-2 mb-0">
+              <a href="javascript:void(0)" (click)="showForgotPassword()" class="text-muted">
+                <small>Forgot your password?</small>
+              </a>
+            </p>
             <hr>
             <p class="text-center mb-0">
               Don't have an account?
-              <a href="javascript:void(0)" (click)="showLogin = false; errorMessage = ''" class="text-success">
+              <a href="javascript:void(0)" (click)="showLogin = false; isForgotPasswordMode = false; errorMessage = ''"
+                class="text-success">
                 <strong>Register here</strong>
               </a>
             </p>
           </div>
-        </div>
-      </div>
-      <div *ngIf="isLoggedIn && isAdmin" class="card mb-3 bg-admin-notice">
-        <div class="card-body">
-          <div class="admin-notice-content">
-            <div class="notice-left">
-              <i class="fas fa-shield-alt notice-icon"></i>
-              <div class="notice-text">
-                <h5 class="mb-1">
-                  <i class="fas fa-user-shield"></i>
-                  Admin Access - {{ farmerName }}
-                </h5>
-                <p class="mb-0 text-muted">
-                  You're logged in as an administrator. You can submit prices directly.
-                </p>
-              </div>
+
+          <div *ngIf="isForgotPasswordMode">
+            <p class="text-muted">Enter your registered phone number. We'll send a reset link to the contact method on
+              file.</p>
+
+            <div class="alert"
+              [ngClass]="{'alert-success': resetMessage.startsWith('✅'), 'alert-danger': resetMessage.startsWith('❌')}"
+              *ngIf="resetMessage">
+              {{ resetMessage }}
             </div>
-            <button class="btn btn-logout-portal" (click)="logoutPortal()">
-              <i class="fas fa-sign-out-alt"></i>
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div *ngIf="isLoggedIn && !isAdmin" class="card mb-3 bg-success-light">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="mb-1">
-                <i class="fas fa-user-check text-success"></i>
-                Welcome, {{ farmerName }}!
-              </h5>
-              <p class="text-muted mb-0">You're logged in and can submit prices</p>
-            </div>
-            <button class="btn btn-logout-portal" (click)="logoutPortal()">
-              <i class="fas fa-sign-out-alt"></i>
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="input-grid">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="fas fa-plus-circle"></i> Submit Local Prices</h3>
-          </div>
-          <div class="card-body">
-            <div *ngIf="!isLoggedIn" class="alert alert-warning">
-              <i class="fas fa-lock"></i> Please register or login above to submit prices
-            </div>
-            <form *ngIf="isLoggedIn" (ngSubmit)="submitPrice()" #priceForm="ngForm">
+
+            <form (ngSubmit)="requestPasswordReset()" #resetForm="ngForm">
               <div class="form-group">
-                <label class="form-label">Crop</label>
-                <select class="form-select" [(ngModel)]="priceInput.crop" name="crop" required>
-                  <option value="">Select Crop</option>
-                  <option *ngFor="let crop of crops" [value]="crop.name">{{ crop.name }}</option>
-                </select>
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" [(ngModel)]="resetPhone" name="resetPhone"
+                  placeholder="+254712345678" required>
               </div>
 
-              <div class="form-group">
-                <label class="form-label">Price (KSh/kg)</label>
-                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0"
-                  step="0.01" required>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <a href="javascript:void(0)" (click)="backToLogin()" class="text-primary">
+                  <i class="fas fa-arrow-left"></i> Back to Login
+                </a>
+                <button type="submit" class="btn btn-primary" [disabled]="!resetForm.valid || isLoading">
+                  <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
+                    [class.fa-spin]="isLoading"></i>
+                  {{ isLoading ? 'Sending...' : 'Send Reset Link' }}
+                </button>
               </div>
-
-              <div class="form-group">
-                <label class="form-label">Your Location</label>
-                <input type="text" class="form-control" [(ngModel)]="priceInput.location" name="location"
-                  placeholder="e.g., Nakuru Market">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Region</label>
-                <select class="form-select" [(ngModel)]="priceInput.region" name="region" required>
-                  <option value="">Select Region</option>
-                  <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Additional Notes (Optional)</label>
-                <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes"
-                  placeholder="Quality, quantity, market conditions, etc."></textarea>
-              </div>
-
-              <!-- Error message display -->
-              <div *ngIf="errorMessage" class="alert alert-danger">
-                {{ errorMessage }}
-              </div>
-
-              <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
-                <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
-                  [class.fa-spin]="isLoading"></i>
-                {{ isLoading ? 'Submitting...' : 'Submit Price' }}
-              </button>
             </form>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="fas fa-info-circle"></i> Why Submit Prices?</h3>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isLoggedIn && isAdmin" class="card mb-3 bg-admin-notice">
+      <div class="card-body">
+        <div class="admin-notice-content">
+          <div class="notice-left">
+            <i class="fas fa-shield-alt notice-icon"></i>
+            <div class="notice-text">
+              <h5 class="mb-1">
+                <i class="fas fa-user-shield"></i>
+                Admin Access - {{ farmerName }}
+              </h5>
+              <p class="mb-0 text-muted">
+                You're logged in as an administrator. You can submit prices directly.
+              </p>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="info-list">
-              <div class="info-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Help other farmers get accurate local pricing</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Improve AI prediction accuracy</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>All submissions are verified by admins</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-users"></i>
-                <span>Build a stronger farming community</span>
-              </div>
+          <button class="btn btn-logout-portal" (click)="logoutPortal()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isLoggedIn && !isAdmin" class="card mb-3 bg-success-light">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-1">
+              <i class="fas fa-user-check text-success"></i>
+              Welcome, {{ farmerName }}!
+            </h5>
+            <p class="text-muted mb-0">You're logged in and can submit prices</p>
+          </div>
+          <button class="btn btn-logout-portal" (click)="logoutPortal()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="input-grid">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-plus-circle"></i> Submit Local Prices</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="!isLoggedIn" class="alert alert-warning">
+            <i class="fas fa-lock"></i> Please register or login above to submit prices
+          </div>
+          <form *ngIf="isLoggedIn" (ngSubmit)="submitPrice()" #priceForm="ngForm">
+            <div class="form-group">
+              <label class="form-label">Crop</label>
+              <select class="form-select" [(ngModel)]="priceInput.crop" name="crop" required>
+                <option value="">Select Crop</option>
+                <option *ngFor="let crop of crops" [value]="crop.name">{{ crop.name }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Price (KSh/kg)</label>
+              <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0" step="0.01"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Your Location</label>
+              <input type="text" class="form-control" [(ngModel)]="priceInput.location" name="location"
+                placeholder="e.g., Nakuru Market">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Region</label>
+              <select class="form-select" [(ngModel)]="priceInput.region" name="region" required>
+                <option value="">Select Region</option>
+                <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Additional Notes (Optional)</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes"
+                placeholder="Quality, quantity, market conditions, etc."></textarea>
+            </div>
+
+            <!-- Error message display -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
+              <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
+                [class.fa-spin]="isLoading"></i>
+              {{ isLoading ? 'Submitting...' : 'Submit Price' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-info-circle"></i> Why Submit Prices?</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-list">
+            <div class="info-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Help other farmers get accurate local pricing</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-chart-line"></i>
+              <span>Improve AI prediction accuracy</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-shield-alt"></i>
+              <span>All submissions are verified by admins</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-users"></i>
+              <span>Build a stronger farming community</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- SMS Alerts Tab -->
-    <div *ngIf="activeTab === 'sms'" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
-        </div>
-        <div class="card-body">
-          <div class="sms-subscription">
-            <div class="sms-info">
-              <h4>Get price alerts on your phone</h4>
-              <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.
-              </p>
-              <ul>
-                <li>Daily price updates</li>
-                <li>Price spike alerts</li>
-                <li>Market opportunity notifications</li>
-                <li>Weather-related price warnings</li>
-              </ul>
+  <!-- SMS Alerts Tab -->
+  <div *ngIf="activeTab === 'sms'" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
+      </div>
+      <div class="card-body">
+        <div class="sms-subscription">
+          <div class="sms-info">
+            <h4>Get price alerts on your phone</h4>
+            <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.
+            </p>
+            <ul>
+              <li>Daily price updates</li>
+              <li>Price spike alerts</li>
+              <li>Market opportunity notifications</li>
+              <li>Weather-related price warnings</li>
+            </ul>
+          </div>
+          <div class="sms-form">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" placeholder="+254 700 000 000">
             </div>
-            <div class="sms-form">
-              <div class="form-group">
-                <label class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" placeholder="+254 700 000 000">
+            <div class="form-group">
+              <label class="form-label">Select Crops (max 5)</label>
+              <div class="crop-checkboxes">
+                <label><input type="checkbox"> Maize</label>
+                <label><input type="checkbox"> Beans</label>
+                <label><input type="checkbox"> Tomatoes</label>
+                <label><input type="checkbox"> Potatoes</label>
+                <label><input type="checkbox"> Onions</label>
               </div>
-              <div class="form-group">
-                <label class="form-label">Select Crops (max 5)</label>
-                <div class="crop-checkboxes">
-                  <label><input type="checkbox"> Maize</label>
-                  <label><input type="checkbox"> Beans</label>
-                  <label><input type="checkbox"> Tomatoes</label>
-                  <label><input type="checkbox"> Potatoes</label>
-                  <label><input type="checkbox"> Onions</label>
-                </div>
-              </div>
-              <button class="btn btn-primary">
-                <i class="fas fa-bell"></i>
-                Subscribe to SMS Alerts
-              </button>
             </div>
+            <button class="btn btn-primary">
+              <i class="fas fa-bell"></i>
+              Subscribe to SMS Alerts
+            </button>
           </div>
         </div>
       </div>

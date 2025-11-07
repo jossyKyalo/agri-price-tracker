@@ -6,6 +6,7 @@ import { ApiError } from '../utils/apiError';
 import { generateToken, generateRefreshToken } from '../middleware/auth';
 import { logger } from '../utils/logger';
 import { sendEmail } from '../services/emailService';
+import { sendSmsMessage } from '../services/smsService';
 import type { User, CreateUserRequest, LoginRequest, AuthResponse, ApiResponse } from '../types/index';
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -215,62 +216,76 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     if (!email) {
       throw new ApiError('Email is required', 400);
     }
-
-    const userResult = await query('SELECT id, full_name FROM users WHERE email = $1', [email]);
+    const userResult = await query('SELECT id, full_name, phone FROM users WHERE email = $1', [email]);
     const user = userResult.rows[0];
 
-    // Generic response for security
     const genericResponse: ApiResponse = {
       success: true,
-      message: 'If an account with that email exists, a password reset link has been sent.',
+      message: 'If an account with that email exists, a password reset link has been processed.',
     };
 
     if (!user) {
       logger.warn(`Password reset requested for non-existent email: ${email}`);
-      // Return the generic success response even if the user wasn't found
       res.json(genericResponse);
       return;
     }
-
     await transaction(async (client) => {
-      // Generate unique token
       const resetToken = crypto.randomBytes(32).toString('hex');
-      // Token expires in 1 hour
-      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000);
+      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
       await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [user.id]);
       await client.query(
         `INSERT INTO password_reset_tokens (user_id, token, expires_at) 
-                 VALUES ($1, $2, $3)`,
+         VALUES ($1, $2, $3)`,
         [user.id, resetToken, tokenExpiration]
       );
 
-       
       const resetUrl = `${process.env.CORS_ORIGIN}/#/reset-password?token=${resetToken}&email=${email}`;
 
-      const emailContent = {
-        to: email,
-        subject: '🔑 Password Reset Request for AgriPrice System',
-        text: `Dear ${user.full_name},\n\nYou requested a password reset. Please click the following link to reset your password: ${resetUrl}\n\nThis link will expire in one hour. If you did not request this, please ignore this email.`,
-        html: `<p>Dear ${user.full_name},</p>
-                       <p>You requested a password reset. Click the link below to set a new password:</p>
-                       <p><a href="${resetUrl}"><strong>Reset My Password</strong></a></p>
-                       <p>This link will expire in one hour.</p>
-                       <p>If you did not request this, please ignore this email.</p>`,
-      };
+      if (email.endsWith('@agriprice.local')) {
+        if (!user.phone) {
+          logger.error(`Farmer reset failed: User ${email} has no phone number on record.`);
+          return;
+        }
 
-      await sendEmail(emailContent);
+        logger.info(`Farmer password reset requested for: ${email}. Sending SMS to ${user.phone}.`);
+        const smsContent = `To reset your AgriPrice password, click this link (expires in 1 hour): ${resetUrl}`;
 
-      logger.info(`Password reset email sent for user: ${email}`);
+        try {
+          const cleanPhone = user.phone.replace(/\s/g, '');
+          await sendSmsMessage(cleanPhone, smsContent, 'password-reset');
+          logger.info(`Password reset SMS sent to user: ${email} (phone: ${cleanPhone})`);
+        } catch (smsError) {
+          logger.error(`FAILED to send SMS for user ${email}.`, smsError);
+          logger.warn(`FALLBACK SMS LINK for ${user.phone}: ${resetUrl}`);
+        }
+
+      } else {
+        logger.info(`Admin password reset requested for: ${email}. Sending email.`);
+
+        const emailContent = {
+          to: email,
+          subject: '🔑 Password Reset Request for AgriPrice System',
+          text: `Dear ${user.full_name},\n\nYou requested a password reset. Please click the following link to reset your password: ${resetUrl}\n\nThis link will expire in one hour. If you did not request this, please ignore this email.`,
+          html: `<p>Dear ${user.full_name},</p>
+                <p>You requested a password reset. Click the link below to set a new password:</p>
+                <p><a href="${resetUrl}"><strong>Reset My Password</strong></a></p>
+                <p>This link will expire in one hour.</p>
+                <p>If you did not request this, please ignore this email.</p>`,
+        };
+
+        await sendEmail(emailContent);
+        logger.info(`Password reset email sent for user: ${email}`);
+      }
     });
+
     res.json(genericResponse);
 
-  } catch (error) { 
+  } catch (error) {
     logger.error('Error during forgot password process:', error);
-
     const securityMaskedResponse: ApiResponse = {
       success: true,
-      message: 'If an account with that email exists, a password reset link has been sent.',
+      message: 'If an account with that email exists, a password reset link has been processed.',
     };
     res.json(securityMaskedResponse);
   }
@@ -278,13 +293,13 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try { 
+  try {
     const { token, email, new_password } = req.body;
 
     if (!token || !email || !new_password) {
       throw new ApiError('Token, email, and new password are required', 400);
     }
- 
+
     const tokenResult = await query(
       `SELECT t.user_id, t.expires_at 
              FROM password_reset_tokens t
@@ -293,26 +308,26 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
       [token, email]
     );
 
-    if (tokenResult.rows.length === 0) { 
+    if (tokenResult.rows.length === 0) {
       throw new ApiError('Invalid or already used password reset token', 400);
     }
 
     const resetTokenRecord = tokenResult.rows[0];
     const userId = resetTokenRecord.user_id;
- 
-    if (new Date(resetTokenRecord.expires_at).getTime() < Date.now()) { 
+
+    if (new Date(resetTokenRecord.expires_at).getTime() < Date.now()) {
       await query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
       throw new ApiError('Password reset token has expired', 400);
     }
- 
+
     const newPasswordHash = await bcrypt.hash(new_password, 12);
- 
-    await transaction(async (client) => { 
+
+    await transaction(async (client) => {
       await client.query(
         'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
         [newPasswordHash, userId]
       );
- 
+
       await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
     });
 

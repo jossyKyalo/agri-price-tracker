@@ -51,7 +51,14 @@ export const schemas = {
 
 
   forgotPassword: Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.alternatives().try( 
+      Joi.string().email(),
+ 
+      Joi.string().pattern(/^farmer\d+@agriprice\.local$/)
+
+    ).required().messages({ 
+      'alternatives.match': '"email" must be a valid email or farmer phone format'
+    }),
   }),
 
   resetPassword: Joi.object({

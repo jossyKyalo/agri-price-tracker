@@ -38,6 +38,10 @@ export class PublicPortalComponent implements OnInit {
   showPassword = false;
   isAdmin= false;
 
+  isForgotPasswordMode= false;
+  resetPhone = '';
+  resetMessage = '';
+
   registration = {
     name: '',
     phone: '',
@@ -228,9 +232,47 @@ export class PublicPortalComponent implements OnInit {
     this.farmerName = '';
   }
 
+  showForgotPassword() {
+    this.isForgotPasswordMode = true;
+    this.showLogin = false;  
+    this.errorMessage = '';    
+    this.resetMessage = '';
+  }
+
+  backToLogin() {
+    this.isForgotPasswordMode = false;
+    this.showLogin = true;  
+    this.resetMessage = '';
+  }
+
+  requestPasswordReset() {
+    if (!this.resetPhone) {
+      this.resetMessage = 'Please enter your phone number.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.resetMessage = '';
+ 
+    const farmerEmail = `farmer${this.resetPhone.replace(/[^\d]/g, '')}@agriprice.local`;
+
+    this.authService.requestPasswordReset(farmerEmail).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.resetMessage = `✅ If an account with phone ${this.resetPhone} exists, a reset link has been processed.`;
+        this.resetPhone = '';
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.resetMessage = error.error?.message || '❌ Failed to process request. Please try again later.';
+      }
+    });
+  }
+
   quickRegister() {
     this.isLoading = true;
     this.errorMessage = '';
+    this.isForgotPasswordMode = false;
 
     this.http.post(`${this.baseUrl}/auth/register/farmer`, {
       full_name: this.registration.name,
@@ -267,6 +309,7 @@ export class PublicPortalComponent implements OnInit {
   farmerLogin() {
   this.isLoading = true;
   this.errorMessage = '';
+  this.isForgotPasswordMode = false;
 
   const loginRequest: LoginRequest = {
     email: `farmer${this.login.phone.replace(/[^\d]/g, '')}@agriprice.local`,

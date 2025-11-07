@@ -161,7 +161,7 @@ export interface SmsLog {
   id: string;
   recipient: string;
   message: string;
-  sms_type: 'alert' | 'update' | 'prediction' | 'weather' | 'general';
+  sms_type: 'alert' | 'update' | 'prediction' | 'weather' | 'general' | 'password-reset';
   status: 'pending' | 'sent' | 'failed' | 'delivered';
   external_id?: string;
   cost?: number;

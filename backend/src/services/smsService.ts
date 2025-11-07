@@ -5,8 +5,6 @@ import type { SmsLog } from '../types/index';
 import dotenv from "dotenv";
 dotenv.config();
 
-
-// Initialize Africa's Talking
 const at = africastalking({
   apiKey: process.env.AFRICASTALKING_API_KEY as string,
   username: process.env.AFRICASTALKING_USERNAME as string,
@@ -14,34 +12,43 @@ const at = africastalking({
 
 const sms = at.SMS;
 
-/**
- * Send a single SMS
- */
+
 export const sendSmsMessage = async (
   recipient: string,
   message: string,
-  smsType: string,
+  smsType: SmsLog['sms_type'],
   sentBy?: string
 ): Promise<SmsLog> => {
   try {
-    // Send SMS via Africa's Talking
     const response = await sms.send({
       to: [recipient],
       message,
-      from: process.env.AFRICASTALKING_SHORTCODE || '',  
+      from: process.env.AFRICASTALKING_SHORTCODE || '',
     });
 
- 
-    const smsData = response.Recipients;
-    const status = smsData.status;
-    const messageId = smsData.messageId;
+    const responseData = response as any;
+    const recipientData = responseData.SMSMessageData.Recipients[0];
 
-    // Log SMS in database
+    if (!recipientData) {
+      throw new Error('Africa\'s Talking response did not include recipient data.');
+    }
+
+    let dbStatus: SmsLog['status'] = 'pending';
+
+    if (recipientData.status === 'Success' || recipientData.statusCode === 101) {
+      dbStatus = 'sent';
+    } else {
+      dbStatus = 'failed';
+    }
+
+    const messageId = recipientData.messageId;
+    const cost = recipientData.cost.replace(/[^0-9.]/g, '');
+
     const result = await query(
-      `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, sent_at)
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+      `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, sent_at, cost)
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7)
        RETURNING *`,
-      [recipient, message, smsType, status, messageId, sentBy]
+      [recipient, message, smsType, dbStatus, messageId, sentBy, cost]
     );
 
     logger.info(`📨 SMS sent to ${recipient}: ${messageId}`);
@@ -50,7 +57,6 @@ export const sendSmsMessage = async (
   } catch (error: any) {
     logger.error(`❌ Failed to send SMS to ${recipient}:`, error);
 
-    // Log failed SMS
     const result = await query(
       `INSERT INTO sms_logs (recipient, message, sms_type, status, error_message, sent_by)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -62,13 +68,10 @@ export const sendSmsMessage = async (
   }
 };
 
-/**
- * Send bulk SMS (multiple recipients)
- */
 export const sendBulkSms = async (
   recipients: string[],
   message: string,
-  smsType: string,
+  smsType: SmsLog['sms_type'],
   sentBy?: string
 ): Promise<SmsLog[]> => {
   const results: SmsLog[] = [];
@@ -77,8 +80,7 @@ export const sendBulkSms = async (
     try {
       const result = await sendSmsMessage(recipient, message, smsType, sentBy);
       results.push(result);
-
-      // Add delay between messages to avoid rate limiting
+ 
       await new Promise(resolve => setTimeout(resolve, 300));
     } catch (error) {
       logger.error(`❌ Bulk SMS failed for ${recipient}:`, error);
@@ -88,9 +90,7 @@ export const sendBulkSms = async (
   return results;
 };
 
-/**
- * Fetch subscribed numbers (filters: crop, region, alert type)
- */
+ 
 export const getSubscribedNumbers = async (
   cropIds?: string[],
   regionIds?: string[],
@@ -128,9 +128,7 @@ export const getSubscribedNumbers = async (
   }
 };
 
-/**
- * Send price alert notification
- */
+ 
 export const sendPriceAlert = async (
   cropName: string,
   price: number,
@@ -172,10 +170,7 @@ export const sendPriceAlert = async (
     logger.error('❌ Failed to send price alert:', error);
   }
 };
-
-/**
- * Send daily top price update
- */
+ 
 export const sendDailyPriceUpdate = async (): Promise<void> => {
   try {
     const priceChanges = await query(`
@@ -198,7 +193,7 @@ export const sendDailyPriceUpdate = async (): Promise<void> => {
     const priceList = priceChanges.rows
       .map(row => `${row.crop_name}: KSh ${row.price}/kg (${row.region_name})`)
       .join(', ');
-    
+
     message += priceList + '. For more info, reply HELP';
 
     // Subscribers interested in daily updates
@@ -213,9 +208,7 @@ export const sendDailyPriceUpdate = async (): Promise<void> => {
   }
 };
 
-/**
- * Process SMS delivery webhook
- */
+ 
 export const processSmsWebhook = async (req: any): Promise<void> => {
   try {
     const { id, status, phoneNumber } = req.body;
