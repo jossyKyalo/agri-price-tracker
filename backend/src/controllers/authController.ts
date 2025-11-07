@@ -246,7 +246,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
       );
 
        
-      const resetUrl = `${process.env.CORS_ORIGIN}/reset-password?token=${resetToken}&email=${email}`;
+      const resetUrl = `${process.env.CORS_ORIGIN}/#/reset-password?token=${resetToken}&email=${email}`;
 
       const emailContent = {
         to: email,

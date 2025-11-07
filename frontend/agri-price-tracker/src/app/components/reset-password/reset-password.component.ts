@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router'; 
+import { AuthService } from '../../services/auth.service'; 
 
 @Component({
   selector: 'app-reset-password',
@@ -21,22 +21,33 @@ export class ResetPasswordComponent implements OnInit {
   isLoading: boolean = false;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.token = params['token'] || '';
-      this.email = params['email'] || '';
+    if (isPlatformBrowser(this.platformId)) { 
+        const hash = window.location.hash;  
+        const queryParamIndex = hash.indexOf('?');
+        
+        if (queryParamIndex === -1) {
+            this.message = 'Invalid password reset link. Missing parameters.';
+            this.isError = true;
+            return;
+        }
+ 
+        const queryString = hash.substring(queryParamIndex + 1);
+        const params = new URLSearchParams(queryString);
 
-
-      if (!this.token || !this.email) {
-        this.message = 'Invalid password reset link. Missing token or email.';
-        this.isError = true;
-      }
-    });
+        this.token = params.get('token') || '';
+        this.email = params.get('email') || '';
+ 
+        if (!this.token || !this.email) {
+            this.message = 'Invalid password reset link. Missing token or email.';
+            this.isError = true;
+        }
+    }
   }
 
   submitResetPassword(): void {
@@ -47,15 +58,15 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     if (this.newPassword.length < 8) {
-      this.message = 'Password must be at least 8 characters long.';
-      this.isError = true;
-      return;
+        this.message = 'Password must be at least 8 characters long.';
+        this.isError = true;
+        return;
     }
 
     this.isLoading = true;
     this.message = '';
     this.isError = false;
-
+ 
     this.authService.resetPassword({
       token: this.token,
       email: this.email,
@@ -65,14 +76,14 @@ export class ResetPasswordComponent implements OnInit {
         this.isLoading = false;
         this.message = '✅ Your password has been successfully reset. Redirecting to login...';
         this.isError = false;
-
-        this.router.navigate(['/']);
-
+         
+        this.router.navigate(['/']); 
+  
         setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            const event = new CustomEvent('showAdminLoginFromReset');
-            window.dispatchEvent(event);
-          }
+            if (isPlatformBrowser(this.platformId)) {
+                const event = new CustomEvent('showAdminLoginFromReset');
+                window.dispatchEvent(event);
+            }
         }, 3000);
       },
       error: (error) => {

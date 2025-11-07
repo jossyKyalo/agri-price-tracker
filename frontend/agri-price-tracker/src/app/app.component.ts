@@ -107,26 +107,32 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Check if user is admin (only in browser environment)
-    this.checkAdminStatus();
-    // check for the URL path
+    this.checkAdminStatus(); 
     this.checkCurrentPath();
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('showAdminLoginFromReset', this.handleLoginSignal.bind(this));
+    }
+  }
+
+  handleLoginSignal() { 
+    this.showResetPasswordPage = false;
+    this.currentPage = 'home';
+    this.showAdminLogin();
   }
 
   checkCurrentPath() {
-    if (!isPlatformBrowser(this.platformId)) return;
- 
-    const path = window.location.pathname;
-
-    if (path === '/reset-password') {
+    if (!isPlatformBrowser(this.platformId)) return; 
+    const hash = window.location.hash;  
+    if (hash.startsWith('#/reset-password')) {
         this.showResetPasswordPage = true;
-        this.currentPage = 'reset'; 
-        
-        
+        this.currentPage = 'reset';  
         this.showAdminRegModal = false;
         this.showAdminLoginModal = false;
     } else {
-        this.showResetPasswordPage = false;
+        this.showResetPasswordPage = false; 
+        if (this.currentPage === 'reset') {
+            this.currentPage = 'home';
+        }
     }
   }
 
@@ -163,7 +169,7 @@ export class AppComponent implements OnInit {
     }
     this.currentPage = 'public';
     
-    // Only dispatch custom events in browser environment
+ 
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         const customEvent = new CustomEvent('switchToSection', { detail: section });
@@ -172,8 +178,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  openChatbot() {
-    // Only dispatch custom events in browser environment
+  openChatbot() { 
     if (isPlatformBrowser(this.platformId)) {
       const event = new CustomEvent('openChatbot');
       window.dispatchEvent(event);
@@ -215,8 +220,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  checkAdminStatus() {
-    // Only check localStorage in browser environment
+  checkAdminStatus() { 
     if (isPlatformBrowser(this.platformId)) {
       const userRole = localStorage.getItem('userRole');
       this.isAdmin = userRole === 'admin' || userRole === 'super_admin';
