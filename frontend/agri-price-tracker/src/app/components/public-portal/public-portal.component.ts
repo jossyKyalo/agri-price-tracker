@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoginRequest } from '../../services/auth.service';
+import { SmsService, SmsSubscription } from '../../services/sms.service';
 
 interface DisplayCrop {
   id: string;
@@ -36,9 +37,9 @@ export class PublicPortalComponent implements OnInit {
   showLogin = false;
   farmerName = '';
   showPassword = false;
-  isAdmin= false;
+  isAdmin = false;
 
-  isForgotPasswordMode= false;
+  isForgotPasswordMode = false;
   resetPhone = '';
   resetMessage = '';
 
@@ -74,6 +75,11 @@ export class PublicPortalComponent implements OnInit {
     notes: ''
   };
 
+  smsSubPhone: string = '';
+  smsSubCrops: { [cropName: string]: boolean } = {};
+  smsSubMessage: string = '';
+  smsSubIsError: boolean = false;
+
   allCrops: DisplayCrop[] = [];
   crops: Crop[] = [];
   regions: Region[] = [];
@@ -84,7 +90,8 @@ export class PublicPortalComponent implements OnInit {
     private priceService: PriceService,
     private cropService: CropService,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private smsService: SmsService
   ) { }
 
   ngOnInit(): void {
@@ -129,14 +136,14 @@ export class PublicPortalComponent implements OnInit {
     this.priceService.getPrices({ limit: 100 }).subscribe({
       next: (response: any) => {
         console.log('Raw prices response:', response);
-        
+
         const pricesData = response.data || response.prices || [];
-        
+
         // Transform API data to DisplayCrop format
         this.allCrops = pricesData.map((item: any) => {
           const currentPrice = parseFloat(item.price || item.current_price || 0);
           const previousPrice = currentPrice > 0 ? currentPrice * 0.95 : 0; // Mock previous price
-          
+
           return {
             id: item.id || item.crop_id,
             name: item.crop_name || item.name || 'Unknown',
@@ -153,7 +160,7 @@ export class PublicPortalComponent implements OnInit {
 
         this.filteredCrops = this.allCrops;
         this.isLoading = false;
-        
+
         if (this.allCrops.length > 0) {
           this.lastUpdated = this.allCrops[0].lastUpdated;
         }
@@ -191,13 +198,13 @@ export class PublicPortalComponent implements OnInit {
 
   filterCrops() {
     this.filteredCrops = this.allCrops.filter(crop => {
-      const matchesSearch = !this.searchTerm || 
+      const matchesSearch = !this.searchTerm ||
         crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      const matchesCategory = !this.selectedCategory || 
+
+      const matchesCategory = !this.selectedCategory ||
         crop.category === this.selectedCategory;
-      
-      const matchesRegion = !this.selectedRegion || 
+
+      const matchesRegion = !this.selectedRegion ||
         crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
 
       return matchesSearch && matchesCategory && matchesRegion;
@@ -206,7 +213,7 @@ export class PublicPortalComponent implements OnInit {
     console.log('Filtered crops:', this.filteredCrops);
   }
 
-    checkAuth() {
+  checkAuth() {
     // Check if logged in as admin
     const adminUser = this.authService.getCurrentUser();
     if (adminUser && (adminUser.role === 'admin' || adminUser.role === 'super_admin')) {
@@ -234,14 +241,14 @@ export class PublicPortalComponent implements OnInit {
 
   showForgotPassword() {
     this.isForgotPasswordMode = true;
-    this.showLogin = false;  
-    this.errorMessage = '';    
+    this.showLogin = false;
+    this.errorMessage = '';
     this.resetMessage = '';
   }
 
   backToLogin() {
     this.isForgotPasswordMode = false;
-    this.showLogin = true;  
+    this.showLogin = true;
     this.resetMessage = '';
   }
 
@@ -253,7 +260,7 @@ export class PublicPortalComponent implements OnInit {
 
     this.isLoading = true;
     this.resetMessage = '';
- 
+
     const farmerEmail = `farmer${this.resetPhone.replace(/[^\d]/g, '')}@agriprice.local`;
 
     this.authService.requestPasswordReset(farmerEmail).subscribe({
@@ -285,7 +292,7 @@ export class PublicPortalComponent implements OnInit {
         localStorage.setItem('farmer_name', response.data.user.full_name);
         this.isLoggedIn = true;
         this.farmerName = response.data.user.full_name;
-        
+
         alert(
           `✅ Registration Successful!\n\n` +
           `Welcome ${response.data.user.full_name}!\n\n` +
@@ -307,64 +314,64 @@ export class PublicPortalComponent implements OnInit {
   }
 
   farmerLogin() {
-  this.isLoading = true;
-  this.errorMessage = '';
-  this.isForgotPasswordMode = false;
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.isForgotPasswordMode = false;
 
-  const loginRequest: LoginRequest = {
-    email: `farmer${this.login.phone.replace(/[^\d]/g, '')}@agriprice.local`,
-    password: this.login.password
-  };
+    const loginRequest: LoginRequest = {
+      email: `farmer${this.login.phone.replace(/[^\d]/g, '')}@agriprice.local`,
+      password: this.login.password
+    };
 
-  // Use the farmer login endpoint
-  this.http.post(`${this.baseUrl}/auth/login/farmer`, {
-    phone: this.login.phone,
-    password: this.login.password
-  }).subscribe({
-    next: (response: any) => {
-      this.isLoading = false;
-      
-      // Store using consistent keys
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-      localStorage.setItem('farmer_token', response.data.token);
-      localStorage.setItem('farmer_name', response.data.user.full_name);
-      
-      this.isLoggedIn = true;
-      this.farmerName = response.data.user.full_name;
-      
-      alert(`✅ Welcome back, ${response.data.user.full_name}!`);
+    // Use the farmer login endpoint
+    this.http.post(`${this.baseUrl}/auth/login/farmer`, {
+      phone: this.login.phone,
+      password: this.login.password
+    }).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
 
-      this.login = { phone: '', password: '' };
-    },
-    error: (error) => {
-      this.isLoading = false;
-      this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
-    }
-  });
-}
+        // Store using consistent keys
+        localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+        localStorage.setItem('farmer_token', response.data.token);
+        localStorage.setItem('farmer_name', response.data.user.full_name);
 
-logoutPortal() {
+        this.isLoggedIn = true;
+        this.farmerName = response.data.user.full_name;
+
+        alert(`✅ Welcome back, ${response.data.user.full_name}!`);
+
+        this.login = { phone: '', password: '' };
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
+      }
+    });
+  }
+
+  logoutPortal() {
     if (confirm('Are you sure you want to logout from the portal?')) {
       if (this.isAdmin) {
         alert('ℹ️ To fully logout, use the logout button in the header.');
         return;
       } else {
-       
+
         localStorage.removeItem('farmer_token');
         localStorage.removeItem('farmer_name');
-        
+
         this.isLoggedIn = false;
         this.isAdmin = false;
         this.farmerName = '';
-        
+
         alert('✅ You have been logged out successfully');
       }
     }
   }
 
   logout() {
-     this.logoutPortal()
+    this.logoutPortal()
   }
 
   submitPrice() {
@@ -395,8 +402,8 @@ logoutPortal() {
       notes: this.priceInput.notes
     };
 
-    const token = this.isAdmin 
-      ? localStorage.getItem('authToken') 
+    const token = this.isAdmin
+      ? localStorage.getItem('authToken')
       : localStorage.getItem('farmer_token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
@@ -408,7 +415,7 @@ logoutPortal() {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
         this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
-        this.loadPrices(); 
+        this.loadPrices();
       },
       error: (error) => {
         console.error('Error submitting price:', error);
@@ -432,5 +439,63 @@ logoutPortal() {
   getPriceChange(current: number, previous: number): number {
     if (!previous) return 0;
     return Math.round(((current - previous) / previous) * 100);
+  }
+
+
+  subscribeToSms() {
+    this.isLoading = true;
+    this.smsSubMessage = '';
+    this.smsSubIsError = false;
+
+    const selectedCropNames = Object.keys(this.smsSubCrops).filter(
+      cropName => this.smsSubCrops[cropName]
+    );
+
+    if (selectedCropNames.length === 0) {
+      this.smsSubMessage = 'Please select at least one crop to subscribe.';
+      this.smsSubIsError = true;
+      this.isLoading = false;
+      return;
+    }
+
+    if (!this.smsSubPhone) {
+      this.smsSubMessage = 'Please enter your phone number.';
+      this.smsSubIsError = true;
+      this.isLoading = false;
+      return;
+    }
+
+    const selectedCropIDs = selectedCropNames.map(cropName => {
+      const crop = this.crops.find(c => c.name === cropName);
+      return crop ? crop.id : null;
+    }).filter(id => id !== null);
+
+    if (selectedCropIDs.length !== selectedCropNames.length) {
+      this.smsSubMessage = 'An error occurred matching crop names to IDs.';
+      this.smsSubIsError = true;
+      this.isLoading = false;
+      return;
+    }
+
+    const subscriptionData: SmsSubscription = {
+      phone: this.smsSubPhone,
+      crops: selectedCropIDs,
+      alert_types: ['price-alert', 'price-update']
+    };
+
+    this.smsService.subscribeSms(subscriptionData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.smsSubMessage = '✅ Success! You are now subscribed to SMS alerts.';
+        this.smsSubIsError = false;
+        this.smsSubPhone = '';
+        this.smsSubCrops = {};
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.smsSubMessage = error.error?.error || 'Subscription failed. Please try again.';
+        this.smsSubIsError = true;
+      }
+    });
   }
 }

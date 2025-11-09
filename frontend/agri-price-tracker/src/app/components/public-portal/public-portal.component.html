@@ -190,7 +190,7 @@
     </div>
 
     <div *ngIf="activeTab === 'input'" class="tab-content">
-      
+
       <div *ngIf="!isLoggedIn" class="card mb-3">
         <div class="card-header">
           <h3 *ngIf="!isForgotPasswordMode">
@@ -317,7 +317,8 @@
           </div>
 
         </div>
-      </div> <div *ngIf="isLoggedIn && isAdmin" class="card mb-3 bg-admin-notice">
+      </div>
+      <div *ngIf="isLoggedIn && isAdmin" class="card mb-3 bg-admin-notice">
         <div class="card-body">
           <div class="admin-notice-content">
             <div class="notice-left">
@@ -377,8 +378,8 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Price (KSh/kg)</label>
-                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0" step="0.01"
-                  required>
+                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0"
+                  step="0.01" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Your Location</label>
@@ -435,8 +436,9 @@
           </div>
         </div>
       </div>
-    
-    </div> <div *ngIf="activeTab === 'sms'" class="tab-content">
+
+    </div>
+    <div *ngIf="activeTab === 'sms'" class="tab-content">
       <div class="card">
         <div class="card-header">
           <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
@@ -455,28 +457,35 @@
               </ul>
             </div>
             <div class="sms-form">
-              <div class="form-group">
-                <label class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" placeholder="+254 700 000 000">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Select Crops (max 5)</label>
-                <div class="crop-checkboxes">
-                  <label><input type="checkbox"> Maize</label>
-                  <label><input type="checkbox"> Beans</label>
-                  <label><input type="checkbox"> Tomatoes</label>
-                  <label><input type="checkbox"> Potatoes</label>
-                  <label><input type="checkbox"> Onions</label>
+              <form (ngSubmit)="subscribeToSms()">
+                <div *ngIf="smsSubMessage" class="alert"
+                  [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
+                  {{ smsSubMessage }}
                 </div>
-              </div>
-              <button class="btn btn-primary">
-                <i class="fas fa-bell"></i>
-                Subscribe to SMS Alerts
-              </button>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input type="tel" class="form-control" placeholder="+254 700 000 000" [(ngModel)]="smsSubPhone"
+                    name="smsSubPhone" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Select Crops *</label>
+                  <div class="crop-checkboxes">
+                    <label *ngFor="let crop of crops">
+                      <input type="checkbox" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
+                      {{ crop.name }}
+                    </label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                  <i class="fas fa-bell"></i>
+                  {{ isLoading ? 'Subscribing...' : 'Subscribe to SMS Alerts' }}
+                </button>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
-  </div> </div> 
+
+  </div>
+</div>
