@@ -5511,3 +5511,11 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-11-07 19:31:56:3156"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-11-07 19:31:56:3156"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-11-07 19:31:56:3156"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRunning KAMIS data sync job\u001b[39m","timestamp":"2025-11-07 20:00:00:00"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 287ms: INSERT INTO kamis_sync_logs (sync_date, status) VALUES (CURRENT_DATE, $1) RETURNING id\u001b[39m","timestamp":"2025-11-07 20:00:01:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting KAMIS data synchronization\u001b[39m","timestamp":"2025-11-07 20:00:01:01"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 25ms: UPDATE kamis_sync_logs \u001b[39m\n\u001b[37m     SET records_processed = $1, records_inserted = $2, records_updated = $3, \u001b[39m\n\u001b[37m         status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP\u001b[39m\n\u001b[37m     WHERE id = $6\u001b[39m","timestamp":"2025-11-07 20:00:04:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRunning KAMIS data sync job\u001b[39m","timestamp":"2025-11-08 20:00:00:00"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 703ms: INSERT INTO kamis_sync_logs (sync_date, status) VALUES (CURRENT_DATE, $1) RETURNING id\u001b[39m","timestamp":"2025-11-08 20:00:01:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting KAMIS data synchronization\u001b[39m","timestamp":"2025-11-08 20:00:01:01"}
+{"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 22ms: UPDATE kamis_sync_logs \u001b[39m\n\u001b[37m     SET records_processed = $1, records_inserted = $2, records_updated = $3, \u001b[39m\n\u001b[37m         status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP\u001b[39m\n\u001b[37m     WHERE id = $6\u001b[39m","timestamp":"2025-11-08 20:00:05:05"}
