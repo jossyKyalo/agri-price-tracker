@@ -2,7 +2,7 @@
   <div class="container">
     <div class="portal-header">
       <h1><i class="fas fa-chart-line"></i> Farmer Portal</h1>
-      <p class="text-muted">Real-time crop prices, AI predictions, and price input for farmers</p>
+      <p class="text-muted">Real-time agricultural products prices, AI predictions, and price input for farmers</p>
     </div>
 
     <div class="stats-grid">
@@ -12,7 +12,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ totalCrops }}</h3>
-          <p>Crops Tracked</p>
+          <p>Agricultural products Tracked</p>
         </div>
       </div>
       <div class="stat-card">
@@ -68,7 +68,7 @@
         <div class="card-body">
           <div class="search-filters">
             <div class="search-group">
-              <label class="form-label">Search Crop</label>
+              <label class="form-label">Search Crop/Product</label>
               <input type="text" class="form-control" placeholder="Search for crops..." [(ngModel)]="searchTerm"
                 (input)="filterCrops()">
             </div>
@@ -107,7 +107,7 @@
             <table class="price-table">
               <thead>
                 <tr>
-                  <th>Crop</th>
+                  <th>Agricultural Product</th>
                   <th>Category</th>
                   <th>Current Price</th>
                   <th>Trend</th>
@@ -370,9 +370,9 @@
             </div>
             <form *ngIf="isLoggedIn" (ngSubmit)="submitPrice()" #priceForm="ngForm">
               <div class="form-group">
-                <label class="form-label">Crop</label>
+                <label class="form-label">Crop/Product</label>
                 <select class="form-select" [(ngModel)]="priceInput.crop" name="crop" required>
-                  <option value="">Select Crop</option>
+                  <option value="">Select Crop/Product</option>
                   <option *ngFor="let crop of crops" [value]="crop.name">{{ crop.name }}</option>
                 </select>
               </div>
@@ -468,7 +468,7 @@
                     name="smsSubPhone" required>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Select Crops *</label>
+                  <label class="form-label">Select agricultural product *</label>
                   <div class="crop-checkboxes">
                     <label *ngFor="let crop of crops">
                       <input type="checkbox" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">

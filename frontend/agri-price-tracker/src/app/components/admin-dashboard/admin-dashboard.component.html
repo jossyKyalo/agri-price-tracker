@@ -139,7 +139,7 @@
           <div class="card-body">
             <form (ngSubmit)="submitPriceEntry()" #priceForm="ngForm">
               <div class="form-group">
-                <label class="form-label">Crop *</label>
+                <label class="form-label">Crop/Product *</label>
                 <select class="form-select" [(ngModel)]="newPriceEntry.crop_id" name="crop_id" required [disabled]="loadingCrops">
                   <option value="">{{ loadingCrops ? 'Loading crops...' : 'Select Crop' }}</option>
                   <option *ngFor="let crop of crops" [value]="crop.id">{{ crop.name }}</option>
