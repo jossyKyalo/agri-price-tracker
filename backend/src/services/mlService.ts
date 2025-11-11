@@ -1,66 +1,52 @@
 import axios from 'axios';
 import { query } from '../database/connection';
 import { logger } from '../utils/logger';
-import type { PredictionRequest, PredictionResponse } from '../types/index';
+import type { PredictionResponse } from '../types/index';
 
-export const generatePricePrediction = async (
-  cropId: string,
-  regionId: string,
-  predictionDays: number = 7
-): Promise<PredictionResponse | null> => {
-  try {
-    // Get historical price data
-    const historicalData = await query(
-      `SELECT price, entry_date
-       FROM price_entries
-       WHERE crop_id = $1 AND region_id = $2 AND is_verified = true
-       ORDER BY entry_date DESC
-       LIMIT 90`,
-      [cropId, regionId]
-    );
+ 
+export interface MLPredictionRequest {
+  commodity: string;
+  market: string;
+  county: string;
+  prediction_days: number;
+}
 
-    if (historicalData.rows.length < 10) {
-      logger.warn(`Insufficient data for prediction: ${cropId} in ${regionId}`);
-      return null;
+ 
+const storePrediction = async (prediction: PredictionResponse): Promise<void> => {
+  try { 
+    const mainPrediction = prediction.predicted_prices[0];
+    if (!mainPrediction) {
+      throw new Error('Prediction data is missing predicted_prices');
     }
 
-    // Prepare data for ML model
-    const requestData: PredictionRequest = {
-      crop_id: cropId,
-      region_id: regionId,
-      historical_data: historicalData.rows,
-      prediction_days: predictionDays
-    };
-
-    // Call ML model API
-    const response = await axios.post(
-      `${process.env.ML_MODEL_URL}/predict`,
-      requestData,
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.ML_MODEL_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      }
+    await query(
+      `INSERT INTO price_predictions (
+         crop_id, region_id, current_price, predicted_price, prediction_date,
+         confidence_score, model_version, factors
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (crop_id, region_id, prediction_date) 
+       DO UPDATE SET 
+         predicted_price = EXCLUDED.predicted_price,
+         confidence_score = EXCLUDED.confidence_score,
+         factors = EXCLUDED.factors`,
+      [
+        prediction.crop_id,
+        prediction.region_id,
+        prediction.current_price,
+        mainPrediction.price,
+        mainPrediction.date,
+        mainPrediction.confidence,
+        prediction.model_version,
+        JSON.stringify(prediction.factors)
+      ]
     );
 
-    const prediction: PredictionResponse = response.data;
-
-    // Store prediction in database
-    await storePrediction(prediction);
-
-    logger.info(`Prediction generated for crop ${cropId} in region ${regionId}`);
-    return prediction;
-
   } catch (error: any) {
-    logger.error('ML prediction failed:', error);
-    
-    // Fallback to simple trend analysis
-    return generateSimplePrediction(cropId, regionId, predictionDays);
+    logger.error('Failed to store prediction:', error); 
   }
 };
 
+ 
 const generateSimplePrediction = async (
   cropId: string,
   regionId: string,
@@ -80,23 +66,20 @@ const generateSimplePrediction = async (
       return null;
     }
 
-    // Parse and validate prices
     const prices = result.rows
       .map(row => parseFloat(row.price))
       .filter(price => !isNaN(price) && price > 0);
     
     if (prices.length === 0) {
-      logger.warn(`No valid prices found for ${cropId} in ${regionId}`);
+      logger.warn(`No valid prices found for ${cropId} in ${regionId} for fallback`);
       return null;
     }
     
-    const currentPrice = prices[0]!; // guaranteed after check
-    
-    // Simple moving average
+    const currentPrice = prices[0]!;
+     
     const recentPrices = prices.slice(0, Math.min(7, prices.length));
     const average = recentPrices.reduce((sum, price) => sum + price, 0) / recentPrices.length;
-    
-    // Trend factor
+     
     const trendFactor = prices.length >= 14 ? (() => {
       const oldPrices = prices.slice(7, 14);
       const oldAverage = oldPrices.reduce((sum, price) => sum + price, 0) / oldPrices.length;
@@ -125,87 +108,138 @@ const generateSimplePrediction = async (
     await storePrediction(prediction);
     return prediction;
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Simple prediction failed:', error);
     return null;
   }
 };
 
-const storePrediction = async (prediction: PredictionResponse): Promise<void> => {
+ 
+export const generatePricePrediction = async (
+  commodityName: string,
+  marketName: string,
+  countyName: string,  
+  cropId: string, 
+  regionId: string,
+  predictionDays: number = 7
+): Promise<PredictionResponse | null> => {
   try {
-    const mainPrediction = prediction.predicted_prices[0]!; // guaranteed
+     
+    const requestData: MLPredictionRequest = {
+      commodity: commodityName,
+      market: marketName,
+      county: countyName,
+      prediction_days: predictionDays
+    };
+ 
+    const response = await axios.post(
+      `${process.env.ML_MODEL_URL}/predict`,
+      requestData,
+      {
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        timeout: 30000
+      }
+    ); 
+    const predictionResult = response.data;
+ 
+    const mainPrediction = predictionResult.predictions[0];
+    const trend = predictionResult.trend;
 
-    await query(
-      `INSERT INTO price_predictions (
-        crop_id, region_id, current_price, predicted_price, prediction_date,
-        confidence_score, model_version, factors
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      ON CONFLICT (crop_id, region_id, prediction_date) 
-      DO UPDATE SET 
-        predicted_price = EXCLUDED.predicted_price,
-        confidence_score = EXCLUDED.confidence_score,
-        factors = EXCLUDED.factors`,
-      [
-        prediction.crop_id,
-        prediction.region_id,
-        prediction.current_price,
-        mainPrediction.price,
-        mainPrediction.date,
-        mainPrediction.confidence,
-        prediction.model_version,
-        JSON.stringify(prediction.factors)
-      ]
-    );
+    const dbPrediction: PredictionResponse = {
+      crop_id: cropId,
+      region_id: regionId,
+      current_price: predictionResult.current_price,
+      predicted_prices: [{
+        date: new Date(mainPrediction.date),
+        price: mainPrediction.predicted_price,
+        confidence: 0.75  
+      }],
+      factors: {
+        method: 'ml-random-forest',
+        trend: trend,
+        recommendation: predictionResult.recommendation
+      },
+      model_version: 'RandomForest-v1'  
+    };
+     
+    await storePrediction(dbPrediction);
 
-  } catch (error) {
-    logger.error('Failed to store prediction:', error);
-    throw error;
+    logger.info(`ML Prediction generated for ${commodityName} in ${marketName}`);
+    return dbPrediction;
+
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      logger.error(`ML prediction failed with status ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    } else {
+      logger.error('ML prediction failed:', error.message);
+    } 
+    logger.warn(`ML service failed. Falling back to simple prediction for ${commodityName}.`);
+    return generateSimplePrediction(cropId, regionId, predictionDays);
   }
 };
 
+ 
 export const generateDailyPredictions = async (): Promise<void> => {
   try {
     logger.info('Starting daily predictions generation');
-
+ 
     const combinations = await query(`
-      SELECT DISTINCT pe.crop_id, pe.region_id, c.name as crop_name, r.name as region_name
+      SELECT DISTINCT 
+        pe.crop_id, 
+        pe.region_id, 
+        pe.market_id,
+        c.name as crop_name, 
+        r.name as region_name,
+        m.name as market_name
       FROM price_entries pe
       JOIN crops c ON pe.crop_id = c.id
       JOIN regions r ON pe.region_id = r.id
+      JOIN markets m ON pe.market_id = m.id
       WHERE pe.entry_date >= CURRENT_DATE - INTERVAL '30 days'
         AND pe.is_verified = true
-      GROUP BY pe.crop_id, pe.region_id, c.name, r.name
-      HAVING COUNT(*) >= 5
+      GROUP BY pe.crop_id, pe.region_id, pe.market_id, c.name, r.name, m.name
+      HAVING COUNT(pe.id) >= 5 -- Only predict for combos with recent data
     `);
 
     let generated = 0;
     let failed = 0;
 
     for (const combo of combinations.rows) {
-      try {
-        const prediction = await generatePricePrediction(combo.crop_id, combo.region_id);
+      try { 
+        const prediction = await generatePricePrediction(
+          combo.crop_name,
+          combo.market_name,
+          combo.region_name,  
+          combo.crop_id,
+          combo.region_id,
+          7  
+        );
+        
         if (prediction) {
           generated++;
         } else {
           failed++;
         }
-        
+         
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-      } catch (error) {
-        logger.error(`Failed to generate prediction for ${combo.crop_name} in ${combo.region_name}:`, error);
+      } catch (error: any) {
+        logger.error(`Failed to generate prediction for ${combo.crop_name} in ${combo.market_name}:`, error.message);
         failed++;
       }
     }
 
     logger.info(`Daily predictions completed: ${generated} generated, ${failed} failed`);
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Daily predictions generation failed:', error);
     throw error;
   }
 };
 
+ 
 export const getPredictions = async (
   cropId?: string,
   regionId?: string,
@@ -241,7 +275,7 @@ export const getPredictions = async (
 
     return result.rows;
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Failed to get predictions:', error);
     return [];
   }
