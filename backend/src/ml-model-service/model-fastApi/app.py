@@ -40,20 +40,19 @@ def load_model_components():
     """Load model, scaler, encoder, and metadata"""
     global model, scaler, encoder, metadata
     
-    try:
-        # File existence checks
+    try: 
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
         if not os.path.exists(SCALER_PATH):
             raise FileNotFoundError(f"Scaler not found at {SCALER_PATH}")
-        if not os.path.exists(ENCODER_PATH): 
+        if not os.path.exists(ENCODER_PATH):  
             raise FileNotFoundError(f"Encoder not found at {ENCODER_PATH}")
         if not os.path.exists(METADATA_PATH):
             raise FileNotFoundError(f"Metadata not found at {METADATA_PATH}")
         
         model = joblib.load(MODEL_PATH)
         scaler = joblib.load(SCALER_PATH)
-        encoder = joblib.load(ENCODER_PATH)  
+        encoder = joblib.load(ENCODER_PATH) 
         
         with open(METADATA_PATH) as f:
             metadata = json.load(f)
@@ -109,6 +108,7 @@ class PredictionResponse(BaseModel):
     trend: str
     recommendation: str
     confidence: str
+
  
 
 def get_recent_data(commodity: str, market: str, county: str):
@@ -118,7 +118,7 @@ def get_recent_data(commodity: str, market: str, county: str):
         (historical_data['Market'] == market) &
         (historical_data['County'] == county)
     )
-   
+     
     data = historical_data[mask].sort_values('Date', ascending=False).head(30)
     
     if len(data) < 14:  
@@ -148,8 +148,7 @@ def engineer_features(commodity: str, market: str, county: str, target_date: dat
     features['month_cos'] = np.cos(2 * np.pi * features['month'] / 12)
     features['is_harvest'] = 1 if features['month'] in [7, 8, 1, 2] else 0
     features['is_rainy'] = 1 if features['month'] in [3, 4, 5, 10, 11] else 0
-    
-   
+ 
     cat_input = [[commodity, market, county]] 
     cat_encoded = encoder.transform(cat_input)[0] 
     
@@ -159,15 +158,14 @@ def engineer_features(commodity: str, market: str, county: str, target_date: dat
      
     for lag in [1, 3, 7, 14]: 
         features[f'lag_{lag}'] = float(prices[lag-1]) if len(prices) >= lag else features.get(f'lag_{lag-1}', 0.0)
-    
-    
+     
     for window in [7, 14]:
         window_data = prices[:window]  
         features[f'ma_{window}'] = float(np.mean(window_data))
         features[f'std_{window}'] = float(np.std(window_data))
          
     feature_df = pd.DataFrame([features])
-    
+     
     feature_df = feature_df.reindex(columns=metadata['features'], fill_value=0.0)
     
     return feature_df
@@ -202,26 +200,25 @@ def predict(request: PredictionRequest):
     try:
         if request.days_ahead != 7:
              raise HTTPException(status_code=400, detail="This model is only trained for 7-day forecasting. Set days_ahead=7.")
-        
+         
         recent_data = get_recent_data(request.commodity, request.market, request.county)
-        
+         
         current_price = recent_data['Retail'].iloc[0]
         current_date = recent_data['Date'].iloc[0]
-        
-       
+      
         target_date = current_date + timedelta(days=7) 
-        
+         
         X = engineer_features(
             request.commodity,
             request.market,
             request.county,
             target_date, 
             recent_data
-        ) 
-
+        )
+         
         X_scaled = scaler.transform(X)
         predicted_price = float(model.predict(X_scaled)[0])
-         
+       
         change_pct = ((predicted_price - current_price) / current_price) * 100
         
         day_prediction = DayPrediction(
@@ -254,16 +251,17 @@ def predict(request: PredictionRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Internal prediction error: {str(e)}")
 
-
+ 
 
 @app.get("/commodities")
 def get_commodities():
     """Get available commodities"""
     if not MODEL_LOADED:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
-    commodities = historical_data['Commodity'].unique().tolist()
-    return {"count": len(commodities), "commodities": sorted(commodities)}
+     
+    commodities_list = historical_data['Commodity'].dropna().unique().tolist()
+    commodities = sorted([str(c) for c in commodities_list])
+    return {"count": len(commodities), "commodities": commodities}
 
 @app.get("/markets")
 def get_markets():
@@ -271,17 +269,19 @@ def get_markets():
     if not MODEL_LOADED:
         raise HTTPException(status_code=503, detail="Model not loaded")
     
-    markets = historical_data['Market'].unique().tolist()
-    return {"count": len(markets), "markets": sorted(markets)}
+    markets_list = historical_data['Market'].dropna().unique().tolist()
+    markets = sorted([str(m) for m in markets_list])
+    return {"count": len(markets), "markets": markets}
 
 @app.get("/counties")
 def get_counties():
     """Get available counties"""
     if not MODEL_LOADED:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
-    counties = historical_data['County'].unique().tolist()
-    return {"count": len(counties), "counties": sorted(counties)}
+     
+    counties_list = historical_data['County'].dropna().unique().tolist()
+    counties = sorted([str(c) for c in counties_list])
+    return {"count": len(counties), "counties": counties}
 
 @app.get("/health")
 def health_check():
