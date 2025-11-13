@@ -17,9 +17,9 @@
     "ma_14",
     "std_7",
     "std_14",
-    "Commodity",
-    "Market",
-    "County"
+    "Commodity_enc",
+    "Market_enc",
+    "County_enc"
   ],
   "model_type": "RandomForest",
   "n_features": 20,
@@ -27,6 +27,6 @@
   "avg_mae": 43.02528848667451,
   "avg_rmse": 128.40630594611014,
   "avg_r2": 0.5598047856014159,
-  "trained_date": "2025-11-12T00:13:39.722913",
+  "trained_date": "2025-11-13T12:17:46.211828",
   "sklearn_version": "1.3.2 or higher"
 }
