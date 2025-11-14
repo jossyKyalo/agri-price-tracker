@@ -40,8 +40,15 @@ router.post('/predictions/generate', authenticate, requireAdmin, async (req, res
       });
       return;
     }
-
-    const prediction = await generatePricePrediction(crop_id, region_id, prediction_days);
+ 
+    const prediction = await generatePricePrediction(
+      '',
+      '',
+      '',
+      crop_id as string,
+      region_id as string,
+      Number(prediction_days)
+    );
 
     if (!prediction) {
       res.status(400).json({
