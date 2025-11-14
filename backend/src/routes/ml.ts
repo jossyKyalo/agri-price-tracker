@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
 import { generatePricePrediction, getPredictions } from '../services/mlService';
 import type { ApiResponse } from '../types/index';
+import { query } from '../database/connection';
+import { logger } from '../utils/logger';
 
 const router = Router();
 
-// Get price predictions (public with optional auth)
 router.get('/predictions', optionalAuth, async (req, res, next): Promise<void> => {
   try {
     const { crop_id, region_id, limit = 20 } = req.query;
@@ -28,23 +29,48 @@ router.get('/predictions', optionalAuth, async (req, res, next): Promise<void> =
   }
 });
 
-// Generate prediction for specific crop/region (admin only)
+ 
 router.post('/predictions/generate', authenticate, requireAdmin, async (req, res, next): Promise<void> => {
-  try {
-    const { crop_id, region_id, prediction_days = 7 } = req.body;
+  try { 
+    const { crop_id, region_id, market_id, prediction_days = 7 } = req.body;
 
-    if (!crop_id || !region_id) {
+    if (!crop_id || !region_id || !market_id) {
       res.status(400).json({
-        success: false,
-        message: 'crop_id and region_id are required'
+        success: false, 
+        message: 'crop_id, region_id, and market_id are required'
       });
       return;
     }
  
+    const namesResult = await query(
+      `SELECT 
+        (SELECT name FROM crops WHERE id = $1) as crop_name,
+        (SELECT name FROM regions WHERE id = $2) as region_name,
+        (SELECT name FROM markets WHERE id = $3) as market_name
+      `,
+      [crop_id, region_id, market_id]
+    );
+
+    if (namesResult.rows.length === 0) {
+      const err: any = new Error('Could not find names for one or more IDs.');
+      err.status = 500;
+      throw err;
+    }
+
+    const { crop_name, region_name, market_name } = namesResult.rows[0];
+
+    if (!crop_name || !region_name || !market_name) {
+      res.status(404).json({
+        success: false,
+        message: 'One or more IDs (crop, region, market) are invalid.'
+      });
+      return;
+    } 
+
     const prediction = await generatePricePrediction(
-      '',
-      '',
-      '',
+      crop_name,
+      market_name, 
+      region_name,
       crop_id as string,
       region_id as string,
       Number(prediction_days)
