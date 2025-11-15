@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PriceService, CropPrice, CreatePriceEntry } from '../../services/price.service';
+import { PriceService, CropPrice, CreatePriceEntry, PricePrediction } from '../../services/price.service';
 import { CropService, Crop, Region } from '../../services/crop.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
@@ -9,6 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoginRequest } from '../../services/auth.service';
 import { SmsService, SmsSubscription } from '../../services/sms.service';
+import { forkJoin } from 'rxjs';
 
 interface DisplayCrop {
   id: string;
@@ -21,6 +22,8 @@ interface DisplayCrop {
   market: string;
   lastUpdated: string;
   prediction: number;
+  crop_id: string;
+  region_id: string;
 }
 
 @Component({
@@ -101,84 +104,80 @@ export class PublicPortalComponent implements OnInit {
 
   loadData(): void {
     this.isLoading = true;
-    this.loadCrops();
-    this.loadRegions();
-    this.loadPrices();
-  }
+    const crops$ = this.cropService.getCrops();
+    const regions$ = this.cropService.getRegions();
+    const prices$ = this.priceService.getPrices({ limit: 100 });
+    const predictions$ = this.priceService.getPredictions();
 
-  loadCrops() {
-    this.cropService.getCrops().subscribe({
-      next: (response: any) => {
-        this.crops = response.data || response || [];
+    forkJoin({
+      crops: crops$,
+      regions: regions$,
+      prices: prices$,
+      predictions: predictions$
+    }).subscribe({
+      next: ({ crops, regions, prices, predictions }) => {
+
+        this.crops = ((crops as any).data || crops) || [];
         this.totalCrops = this.crops.length;
-        console.log('Crops loaded:', this.crops);
-      },
-      error: (error) => {
-        console.error('Error loading crops:', error);
-      }
-    });
-  }
-
-  loadRegions() {
-    this.cropService.getRegions().subscribe({
-      next: (response: any) => {
-        this.regions = response.data || response || [];
+        this.regions = ((regions as any).data || regions) || [];
         this.totalRegions = this.regions.length;
-        console.log('Regions loaded:', this.regions);
-      },
-      error: (error) => {
-        console.error('Error loading regions:', error);
-      }
-    });
-  }
 
-  loadPrices() {
-    this.priceService.getPrices({ limit: 100 }).subscribe({
-      next: (response: any) => {
-        console.log('Raw prices response:', response);
+        const predictionMap = new Map<string, PricePrediction>();
+        for (const pred of predictions) {
+          const key = `${pred.crop_id}_${pred.region_id}`;
+          predictionMap.set(key, pred);
+        } 
+        const pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
 
-        const pricesData = response.data || response.prices || [];
-
-        // Transform API data to DisplayCrop format
         this.allCrops = pricesData.map((item: any) => {
           const currentPrice = parseFloat(item.price || item.current_price || 0);
-          const previousPrice = currentPrice > 0 ? currentPrice * 0.95 : 0; // Mock previous price
+          const crop_id = item.crop_id;
+          const region_id = item.region_id;
+          const predictionKey = `${crop_id}_${region_id}`;
+          const realPrediction = predictionMap.get(predictionKey);
+ 
+          const previousPrice = parseFloat(item.previous_price || currentPrice);
 
           return {
-            id: item.id || item.crop_id,
+            id: item.id || crop_id,
             name: item.crop_name || item.name || 'Unknown',
             category: item.category || 'general',
             currentPrice: currentPrice,
+ 
             previousPrice: previousPrice,
+ 
             trend: this.calculateTrend(currentPrice, previousPrice),
+
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
             lastUpdated: this.formatDate(item.entry_date || item.created_at || new Date()),
-            prediction: currentPrice * 1.05 // Mock prediction
+ 
+            prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
+
+            crop_id: crop_id,
+            region_id: region_id
           } as DisplayCrop;
         });
 
         this.filteredCrops = this.allCrops;
         this.isLoading = false;
-
         if (this.allCrops.length > 0) {
           this.lastUpdated = this.allCrops[0].lastUpdated;
         }
-
-        console.log('Transformed crops:', this.allCrops);
       },
       error: (error) => {
-        console.error('Error loading prices:', error);
+        console.error('Error loading combined data:', error);
         this.isLoading = false;
-        this.allCrops = [];
-        this.filteredCrops = [];
+        this.errorMessage = "Failed to load all portal data. Please try again later.";
       }
     });
   }
+ 
 
-  calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
-    if (current > previous) return 'up';
-    if (current < previous) return 'down';
+  calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' { 
+    const diff = current - previous;
+    if (diff > (previous * 0.01)) return 'up';  
+    if (diff < -(previous * 0.01)) return 'down';  
     return 'stable';
   }
 
@@ -323,7 +322,6 @@ export class PublicPortalComponent implements OnInit {
       password: this.login.password
     };
 
-    // Use the farmer login endpoint
     this.http.post(`${this.baseUrl}/auth/login/farmer`, {
       phone: this.login.phone,
       password: this.login.password
@@ -331,7 +329,6 @@ export class PublicPortalComponent implements OnInit {
       next: (response: any) => {
         this.isLoading = false;
 
-        // Store using consistent keys
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('currentUser', JSON.stringify(response.data.user));
         localStorage.setItem('farmer_token', response.data.token);
@@ -346,7 +343,7 @@ export class PublicPortalComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
+        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
       }
     });
   }
@@ -357,14 +354,11 @@ export class PublicPortalComponent implements OnInit {
         alert('ℹ️ To fully logout, use the logout button in the header.');
         return;
       } else {
-
         localStorage.removeItem('farmer_token');
         localStorage.removeItem('farmer_name');
-
         this.isLoggedIn = false;
         this.isAdmin = false;
         this.farmerName = '';
-
         alert('✅ You have been logged out successfully');
       }
     }
@@ -375,9 +369,6 @@ export class PublicPortalComponent implements OnInit {
   }
 
   submitPrice() {
-    console.log('Submit button clicked!');
-    console.log('Form data:', this.priceInput);
-
     if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
       this.errorMessage = 'Please fill in all required fields';
       return;
@@ -387,7 +378,8 @@ export class PublicPortalComponent implements OnInit {
     this.errorMessage = '';
 
     const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
-    const region = this.regions.find(r => r.name.toLowerCase().includes(this.priceInput.region.toLowerCase()));
+    // 💡 Use a more robust region find
+    const region = this.regions.find(r => r.name.toLowerCase() === this.priceInput.region.toLowerCase());
 
     if (!crop || !region) {
       this.errorMessage = 'Invalid crop or region selected';
@@ -399,7 +391,8 @@ export class PublicPortalComponent implements OnInit {
       crop_id: crop.id,
       region_id: region.id,
       price: this.priceInput.price,
-      notes: this.priceInput.notes
+      notes: this.priceInput.notes,
+      market: this.priceInput.location 
     };
 
     const token = this.isAdmin
@@ -415,7 +408,8 @@ export class PublicPortalComponent implements OnInit {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
         this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
-        this.loadPrices();
+ 
+        this.loadData();
       },
       error: (error) => {
         console.error('Error submitting price:', error);
@@ -436,11 +430,10 @@ export class PublicPortalComponent implements OnInit {
     return Math.round(((predicted - current) / current) * 100);
   }
 
-  getPriceChange(current: number, previous: number): number {
+  getPriceChange(current: number, previous: number): number { 
     if (!previous) return 0;
     return Math.round(((current - previous) / previous) * 100);
   }
-
 
   subscribeToSms() {
     this.isLoading = true;

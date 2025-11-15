@@ -47,19 +47,34 @@ export interface CreatePriceEntry {
   crop_id: string;
   region_id: string;
   market_id?: string;
+  market?: string;
   price: number;
   unit?: string;
   notes?: string;
   entry_date?: string;
 }
 
+export interface PricePrediction {
+  id: string;
+  crop_id: string;
+  region_id: string;
+  current_price: number;
+  predicted_price: number;
+  prediction_date: string;
+  confidence_score: number;
+  model_version: string;
+  factors: any;
+  crop_name: string;
+  region_name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PriceService {
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) { }
 
-  getPrices(params?: PriceQueryParams): Observable<{prices: CropPrice[], pagination: any}> {
+  getPrices(params?: PriceQueryParams): Observable<{ prices: CropPrice[], pagination: any }> {
     return this.apiService.get<CropPrice[]>('/prices', params).pipe(
       map(response => ({
         prices: response.data || [],
@@ -89,6 +104,16 @@ export class PriceService {
   rejectPriceEntry(id: string): Observable<void> {
     return this.apiService.delete<void>(`/prices/${id}/reject`).pipe(
       map(() => void 0)
+    );
+  }
+
+  getPredictions(cropId?: string, regionId?: string): Observable<PricePrediction[]> {
+    const params: any = {};
+    if (cropId) params.cropId = cropId;
+    if (regionId) params.regionId = regionId;
+
+    return this.apiService.get<PricePrediction[]>('/ml/predictions', params).pipe(
+      map(response => response.data || [])
     );
   }
 }

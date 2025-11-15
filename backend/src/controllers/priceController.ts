@@ -17,16 +17,23 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       verified,
       date_from,
       date_to,
-      sort = 'entry_date',
-      order = 'desc'
+      sort: sortQuery = 'entry_date',  
+      order: orderQuery = 'desc'  
     } = req.query as PriceQueryParams;
+
+     
+    const sortWhitelist = [
+      'price', 'entry_date', 'created_at',
+      'crop_name', 'region_name', 'market_name'
+    ];
+    const sort = sortWhitelist.includes(sortQuery) ? sortQuery : 'entry_date';
+    const order = orderQuery.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const offset = (page - 1) * limit;
     const conditions: string[] = [];
     const params: any[] = [];
-    let paramIndex = 1;
+    let paramIndex = 1; 
 
-    // WHERE conditions
     if (crop_id) {
       conditions.push(`pe.crop_id = $${paramIndex++}`);
       params.push(crop_id);
@@ -34,7 +41,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     if (region_id) {
       conditions.push(`pe.region_id = $${paramIndex++}`);
       params.push(region_id);
-    }
+    } 
     if (market_id) {
       conditions.push(`pe.market_id = $${paramIndex++}`);
       params.push(market_id);
@@ -43,7 +50,6 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       conditions.push(`pe.market ILIKE $${paramIndex++}`);
       params.push(market);
     }
-
     if (source) {
       conditions.push(`pe.source = $${paramIndex++}`);
       params.push(source);
@@ -62,42 +68,54 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-    // Add pagination params
+ 
     params.push(limit, offset);
+ 
+    const sqlQuery = `
+      WITH RankedPrices AS (
+        SELECT 
+          pe.*, 
+          c.name as crop_name,
+          r.name as region_name,
+          m.name as market_name,
+          u1.full_name as entered_by_name,
+          u2.full_name as verified_by_name, 
+          LAG(pe.price, 1) OVER (
+            PARTITION BY pe.crop_id, pe.region_id, pe.market_id 
+            ORDER BY pe.entry_date DESC
+          ) AS previous_price
+        FROM price_entries pe
+        JOIN crops c ON pe.crop_id = c.id
+        JOIN regions r ON pe.region_id = r.id
+        LEFT JOIN markets m ON pe.market_id = m.id
+        LEFT JOIN users u1 ON pe.entered_by = u1.id
+        LEFT JOIN users u2 ON pe.verified_by = u2.id
+        ${whereClause} -- Your dynamic filters are applied here
+      ) 
+      SELECT * FROM RankedPrices
+      ORDER BY ${sort} ${order}
+      LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+    `;
 
-    const result = await query(
-      `SELECT pe.*, 
-              c.name as crop_name,
-              r.name as region_name,
-              m.name as market_name,
-              u1.full_name as entered_by_name,
-              u2.full_name as verified_by_name
-       FROM price_entries pe
-       JOIN crops c ON pe.crop_id = c.id
-       JOIN regions r ON pe.region_id = r.id
-       LEFT JOIN markets m ON pe.market_id = m.id
-       LEFT JOIN users u1 ON pe.entered_by = u1.id
-       LEFT JOIN users u2 ON pe.verified_by = u2.id
-       ${whereClause}
-       ORDER BY pe.${sort} ${order.toUpperCase()}
-       LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
-      params
-    );
-
-    // Get total count
+    const result = await query(sqlQuery, params);
+ 
     const countResult = await query(
       `SELECT COUNT(*) FROM price_entries pe ${whereClause}`,
-      params.slice(0, -2) // Remove limit and offset
+      params.slice(0, -2)  
     );
 
     const total = parseInt(countResult.rows[0].count);
     const pages = Math.ceil(total / limit);
+ 
+    const prices = result.rows.map(item => ({
+      ...item,
+      previous_price: item.previous_price || null
+    }));
 
     const response: ApiResponse<PriceEntry[]> = {
       success: true,
       message: 'Prices retrieved successfully',
-      data: result.rows,
+      data: prices,  
       pagination: {
         page,
         limit,
@@ -112,13 +130,15 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+ 
+
 export const createPriceEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
       crop_id,
       region_id,
-      market,          
-      market_id,       
+      market,
+      market_id,
       price,
       unit = 'kg',
       source = 'farmer',
