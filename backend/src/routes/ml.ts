@@ -4,8 +4,30 @@ import { generatePricePrediction, getPredictions } from '../services/mlService';
 import type { ApiResponse } from '../types/index';
 import { query } from '../database/connection';
 import { logger } from '../utils/logger';
+import { ApiError } from '../utils/apiError';
+import axios from 'axios';
 
 const router = Router();
+
+router.get('/', optionalAuth, async (req, res, next): Promise<void> => {
+  try { 
+    const mlServiceResponse = await axios.get(
+      `${process.env.ML_MODEL_URL}/`,
+      { timeout: 5000 }
+    );
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'ML service status retrieved successfully', 
+      data: mlServiceResponse.data
+    };
+    res.json(response);
+
+  } catch (error: any) {
+    logger.error('Failed to connect to ML service:', error.message);
+    next(new ApiError('ML service is unavailable', 503));
+  }
+});
 
 router.get('/predictions', optionalAuth, async (req, res, next): Promise<void> => {
   try {
@@ -29,19 +51,19 @@ router.get('/predictions', optionalAuth, async (req, res, next): Promise<void> =
   }
 });
 
- 
+
 router.post('/predictions/generate', authenticate, requireAdmin, async (req, res, next): Promise<void> => {
-  try { 
+  try {
     const { crop_id, region_id, market_id, prediction_days = 7 } = req.body;
 
     if (!crop_id || !region_id || !market_id) {
       res.status(400).json({
-        success: false, 
+        success: false,
         message: 'crop_id, region_id, and market_id are required'
       });
       return;
     }
- 
+
     const namesResult = await query(
       `SELECT 
         (SELECT name FROM crops WHERE id = $1) as crop_name,
@@ -65,11 +87,11 @@ router.post('/predictions/generate', authenticate, requireAdmin, async (req, res
         message: 'One or more IDs (crop, region, market) are invalid.'
       });
       return;
-    } 
+    }
 
     const prediction = await generatePricePrediction(
       crop_name,
-      market_name, 
+      market_name,
       region_name,
       crop_id as string,
       region_id as string,
