@@ -126,8 +126,8 @@ export class PublicPortalComponent implements OnInit {
         this.regions = ((regions as any).data || regions) || [];
         this.totalRegions = this.regions.length;
 
-        if (mlStats && mlStats.performance && mlStats.performance.r2) {
-          this.aiAccuracy = mlStats.performance.r2 * 100; 
+        if (mlStats && mlStats.data.performance && mlStats.data.performance.r2) {
+          this.aiAccuracy = mlStats.data.performance.r2 * 100; 
         }
 
         const predictionMap = new Map<string, PricePrediction>();

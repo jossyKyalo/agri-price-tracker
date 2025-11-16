@@ -38,7 +38,7 @@
           <i class="fas fa-brain" style="color: var(--secondary-green);"></i>
         </div>
         <div class="stat-info">
-          <h3>95%</h3>
+          <h3>{{ aiAccuracy | number:'1.0-0' }}%</h3>
           <p>AI Accuracy</p>
         </div>
       </div>
@@ -162,7 +162,7 @@
           </div>
           <div class="card-body">
             <div class="prediction-list">
-              <div *ngFor="let crop of filteredCrops" class="prediction-item">
+              <div *ngFor="let crop of filteredCrops" class="prediction-item" [hidden]="crop.prediction === null">
                 <div class="prediction-info">
                   <div class="crop-name">{{ crop.name }}</div>
                   <div class="current-price">Current: KSh {{ crop.currentPrice }}/kg</div>
@@ -172,15 +172,15 @@
                     <strong>KSh {{ crop.prediction }}/kg</strong>
                     <small>7-day prediction</small>
                   </div>
-                  <div class="confidence">95% confidence</div>
+                  <div class="confidence">{{ (crop.confidence * 100) | number:'1.0-0' }}% confidence</div>
                 </div>
                 <div class="prediction-trend"
-                  [class]="(crop.currentPrice !== undefined && crop.prediction !== undefined) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
+                  [class]="(crop.currentPrice !== undefined && crop.prediction !== null) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
                   <i class="fas"
-                    [class.fa-arrow-up]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
-                    [class.fa-arrow-down]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
-                    [class.fa-minus]="crop.prediction !== undefined && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
-                  {{ getPredictionChange(crop.currentPrice, crop.prediction ) }}%
+                    [class.fa-arrow-up]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
+                    [class.fa-arrow-down]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
+                    [class.fa-minus]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
+                  {{ getPredictionChange(crop.currentPrice, crop.prediction! ) }}%
                 </div>
               </div>
             </div>
