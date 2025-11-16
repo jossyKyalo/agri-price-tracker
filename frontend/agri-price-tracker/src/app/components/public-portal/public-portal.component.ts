@@ -24,7 +24,7 @@ interface DisplayCrop {
   prediction: number | null;
   crop_id: string;
   region_id: string;
-  confidence: number; 
+  confidence: number;
 }
 
 @Component({
@@ -69,7 +69,7 @@ export class PublicPortalComponent implements OnInit {
   totalCrops = 0;
   totalRegions = 0;
   lastUpdated = 'Loading...';
-  aiAccuracy: number = 0; 
+  aiAccuracy: number = 0;
 
   // Price input form
   priceInput = {
@@ -127,14 +127,14 @@ export class PublicPortalComponent implements OnInit {
         this.totalRegions = this.regions.length;
 
         if (mlStats && mlStats.data.performance && mlStats.data.performance.r2) {
-          this.aiAccuracy = mlStats.data.performance.r2 * 100; 
+          this.aiAccuracy = mlStats.data.performance.r2 * 100;
         }
 
         const predictionMap = new Map<string, PricePrediction>();
         for (const pred of predictions) {
           const key = `${pred.crop_id}_${pred.region_id}`;
           predictionMap.set(key, pred);
-        } 
+        }
         const pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
 
         this.allCrops = pricesData.map((item: any) => {
@@ -143,7 +143,7 @@ export class PublicPortalComponent implements OnInit {
           const region_id = item.region_id;
           const predictionKey = `${crop_id}_${region_id}`;
           const realPrediction = predictionMap.get(predictionKey);
- 
+
           const previousPrice = parseFloat(item.previous_price || currentPrice);
 
           return {
@@ -176,12 +176,12 @@ export class PublicPortalComponent implements OnInit {
       }
     });
   }
- 
 
-  calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' { 
+
+  calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
     const diff = current - previous;
-    if (diff > (previous * 0.01)) return 'up';  
-    if (diff < -(previous * 0.01)) return 'down';  
+    if (diff > (previous * 0.01)) return 'up';
+    if (diff < -(previous * 0.01)) return 'down';
     return 'stable';
   }
 
@@ -347,7 +347,7 @@ export class PublicPortalComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
+        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
       }
     });
   }
@@ -381,8 +381,7 @@ export class PublicPortalComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
-    // 💡 Use a more robust region find
+    const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase()); 
     const region = this.regions.find(r => r.name.toLowerCase() === this.priceInput.region.toLowerCase());
 
     if (!crop || !region) {
@@ -396,7 +395,7 @@ export class PublicPortalComponent implements OnInit {
       region_id: region.id,
       price: this.priceInput.price,
       notes: this.priceInput.notes,
-      market: this.priceInput.location 
+      market: this.priceInput.location
     };
 
     const token = this.isAdmin
@@ -412,7 +411,7 @@ export class PublicPortalComponent implements OnInit {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
         this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
- 
+
         this.loadData();
       },
       error: (error) => {
@@ -430,13 +429,13 @@ export class PublicPortalComponent implements OnInit {
   }
 
   getPredictionChange(current: number, predicted: number): number {
-    if (!current) return 0;
+    if (!current || !predicted) return 0;
     return Math.round(((predicted - current) / current) * 100);
   }
 
-  getPriceChange(current: number, previous: number): number { 
-    if (!previous) return 0;
-    return Math.round(((current - previous) / previous) * 100);
+  getPriceChange(current: number, previous: number): number {
+     if (!previous || previous <= 10) return 0; 
+     return Math.round(((current - previous) / previous) * 100);
   }
 
   subscribeToSms() {

@@ -34,6 +34,8 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     const params: any[] = [];
     let paramIndex = 1; 
 
+    conditions.push(`pe.price > 20`);
+
     if (crop_id) {
       conditions.push(`pe.crop_id = $${paramIndex++}`);
       params.push(crop_id);
@@ -90,7 +92,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
         LEFT JOIN markets m ON pe.market_id = m.id
         LEFT JOIN users u1 ON pe.entered_by = u1.id
         LEFT JOIN users u2 ON pe.verified_by = u2.id
-        ${whereClause} -- Your dynamic filters are applied here
+        ${whereClause} 
       ) 
       SELECT * FROM RankedPrices
       ORDER BY ${sort} ${order}
