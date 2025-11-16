@@ -21,9 +21,10 @@ interface DisplayCrop {
   region: string;
   market: string;
   lastUpdated: string;
-  prediction: number;
+  prediction: number | null;
   crop_id: string;
   region_id: string;
+  confidence: number; 
 }
 
 @Component({
@@ -68,6 +69,7 @@ export class PublicPortalComponent implements OnInit {
   totalCrops = 0;
   totalRegions = 0;
   lastUpdated = 'Loading...';
+  aiAccuracy: number = 0; 
 
   // Price input form
   priceInput = {
@@ -108,19 +110,25 @@ export class PublicPortalComponent implements OnInit {
     const regions$ = this.cropService.getRegions();
     const prices$ = this.priceService.getPrices({ limit: 100 });
     const predictions$ = this.priceService.getPredictions();
+    const mlStats$ = this.apiService.get<any>('/ml/');
 
     forkJoin({
       crops: crops$,
       regions: regions$,
       prices: prices$,
-      predictions: predictions$
+      predictions: predictions$,
+      mlStats: mlStats$
     }).subscribe({
-      next: ({ crops, regions, prices, predictions }) => {
+      next: ({ crops, regions, prices, predictions, mlStats }) => {
 
         this.crops = ((crops as any).data || crops) || [];
         this.totalCrops = this.crops.length;
         this.regions = ((regions as any).data || regions) || [];
         this.totalRegions = this.regions.length;
+
+        if (mlStats && mlStats.performance && mlStats.performance.r2) {
+          this.aiAccuracy = mlStats.performance.r2 * 100; 
+        }
 
         const predictionMap = new Map<string, PricePrediction>();
         for (const pred of predictions) {
@@ -143,17 +151,13 @@ export class PublicPortalComponent implements OnInit {
             name: item.crop_name || item.name || 'Unknown',
             category: item.category || 'general',
             currentPrice: currentPrice,
- 
             previousPrice: previousPrice,
- 
             trend: this.calculateTrend(currentPrice, previousPrice),
-
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
             lastUpdated: this.formatDate(item.entry_date || item.created_at || new Date()),
- 
             prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
-
+            confidence: realPrediction ? realPrediction.confidence_score : 0,
             crop_id: crop_id,
             region_id: region_id
           } as DisplayCrop;
