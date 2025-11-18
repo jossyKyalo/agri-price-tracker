@@ -22,8 +22,7 @@ interface KamisRecord {
   ProductID: string;
   ProductName: string;
 }
-
-// Complete mapping of all 47 Kenyan counties to regions
+ 
 const countyToRegion: Record<string, { region: string; code: string }> = {
   // Nairobi
   'Nairobi': { region: 'Nairobi', code: 'nairobi' },
@@ -90,8 +89,7 @@ const countyToRegion: Record<string, { region: string; code: string }> = {
 };
 
 const parsePrice = (priceStr: string): number | null => {
-  if (!priceStr) return null;
-  // Remove any non-numeric characters except decimal point
+  if (!priceStr) return null; 
   const cleaned = priceStr.toString().replace(/[^\d.]/g, '');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? null : parsed;
@@ -118,8 +116,7 @@ const importKamisData = async () => {
   try {
     console.log(' Starting KAMIS data import...');
     console.log(`Reading file: ${DATA_FILE}\n`);
-
-    // Check database connection
+ 
     console.log('🔌 Testing database connection...');
     const connectionTest = await pool.query('SELECT NOW()');
     console.log(` Database connected at: ${connectionTest.rows[0].now}\n`);

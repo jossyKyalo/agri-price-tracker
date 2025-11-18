@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
-import { generatePricePrediction, getPredictions } from '../services/mlService';
+import { generatePricePrediction, getPredictions, generateDailyPredictions } from '../services/mlService';
 import type { ApiResponse } from '../types/index';
 import { query } from '../database/connection';
 import { logger } from '../utils/logger';
@@ -10,7 +10,7 @@ import axios from 'axios';
 const router = Router();
 
 router.get('/', optionalAuth, async (req, res, next): Promise<void> => {
-  try { 
+  try {
     const mlServiceResponse = await axios.get(
       `${process.env.ML_MODEL_URL}/`,
       { timeout: 5000 }
@@ -18,7 +18,7 @@ router.get('/', optionalAuth, async (req, res, next): Promise<void> => {
 
     const response: ApiResponse = {
       success: true,
-      message: 'ML service status retrieved successfully', 
+      message: 'ML service status retrieved successfully',
       data: mlServiceResponse.data
     };
     res.json(response);
@@ -113,6 +113,21 @@ router.post('/predictions/generate', authenticate, requireAdmin, async (req, res
     };
 
     res.json(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/predictions/run-daily-job', authenticate, requireAdmin, async (req, res, next): Promise<void> => {
+  try { 
+    generateDailyPredictions();
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Daily prediction job started in the background.'
+    };
+    res.status(202).json(response); 
+
   } catch (error) {
     next(error);
   }
