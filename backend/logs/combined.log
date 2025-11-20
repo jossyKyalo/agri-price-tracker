@@ -6946,3 +6946,12 @@
 {"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 313ms: INSERT INTO kamis_sync_logs (sync_date, status) VALUES (CURRENT_DATE, $1) RETURNING id\u001b[39m","timestamp":"2025-11-20 20:00:01:01"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting KAMIS data synchronization\u001b[39m","timestamp":"2025-11-20 20:00:01:01"}
 {"level":"\u001b[37mdebug\u001b[39m","message":"\u001b[37mQuery executed in 15ms: UPDATE kamis_sync_logs \u001b[39m\n\u001b[37m     SET records_processed = $1, records_inserted = $2, records_updated = $3, \u001b[39m\n\u001b[37m         status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP\u001b[39m\n\u001b[37m     WHERE id = $6\u001b[39m","timestamp":"2025-11-20 20:00:04:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected at: Thu Nov 20 2025 21:11:12 GMT+0300 (East Africa Time)\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDatabase connected successfully\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting cron jobs...\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started successfully\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCron jobs started\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server running on port 3000\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📚 API Documentation: http://localhost:3000/api/v1\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🏥 Health Check: http://localhost:3000/health\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: development\u001b[39m","timestamp":"2025-11-20 21:11:13:1113"}
