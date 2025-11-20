@@ -2,3 +2,5 @@
 *.docx
 *.pptx
 .env
+backend/logs/
+*.log
