@@ -21,13 +21,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
- 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, 'models', 'kamis_model.pkl')
-SCALER_PATH = os.path.join(BASE_DIR, 'models', 'kamis_scaler.pkl')
-ENCODER_PATH = os.path.join(BASE_DIR, 'models', 'kamis_encoder.pkl')  
-METADATA_PATH = os.path.join(BASE_DIR, 'models', 'kamis_metadata.json')
-RECENT_DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'recent_prices.csv')
+
+APP_DIR = os.path.dirname(os.path.abspath(__file__)) 
+
+PARENT_DIR = os.path.dirname(APP_DIR) 
+
+MODELS_ROOT = os.path.join(PARENT_DIR, 'models') 
+
+MODEL_PATH = os.path.join(MODELS_ROOT, 'kamis_model.pkl')
+SCALER_PATH = os.path.join(MODELS_ROOT, 'kamis_scaler.pkl')
+ENCODER_PATH = os.path.join(MODELS_ROOT, 'kamis_encoder.pkl')
+METADATA_PATH = os.path.join(MODELS_ROOT, 'kamis_metadata.json')
+
+RECENT_DATA_PATH = os.path.join(PARENT_DIR, 'data', 'processed', 'recent_prices.csv')
  
 model = None
 scaler = None
@@ -156,10 +162,10 @@ def engineer_features(commodity: str, market: str, county: str, target_date: dat
     features['Market'] = cat_encoded[1]
     features['County'] = cat_encoded[2]
      
-    for lag in [1, 3, 7, 14]: 
+    for lag in [1, 3, 7, 14, 21, 28, 30]: 
         features[f'lag_{lag}'] = float(prices[lag-1]) if len(prices) >= lag else features.get(f'lag_{lag-1}', 0.0)
      
-    for window in [7, 14]:
+    for window in [7, 14, 30]:
         window_data = prices[:window]  
         features[f'ma_{window}'] = float(np.mean(window_data))
         features[f'std_{window}'] = float(np.std(window_data))
