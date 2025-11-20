@@ -119,8 +119,8 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       message: 'Prices retrieved successfully',
       data: prices,  
       pagination: {
-        page,
-        limit,
+        page: Number(page),
+        limit:Number(limit),
         total,
         pages
       }

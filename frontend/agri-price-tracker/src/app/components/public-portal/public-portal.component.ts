@@ -381,7 +381,7 @@ export class PublicPortalComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase()); 
+    const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
     const region = this.regions.find(r => r.name.toLowerCase() === this.priceInput.region.toLowerCase());
 
     if (!crop || !region) {
@@ -434,8 +434,12 @@ export class PublicPortalComponent implements OnInit {
   }
 
   getPriceChange(current: number, previous: number): number {
-     if (!previous || previous <= 10) return 0; 
-     return Math.round(((current - previous) / previous) * 100);
+    if (!previous || previous <= 10) return 0;
+    const percentage = ((current - previous) / previous) * 100;
+    if (percentage > 300 || percentage < -80) {
+      return 0;
+    }
+    return Math.round(percentage);
   }
 
   subscribeToSms() {
