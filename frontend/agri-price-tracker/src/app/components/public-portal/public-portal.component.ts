@@ -135,9 +135,29 @@ export class PublicPortalComponent implements OnInit {
           const key = `${pred.crop_id}_${pred.region_id}`;
           predictionMap.set(key, pred);
         }
-        const pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
+ 
+        let pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
+ 
+        pricesData = pricesData.sort((a: any, b: any) => {
+          const dateA = new Date(a.entry_date || a.created_at || 0).getTime();
+          const dateB = new Date(b.entry_date || b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+ 
+        const uniqueMap = new Map<string, boolean>();
+        const uniquePrices: any[] = [];
 
-        this.allCrops = pricesData.map((item: any) => {
+        for (const item of pricesData) { 
+          const marketName = (item.market_name || item.market || 'unknown').toLowerCase().trim();
+          const uniqueKey = `${item.crop_id}_${item.region_id}_${marketName}`;
+
+          if (!uniqueMap.has(uniqueKey)) {
+            uniqueMap.set(uniqueKey, true);
+            uniquePrices.push(item);
+          }
+        } 
+
+        this.allCrops = uniquePrices.map((item: any) => {
           const currentPrice = parseFloat(item.price || item.current_price || 0);
           const crop_id = item.crop_id;
           const region_id = item.region_id;
@@ -352,19 +372,19 @@ export class PublicPortalComponent implements OnInit {
     });
   }
 
-  logoutPortal() {
-    if (confirm('Are you sure you want to logout from the portal?')) {
-      if (this.isAdmin) {
-        alert('ℹ️ To fully logout, use the logout button in the header.');
-        return;
-      } else {
-        localStorage.removeItem('farmer_token');
-        localStorage.removeItem('farmer_name');
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.farmerName = '';
-        alert('✅ You have been logged out successfully');
-      }
+  logoutPortal() { 
+    alert('ℹ️ Logging out now.');
+
+    if (this.isAdmin) { 
+      alert('ℹ️ To fully logout as admin, use the logout button in the header.');
+      return;
+    } else {
+      localStorage.removeItem('farmer_token');
+      localStorage.removeItem('farmer_name');
+      this.isLoggedIn = false;
+      this.isAdmin = false;
+      this.farmerName = '';
+      alert('✅ You have been logged out successfully');
     }
   }
 
