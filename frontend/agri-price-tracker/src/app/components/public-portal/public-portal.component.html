@@ -165,6 +165,10 @@
               <div *ngFor="let crop of filteredCrops" class="prediction-item" [hidden]="crop.prediction === null">
                 <div class="prediction-info">
                   <div class="crop-name">{{ crop.name }}</div>
+                  <div class="location-badge">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ crop.market }} <span class="text-muted">({{ crop.region }})</span>
+                  </div>
                   <div class="current-price">Current: KSh {{ crop.currentPrice }}/kg</div>
                 </div>
                 <div class="prediction-data">
