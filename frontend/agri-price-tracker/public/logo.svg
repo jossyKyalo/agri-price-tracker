@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#2E7D32" opacity="0.1"/>
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#2E7D32" stroke-width="3"/>
+  
+  <!-- Wheat stalk on left -->
+  <g id="wheat">
+    <!-- Stem -->
+    <line x1="70" y1="140" x2="70" y2="60" stroke="#F9A825" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Wheat grains -->
+    <ellipse cx="70" cy="70" rx="8" ry="5" fill="#FBC02D"/>
+    <ellipse cx="62" cy="75" rx="7" ry="5" fill="#FBC02D"/>
+    <ellipse cx="78" cy="75" rx="7" ry="5" fill="#FBC02D"/>
+    
+    <ellipse cx="70" cy="82" rx="8" ry="5" fill="#F9A825"/>
+    <ellipse cx="62" cy="87" rx="7" ry="5" fill="#F9A825"/>
+    <ellipse cx="78" cy="87" rx="7" ry="5" fill="#F9A825"/>
+    
+    <ellipse cx="70" cy="94" rx="8" ry="5" fill="#FBC02D"/>
+    <ellipse cx="62" cy="99" rx="7" ry="5" fill="#FBC02D"/>
+    <ellipse cx="78" cy="99" rx="7" ry="5" fill="#FBC02D"/>
+    
+    <ellipse cx="70" cy="106" rx="8" ry="5" fill="#F9A825"/>
+    <ellipse cx="62" cy="111" rx="7" ry="5" fill="#F9A825"/>
+    <ellipse cx="78" cy="111" rx="7" ry="5" fill="#F9A825"/>
+  </g>
+  
+  <!-- Price chart on right -->
+  <g id="chart">
+    <!-- Chart line -->
+    <polyline 
+      points="110,130 120,115 130,105 140,110 150,95 160,100" 
+      fill="none" 
+      stroke="#2E7D32" 
+      stroke-width="4" 
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+    
+    <!-- Data points -->
+    <circle cx="110" cy="130" r="4" fill="#4CAF50"/>
+    <circle cx="120" cy="115" r="4" fill="#4CAF50"/>
+    <circle cx="130" cy="105" r="4" fill="#4CAF50"/>
+    <circle cx="140" cy="110" r="4" fill="#4CAF50"/>
+    <circle cx="150" cy="95" r="4" fill="#4CAF50"/>
+    <circle cx="160" cy="100" r="4" fill="#4CAF50"/>
+    
+    <!-- Upward arrow -->
+    <path d="M 155 85 L 160 75 L 165 85" 
+          fill="none" 
+          stroke="#2E7D32" 
+          stroke-width="3" 
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Currency symbol -->
+  <g id="currency" transform="translate(100, 145)">
+    <circle cx="0" cy="0" r="12" fill="none" stroke="#2E7D32" stroke-width="2.5"/>
+    <text x="0" y="5" 
+          font-family="Arial, sans-serif" 
+          font-size="16" 
+          font-weight="bold" 
+          text-anchor="middle" 
+          fill="#2E7D32">$</text>
+  </g>
+</svg>
