@@ -6,14 +6,15 @@ from io import StringIO
 import time
 import random
 from datetime import datetime, timedelta
+
  
 BASE_URL = "https://kamis.kilimo.go.ke/site/market"
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "../../data/raw")
  
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")
- 
-PER_PAGE = 10000 
+MASTER_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")      
+LATEST_FILE = os.path.join(OUTPUT_DIR, "kamis_latest.csv")     
 
+PER_PAGE = 10000 
  
 LAST_SCRAPE_DATE_STR = "2025-09-17"
 CUTOFF_DATE = datetime.strptime(LAST_SCRAPE_DATE_STR, "%Y-%m-%d")
@@ -31,7 +32,6 @@ def scrape_market_data():
     
     print(f"🚀 Starting scrape for {len(PRODUCT_IDS)} products...")
     print(f"📅 Fetching online data posted after: {CUTOFF_DATE.strftime('%Y-%m-%d')}")
-    print(f"📂 Master file target: {OUTPUT_FILE}")
 
     for product_id in PRODUCT_IDS:
         url = f"{BASE_URL}?product={product_id}&per_page={PER_PAGE}"
@@ -55,25 +55,23 @@ def scrape_market_data():
                 continue
 
             df = pd.read_html(StringIO(str(table)))[0]
-         
             df.columns = [c.strip() for c in df.columns]
-             
+            
             date_col = next((col for col in df.columns if 'date' in col.lower()), None)
             
-            if date_col: 
+            if date_col:
                 df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True)
                  
                 df = df[df[date_col] >= CUTOFF_DATE]
                 
                 if not df.empty:
                     df["ProductID"] = product_id
-                    df["CropName"] = product_name if product_name else f"Unknown-{product_id}" 
+                    df["CropName"] = product_name if product_name else f"Unknown-{product_id}"
                     df["ScrapedDate"] = datetime.now().strftime("%Y-%m-%d")
                     
                     new_data.append(df)
                     print(f"✅ {product_name}: found {len(df)} new rows")
             else: 
-                print(f"⚠️  {product_name}: No date column found, keeping all {len(df)} rows.")
                 df["ProductID"] = product_id
                 df["CropName"] = product_name if product_name else f"Unknown-{product_id}"
                 df["ScrapedDate"] = datetime.now().strftime("%Y-%m-%d")
@@ -83,45 +81,40 @@ def scrape_market_data():
             print(f"\n❌ Error on Product {product_id}: {e}")
             continue
 
-    print("\n\n🔄 Processing and Merging Data...")
+    print("\n\n🔄 Processing Data...")
 
     if new_data:
         new_df = pd.concat(new_data, ignore_index=True)
-        print(f"   New data fetched: {len(new_df)} rows.")
+        print(f"   Fetched {len(new_df)} relevant rows from KAMIS.")
  
-        if os.path.exists(OUTPUT_FILE):
-            print(f"   Existing master file found at {OUTPUT_FILE}. Loading...")
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        new_df.to_csv(LATEST_FILE, index=False)
+        print(f"   ⚡ Saved delta file to: {LATEST_FILE} (Use this for DB Import)")
+ 
+        if os.path.exists(MASTER_FILE):
+            print(f"   Updating master archive at {MASTER_FILE}...")
             try:
-                existing_df = pd.read_csv(OUTPUT_FILE)
-                
+                existing_df = pd.read_csv(MASTER_FILE)
                 combined_df = pd.concat([existing_df, new_df], ignore_index=True)
                  
                 cols_to_check = [c for c in combined_df.columns if c != 'ScrapedDate']
-                
-                initial_len = len(combined_df)
                 combined_df.drop_duplicates(subset=cols_to_check, keep='last', inplace=True)
-                removed_count = initial_len - len(combined_df)
                 
-                print(f"   Merged and removed {removed_count} duplicate rows.")
-                final_df = combined_df
-                
+                combined_df.to_csv(MASTER_FILE, index=False)
+                print(f"   ✅ Master archive updated. Total rows: {len(combined_df)}")
             except Exception as e:
-                print(f"⚠️ Error reading existing file ({e}). Creating a new master file.")
-                final_df = new_df
+                print(f"   ⚠️ Error updating master file: {e}")
+                new_df.to_csv(MASTER_FILE, index=False)
         else:
-            print("   No existing master file. Creating new one.")
-            final_df = new_df
- 
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
-        final_df.to_csv(OUTPUT_FILE, index=False)
-        
+            print("   Creating new master archive.")
+            new_df.to_csv(MASTER_FILE, index=False)
+            
         print("------------------------------------------------")
-        print(f"🎉 Success! Master file updated.")
-        print(f"📊 Total Rows in Master File: {len(final_df)}")
-        print(f"💾 Saved to: {OUTPUT_FILE}")
+        print(f"🎉 Done! {len(new_df)} new rows ready for import.")
         print("------------------------------------------------")
     else:
-        print(f"⚠️  No new data found online after {LAST_SCRAPE_DATE_STR}.")
+        print(f"⚠️  No new data found. Clearing latest file.") 
+        open(LATEST_FILE, 'w').close() 
 
 if __name__ == "__main__":
     scrape_market_data()
