@@ -4,6 +4,53 @@
       <h1><i class="fas fa-chart-line"></i> Farmer Portal</h1>
       <p class="text-muted">Real-time agricultural products prices, AI predictions, and price input for farmers</p>
     </div>
+ 
+    <div class="auth-overlay" *ngIf="showHistory">
+      <div class="auth-card bg-white p-4 rounded shadow" style="max-width: 700px;">
+        <button class="close-btn btn btn-sm btn-light" (click)="closeHistoryModal()">&times;</button>
+        
+        <div class="text-center mb-4">
+          <h3 class="mb-1">
+            <i class="fas fa-chart-line text-primary"></i> 
+            {{ selectedHistoryCrop?.name }} Trends
+          </h3>
+          <span class="badge bg-light text-dark border">
+            <i class="fas fa-map-marker-alt"></i> {{ selectedHistoryCrop?.market }}
+          </span>
+        </div>
+
+        <div *ngIf="historyLoading" class="text-center py-5">
+          <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
+          <p class="mt-3">Loading historical prices...</p>
+        </div>
+
+        <div *ngIf="!historyLoading && historyData.length > 1" class="chart-container"> 
+          <svg viewBox="0 0 600 200" class="w-100" style="height: 200px; background: #f8f9fa; border-radius: 8px;"> 
+            <line x1="0" y1="50" x2="600" y2="50" stroke="#e9ecef" stroke-width="1"></line>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="#e9ecef" stroke-width="1"></line>
+            <line x1="0" y1="150" x2="600" y2="150" stroke="#e9ecef" stroke-width="1"></line>
+             
+            <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          
+          <div class="d-flex justify-content-between mt-2 text-muted small">
+            <span>{{ historyData[0].entry_date | date }}</span>
+            <span>Today</span>
+          </div>
+          
+          <div class="alert alert-info mt-3 mb-0 py-2 small">
+            <i class="fas fa-info-circle"></i> 
+            Price started at <strong>KSh {{ historyData[0].price }}</strong> and is now <strong>KSh {{ historyData[historyData.length-1].price }}</strong>.
+          </div>
+        </div>
+
+        <div *ngIf="!historyLoading && historyData.length <= 1" class="text-center py-4">
+          <i class="fas fa-history fa-3x text-muted mb-3"></i>
+          <p>Not enough historical data to show a chart yet.</p>
+        </div>
+
+      </div>
+    </div>
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -114,6 +161,7 @@
                   <th>Region</th>
                   <th>Market</th>
                   <th>Last Updated</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -150,6 +198,11 @@
                   <td>{{ crop.market }}</td>
                   <td>
                     <small class="text-muted">{{ crop.lastUpdated }}</small>
+                  </td>
+                  <td>
+                    <button class="btn btn-outline-primary btn-sm" (click)="openHistoryModal(crop)">
+                      <i class="fas fa-chart-line"></i> Trend
+                    </button>
                   </td>
                 </tr>
                 <tr *ngIf="!isLoading && filteredCrops.length === 0">

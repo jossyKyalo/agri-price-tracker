@@ -96,6 +96,14 @@ export class PublicPortalComponent implements OnInit {
   filteredCrops: DisplayCrop[] = [];
   categories: string[] = [];
 
+  // HISTORY MODAL STATE 
+  showHistory = false;
+  historyLoading = false;
+  selectedHistoryCrop: any = null;
+  historyData: any[] = [];
+  chartPath: string = '';
+  chartPoints: string = '';
+
   constructor(
     private http: HttpClient,
     private priceService: PriceService,
@@ -108,6 +116,73 @@ export class PublicPortalComponent implements OnInit {
   ngOnInit(): void {
     this.checkAuth();
     this.loadData();
+  }
+ 
+  openHistoryModal(crop: DisplayCrop) {
+    this.showHistory = true;
+    this.historyLoading = true;
+    this.selectedHistoryCrop = crop;
+    this.historyData = []; 
+ 
+    this.priceService.getPrices({ 
+      crop_id: crop.crop_id, 
+      region_id: crop.region_id,  
+      limit: 50 
+    }).subscribe({
+      next: (response: any) => {
+        let rawData = (response.data || response.prices || response) || [];
+        
+        const now = new Date();
+        this.historyData = rawData
+          .filter((p: any) => { 
+             const m1 = (p.market_name || p.market || '').toLowerCase();
+             const m2 = (crop.market || '').toLowerCase();
+             return m1.includes(m2) || m2.includes(m1);
+          })
+          .filter((p: any) => new Date(p.entry_date) <= now)
+          .sort((a: any, b: any) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());  
+
+        this.generateChart();
+        this.historyLoading = false;
+      },
+      error: (err) => {
+        console.error('History load error', err);
+        this.historyLoading = false;
+      }
+    });
+  }
+
+  closeHistoryModal() {
+    this.showHistory = false;
+    this.selectedHistoryCrop = null;
+  }
+
+  generateChart() {
+    if (this.historyData.length < 2) {
+      this.chartPath = '';
+      return;
+    }
+ 
+    const prices = this.historyData.map(d => parseFloat(d.price));
+    const minPrice = Math.min(...prices) * 0.95; 
+    const maxPrice = Math.max(...prices) * 1.05;
+    const priceRange = maxPrice - minPrice;
+
+     
+    const width = 600;
+    const height = 200;
+    const padding = 20;
+ 
+    const points = this.historyData.map((d, i) => {
+      const x = padding + (i / (this.historyData.length - 1)) * (width - 2 * padding);
+      const price = parseFloat(d.price); 
+      const y = height - padding - ((price - minPrice) / priceRange) * (height - 2 * padding);
+      return `${x},${y}`;
+    });
+ 
+    this.chartPath = `M ${points.join(' L ')}`;
+     
+    this.chartPoints = points.join(' '); 
   }
 
   get paginatedCrops() {
