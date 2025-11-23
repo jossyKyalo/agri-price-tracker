@@ -135,19 +135,19 @@ export class PublicPortalComponent implements OnInit {
           const key = `${pred.crop_id}_${pred.region_id}`;
           predictionMap.set(key, pred);
         }
- 
+
         let pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
- 
+
         pricesData = pricesData.sort((a: any, b: any) => {
           const dateA = new Date(a.entry_date || a.created_at || 0).getTime();
           const dateB = new Date(b.entry_date || b.created_at || 0).getTime();
           return dateB - dateA;
         });
- 
+
         const uniqueMap = new Map<string, boolean>();
         const uniquePrices: any[] = [];
 
-        for (const item of pricesData) { 
+        for (const item of pricesData) {
           const marketName = (item.market_name || item.market || 'unknown').toLowerCase().trim();
           const uniqueKey = `${item.crop_id}_${item.region_id}_${marketName}`;
 
@@ -155,7 +155,7 @@ export class PublicPortalComponent implements OnInit {
             uniqueMap.set(uniqueKey, true);
             uniquePrices.push(item);
           }
-        } 
+        }
 
         this.allCrops = uniquePrices.map((item: any) => {
           const currentPrice = parseFloat(item.price || item.current_price || 0);
@@ -206,16 +206,24 @@ export class PublicPortalComponent implements OnInit {
   }
 
   formatDate(date: string | Date): string {
+    if (!date) return '';
     const d = new Date(date);
     const now = new Date();
+
     const diffMs = now.getTime() - d.getTime();
+    if (diffMs < 0) {
+      return 'Just now';
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
+    if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} mins ago`;
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 7) return `${diffDays} days ago`;
+
     return d.toLocaleDateString();
   }
 
@@ -372,10 +380,10 @@ export class PublicPortalComponent implements OnInit {
     });
   }
 
-  logoutPortal() { 
+  logoutPortal() {
     alert('ℹ️ Logging out now.');
 
-    if (this.isAdmin) { 
+    if (this.isAdmin) {
       alert('ℹ️ To fully logout as admin, use the logout button in the header.');
       return;
     } else {
