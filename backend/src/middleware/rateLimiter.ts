@@ -2,16 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { ApiError } from '../utils/apiError';
 import { logger } from '../utils/logger';
-
-// Create rate limiters for different endpoints
-const rateLimiters = {
-  // General API rate limiter
+ 
+const rateLimiters = { 
   general: new RateLimiterMemory({
     points: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
     duration: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000') / 1000, // 15 minutes
   }),
 
-  // Authentication rate limiter (stricter)
+  
   auth: new RateLimiterMemory({
     points: 5, // 5 attempts
     duration: 900, // 15 minutes
@@ -41,8 +39,7 @@ const rateLimiters = {
 export const createRateLimiter = (limiterName: keyof typeof rateLimiters) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const limiter = rateLimiters[limiterName];
-      // Fix: Provide fallback for req.ip when it's undefined
+      const limiter = rateLimiters[limiterName]; 
       const key = req.ip || 'unknown';
       await limiter.consume(key);
       next();

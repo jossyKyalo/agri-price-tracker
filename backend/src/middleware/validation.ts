@@ -207,14 +207,14 @@ export const validateQuery = (schema: Joi.ObjectSchema) => {
 export const querySchemas = {
   pagination: Joi.object({
     page: Joi.number().integer().min(1).optional(),
-    limit: Joi.number().integer().min(1).max(100).optional(),
+    limit: Joi.number().integer().min(1).max(50000).optional(),
     sort: Joi.string().optional(),
     order: Joi.string().valid('asc', 'desc').optional()
   }),
 
   priceQuery: Joi.object({
     page: Joi.number().integer().min(1).optional(),
-    limit: Joi.number().integer().min(1).max(100).optional(),
+    limit: Joi.number().integer().min(1).max(50000).optional(),
     sort: Joi.string().optional(),
     order: Joi.string().valid('asc', 'desc').optional(),
     crop_id: Joi.string().uuid().optional(),
