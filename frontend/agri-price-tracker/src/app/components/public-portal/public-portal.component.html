@@ -117,7 +117,13 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let crop of filteredCrops">
+                <tr *ngIf="isLoading">
+                  <td colspan="7" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-success"></i>
+                    <p class="mt-2">Loading latest prices...</p>
+                  </td>
+                </tr>
+                <tr *ngFor="let crop of paginatedCrops">
                   <td>
                     <div class="crop-cell">
                       <strong>{{ crop.name }}</strong>
@@ -146,8 +152,25 @@
                     <small class="text-muted">{{ crop.lastUpdated }}</small>
                   </td>
                 </tr>
+                <tr *ngIf="!isLoading && filteredCrops.length === 0">
+                  <td colspan="7" class="text-center py-4">
+                    <i class="fas fa-leaf text-muted fa-2x mb-2"></i>
+                    <p>No crops found matching your search.</p>
+                  </td>
+                </tr>
               </tbody>
             </table>
+          </div>
+          <div class="pagination-footer d-flex justify-content-center align-items-center mt-4"
+            *ngIf="totalPages > 1 && !isLoading">
+            <button class="btn btn-outline-secondary btn-sm me-3" [disabled]="currentPage === 1" (click)="prevPage()">
+              <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span class="fw-bold text-muted small">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
       </div>

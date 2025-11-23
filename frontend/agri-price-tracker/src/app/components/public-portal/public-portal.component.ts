@@ -25,6 +25,7 @@ interface DisplayCrop {
   crop_id: string;
   region_id: string;
   confidence: number;
+  date: string | Date;
 }
 
 @Component({
@@ -71,6 +72,10 @@ export class PublicPortalComponent implements OnInit {
   lastUpdated = 'Loading...';
   aiAccuracy: number = 0;
 
+  // Pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 12;
+
   // Price input form
   priceInput = {
     crop: '',
@@ -89,6 +94,7 @@ export class PublicPortalComponent implements OnInit {
   crops: Crop[] = [];
   regions: Region[] = [];
   filteredCrops: DisplayCrop[] = [];
+  categories: string[] = [];
 
   constructor(
     private http: HttpClient,
@@ -104,11 +110,34 @@ export class PublicPortalComponent implements OnInit {
     this.loadData();
   }
 
+  get paginatedCrops() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredCrops.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.filteredCrops.length / this.itemsPerPage) || 1;
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
   loadData(): void {
     this.isLoading = true;
     const crops$ = this.cropService.getCrops();
     const regions$ = this.cropService.getRegions();
-    const prices$ = this.priceService.getPrices({ limit: 100 });
+    const prices$ = this.priceService.getPrices({ limit: 3000 });
     const predictions$ = this.priceService.getPredictions();
     const mlStats$ = this.apiService.get<any>('/ml/');
 
@@ -120,32 +149,31 @@ export class PublicPortalComponent implements OnInit {
       mlStats: mlStats$
     }).subscribe({
       next: ({ crops, regions, prices, predictions, mlStats }) => {
-
         this.crops = ((crops as any).data || crops) || [];
-        this.totalCrops = this.crops.length;
         this.regions = ((regions as any).data || regions) || [];
+        this.totalCrops = this.crops.length;
         this.totalRegions = this.regions.length;
 
-        if (mlStats && mlStats.data.performance && mlStats.data.performance.r2) {
-          this.aiAccuracy = mlStats.data.performance.r2 * 100;
+        if (mlStats?.data?.performance?.r2) {
+          this.aiAccuracy = Math.round(mlStats.data.performance.r2 * 100);
         }
 
         const predictionMap = new Map<string, PricePrediction>();
         for (const pred of predictions) {
-          const key = `${pred.crop_id}_${pred.region_id}`;
-          predictionMap.set(key, pred);
+          predictionMap.set(`${pred.crop_id}_${pred.region_id}`, pred);
         }
 
         let pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
+        const now = new Date();
+        pricesData = pricesData.filter((p: any) => new Date(p.entry_date || p.created_at) <= now);
 
-        pricesData = pricesData.sort((a: any, b: any) => {
-          const dateA = new Date(a.entry_date || a.created_at || 0).getTime();
-          const dateB = new Date(b.entry_date || b.created_at || 0).getTime();
-          return dateB - dateA;
-        });
+        
+        pricesData.sort((a: any, b: any) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime());
 
+  
         const uniqueMap = new Map<string, boolean>();
         const uniquePrices: any[] = [];
+        const cats = new Set<string>();
 
         for (const item of pricesData) {
           const marketName = (item.market_name || item.market || 'unknown').toLowerCase().trim();
@@ -154,45 +182,44 @@ export class PublicPortalComponent implements OnInit {
           if (!uniqueMap.has(uniqueKey)) {
             uniqueMap.set(uniqueKey, true);
             uniquePrices.push(item);
+            if (item.category) cats.add(item.category);
           }
         }
 
+        this.categories = Array.from(cats).sort();
+
         this.allCrops = uniquePrices.map((item: any) => {
           const currentPrice = parseFloat(item.price || item.current_price || 0);
-          const crop_id = item.crop_id;
-          const region_id = item.region_id;
-          const predictionKey = `${crop_id}_${region_id}`;
-          const realPrediction = predictionMap.get(predictionKey);
-
+          const predKey = `${item.crop_id}_${item.region_id}`;
+          const realPrediction = predictionMap.get(predKey);
           const previousPrice = parseFloat(item.previous_price || currentPrice);
 
           return {
-            id: item.id || crop_id,
+            id: item.id || item.crop_id,
             name: item.crop_name || item.name || 'Unknown',
-            category: item.category || 'general',
+            category: item.category || 'General',
             currentPrice: currentPrice,
             previousPrice: previousPrice,
             trend: this.calculateTrend(currentPrice, previousPrice),
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
-            lastUpdated: this.formatDate(item.entry_date || item.created_at || new Date()),
+            lastUpdated: this.formatDate(item.entry_date || item.created_at),
+            date: item.entry_date || item.created_at, 
             prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
             confidence: realPrediction ? realPrediction.confidence_score : 0,
-            crop_id: crop_id,
-            region_id: region_id
+            crop_id: item.crop_id,
+            region_id: item.region_id
           } as DisplayCrop;
         });
 
         this.filteredCrops = this.allCrops;
         this.isLoading = false;
-        if (this.allCrops.length > 0) {
-          this.lastUpdated = this.allCrops[0].lastUpdated;
-        }
+        if (this.allCrops.length > 0) this.lastUpdated = this.allCrops[0].lastUpdated;
       },
       error: (error) => {
-        console.error('Error loading combined data:', error);
+        console.error('Data load error', error);
         this.isLoading = false;
-        this.errorMessage = "Failed to load all portal data. Please try again later.";
+        this.errorMessage = "Failed to load market data.";
       }
     });
   }
@@ -241,7 +268,7 @@ export class PublicPortalComponent implements OnInit {
       return matchesSearch && matchesCategory && matchesRegion;
     });
 
-    console.log('Filtered crops:', this.filteredCrops);
+    this.currentPage = 1;
   }
 
   checkAuth() {
