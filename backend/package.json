@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "sync:market-data": "tsx src/scripts/export_data_to_db.ts",
-    "category-update": "tsx src/scripts/update_category.ts",
+    "category-update": "tsx src/scripts/update_category_and_unit.ts",
     "db:migrate": "tsx src/database/migrate.ts",
     "db:seed": "tsx src/database/seed.ts",
     "test": "jest"
