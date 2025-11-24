@@ -15,6 +15,7 @@ interface DisplayCrop {
   id: string;
   name: string;
   category: string;
+  unit: string;
   currentPrice: number;
   previousPrice: number;
   trend: 'up' | 'down' | 'stable';
@@ -117,30 +118,30 @@ export class PublicPortalComponent implements OnInit {
     this.checkAuth();
     this.loadData();
   }
- 
+
   openHistoryModal(crop: DisplayCrop) {
     this.showHistory = true;
     this.historyLoading = true;
     this.selectedHistoryCrop = crop;
-    this.historyData = []; 
- 
-    this.priceService.getPrices({ 
-      crop_id: crop.crop_id, 
-      region_id: crop.region_id,  
-      limit: 50 
+    this.historyData = [];
+
+    this.priceService.getPrices({
+      crop_id: crop.crop_id,
+      region_id: crop.region_id,
+      limit: 50
     }).subscribe({
       next: (response: any) => {
         let rawData = (response.data || response.prices || response) || [];
-        
+
         const now = new Date();
         this.historyData = rawData
-          .filter((p: any) => { 
-             const m1 = (p.market_name || p.market || '').toLowerCase();
-             const m2 = (crop.market || '').toLowerCase();
-             return m1.includes(m2) || m2.includes(m1);
+          .filter((p: any) => {
+            const m1 = (p.market_name || p.market || '').toLowerCase();
+            const m2 = (crop.market || '').toLowerCase();
+            return m1.includes(m2) || m2.includes(m1);
           })
           .filter((p: any) => new Date(p.entry_date) <= now)
-          .sort((a: any, b: any) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());  
+          .sort((a: any, b: any) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());
 
         this.generateChart();
         this.historyLoading = false;
@@ -162,27 +163,27 @@ export class PublicPortalComponent implements OnInit {
       this.chartPath = '';
       return;
     }
- 
+
     const prices = this.historyData.map(d => parseFloat(d.price));
-    const minPrice = Math.min(...prices) * 0.95; 
+    const minPrice = Math.min(...prices) * 0.95;
     const maxPrice = Math.max(...prices) * 1.05;
     const priceRange = maxPrice - minPrice;
 
-     
+
     const width = 600;
     const height = 200;
     const padding = 20;
- 
+
     const points = this.historyData.map((d, i) => {
       const x = padding + (i / (this.historyData.length - 1)) * (width - 2 * padding);
-      const price = parseFloat(d.price); 
+      const price = parseFloat(d.price);
       const y = height - padding - ((price - minPrice) / priceRange) * (height - 2 * padding);
       return `${x},${y}`;
     });
- 
+
     this.chartPath = `M ${points.join(' L ')}`;
-     
-    this.chartPoints = points.join(' '); 
+
+    this.chartPoints = points.join(' ');
   }
 
   get paginatedCrops() {
@@ -242,10 +243,10 @@ export class PublicPortalComponent implements OnInit {
         const now = new Date();
         pricesData = pricesData.filter((p: any) => new Date(p.entry_date || p.created_at) <= now);
 
-        
+
         pricesData.sort((a: any, b: any) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime());
 
-  
+
         const uniqueMap = new Map<string, boolean>();
         const uniquePrices: any[] = [];
         const cats = new Set<string>();
@@ -257,7 +258,8 @@ export class PublicPortalComponent implements OnInit {
           if (!uniqueMap.has(uniqueKey)) {
             uniqueMap.set(uniqueKey, true);
             uniquePrices.push(item);
-            if (item.category) cats.add(item.category);
+            const cat = item.crop_category || item.category || 'General';
+            cats.add(cat);
           }
         }
 
@@ -272,14 +274,15 @@ export class PublicPortalComponent implements OnInit {
           return {
             id: item.id || item.crop_id,
             name: item.crop_name || item.name || 'Unknown',
-            category: item.category || 'General',
+            category: item.crop_category|| item.category || 'General',
+            unit: item.crop_unit || item.unit || 'kg',
             currentPrice: currentPrice,
             previousPrice: previousPrice,
             trend: this.calculateTrend(currentPrice, previousPrice),
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
             lastUpdated: this.formatDate(item.entry_date || item.created_at),
-            date: item.entry_date || item.created_at, 
+            date: item.entry_date || item.created_at,
             prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
             confidence: realPrediction ? realPrediction.confidence_score : 0,
             crop_id: item.crop_id,

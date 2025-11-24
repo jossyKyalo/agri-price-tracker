@@ -21,7 +21,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       order: orderQuery = 'desc'  
     } = req.query as PriceQueryParams;
 
-     
+      
     const sortWhitelist = [
       'price', 'entry_date', 'created_at',
       'crop_name', 'region_name', 'market_name'
@@ -29,7 +29,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     const sort = sortWhitelist.includes(sortQuery) ? sortQuery : 'entry_date';
     const order = orderQuery.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-    const offset = (page - 1) * limit;
+    const offset = (Number(page) - 1) * Number(limit);
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIndex = 1; 
@@ -78,6 +78,8 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
         SELECT 
           pe.*, 
           c.name as crop_name,
+          c.category as crop_category,   
+          c.unit as crop_unit,           
           r.name as region_name,
           m.name as market_name,
           u1.full_name as entered_by_name,
@@ -107,7 +109,7 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     );
 
     const total = parseInt(countResult.rows[0].count);
-    const pages = Math.ceil(total / limit);
+    const pages = Math.ceil(total / Number(limit));
  
     const prices = result.rows.map(item => ({
       ...item,
@@ -131,8 +133,6 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
-
- 
 
 export const createPriceEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
