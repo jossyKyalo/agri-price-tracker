@@ -4,14 +4,14 @@
       <h1><i class="fas fa-chart-line"></i> Farmer Portal</h1>
       <p class="text-muted">Real-time agricultural products prices, AI predictions, and price input for farmers</p>
     </div>
- 
+
     <div class="auth-overlay" *ngIf="showHistory">
       <div class="auth-card bg-white p-4 rounded shadow" style="max-width: 700px;">
         <button class="close-btn btn btn-sm btn-light" (click)="closeHistoryModal()">&times;</button>
-        
+
         <div class="text-center mb-4">
           <h3 class="mb-1">
-            <i class="fas fa-chart-line text-primary"></i> 
+            <i class="fas fa-chart-line text-primary"></i>
             {{ selectedHistoryCrop?.name }} Trends
           </h3>
           <span class="badge bg-light text-dark border">
@@ -24,23 +24,25 @@
           <p class="mt-3">Loading historical prices...</p>
         </div>
 
-        <div *ngIf="!historyLoading && historyData.length > 1" class="chart-container"> 
-          <svg viewBox="0 0 600 200" class="w-100" style="height: 200px; background: #f8f9fa; border-radius: 8px;"> 
+        <div *ngIf="!historyLoading && historyData.length > 1" class="chart-container">
+          <svg viewBox="0 0 600 200" class="w-100" style="height: 200px; background: #f8f9fa; border-radius: 8px;">
             <line x1="0" y1="50" x2="600" y2="50" stroke="#e9ecef" stroke-width="1"></line>
             <line x1="0" y1="100" x2="600" y2="100" stroke="#e9ecef" stroke-width="1"></line>
             <line x1="0" y1="150" x2="600" y2="150" stroke="#e9ecef" stroke-width="1"></line>
-             
-            <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+
+            <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round"
+              stroke-linejoin="round"></path>
           </svg>
-          
+
           <div class="d-flex justify-content-between mt-2 text-muted small">
             <span>{{ historyData[0].entry_date | date }}</span>
             <span>Today</span>
           </div>
-          
+
           <div class="alert alert-info mt-3 mb-0 py-2 small">
-            <i class="fas fa-info-circle"></i> 
-            Price started at <strong>KSh {{ historyData[0].price }}</strong> and is now <strong>KSh {{ historyData[historyData.length-1].price }}</strong>.
+            <i class="fas fa-info-circle"></i>
+            Price started at <strong>KSh {{ historyData[0].price }}</strong> and is now <strong>KSh {{
+              historyData[historyData.length-1].price }}</strong>.
           </div>
         </div>
 
@@ -123,23 +125,16 @@
               <label class="form-label">Category</label>
               <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterCrops()">
                 <option value="">All Categories</option>
-                <option value="cereals">Cereals</option>
-                <option value="vegetables">Vegetables</option>
-                <option value="fruits">Fruits</option>
-                <option value="legumes">Legumes</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
               </select>
             </div>
             <div class="filter-group">
               <label class="form-label">Region</label>
               <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
                 <option value="">All Regions</option>
-                <option value="central">Central Kenya</option>
-                <option value="western">Western Kenya</option>
-                <option value="eastern">Eastern Kenya</option>
-                <option value="rift-valley">Rift Valley</option>
-                <option value="coast">Coast</option>
-              </select>
-            </div>
+                <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
+            </select>
+            </div>  
           </div>
         </div>
       </div>
