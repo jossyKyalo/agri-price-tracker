@@ -168,7 +168,7 @@ def get_recent_data(commodity: str, market: str, county: str):
 def engineer_features(commodity: str, market: str, county: str, target_date: datetime, historical_data_df: pd.DataFrame):
     prices = historical_data_df['Retail'].values 
     features = {}
-     
+      
     features['year'] = target_date.year
     features['month'] = target_date.month
     features['quarter'] = (target_date.month - 1) // 3 + 1
@@ -178,16 +178,16 @@ def engineer_features(commodity: str, market: str, county: str, target_date: dat
     features['month_cos'] = np.cos(2 * np.pi * features['month'] / 12)
     features['is_harvest'] = 1 if features['month'] in [1, 2, 7, 8] else 0
     features['is_rainy'] = 1 if features['month'] in [3, 4, 5, 10, 11, 12] else 0
-     
+      
     cat_input = [[commodity, market, county]]
     cat_encoded = encoder.transform(cat_input)[0] 
     features['Commodity_enc'] = cat_encoded[0]
     features['Market_enc'] = cat_encoded[1]
     features['County_enc'] = cat_encoded[2]
-     
+      
     for lag in [1, 3, 7, 14, 21, 28, 30]:
         features[f'lag_{lag}'] = float(prices[lag-1]) if len(prices) >= lag else features.get(f'lag_{lag-1}', 0.0)
-     
+      
     for window in [7, 14, 30]:
         window_data = prices[:window]
         features[f'ma_{window}'] = float(np.mean(window_data))
@@ -236,9 +236,12 @@ def predict(request: PredictionRequest):
             target_date, 
             recent_data
         )
-        
-        X_scaled = scaler.transform(X)
-        predicted_price = float(model.predict(X_scaled)[0])
+         
+        X_scaled_array = scaler.transform(X)
+         
+        X_scaled_df = pd.DataFrame(X_scaled_array, columns=X.columns)
+         
+        predicted_price = float(model.predict(X_scaled_df)[0]) 
         
         change_pct = ((predicted_price - current_price) / current_price) * 100
         
