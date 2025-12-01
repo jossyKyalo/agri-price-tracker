@@ -133,8 +133,16 @@
               <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
                 <option value="">All Regions</option>
                 <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
-            </select>
-            </div>  
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Data Source</label>
+              <select class="form-select" [(ngModel)]="selectedSource" (change)="filterCrops()">
+                <option value="">All Sources</option>
+                <option value="kamis">Official & Verified</option>
+                <option value="farmer">Farmer Inputs</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -150,6 +158,7 @@
               <thead>
                 <tr>
                   <th>Agricultural Product</th>
+                  <th>Source</th> 
                   <th>Category</th>
                   <th>Current Price</th>
                   <th>Trend</th>
@@ -171,6 +180,21 @@
                     <div class="crop-cell">
                       <strong>{{ crop.name }}</strong>
                     </div>
+                  </td>
+                  <td>
+                     <span class="badge" 
+                      [ngClass]="{
+                        'bg-primary': crop.source === 'kamis', 
+                        'bg-purple text-white': crop.source === 'admin',
+                        'bg-warning text-dark': crop.source === 'farmer'
+                      }">
+                      <i class="fas" [ngClass]="{
+                        'fa-globe': crop.source === 'kamis',
+                        'fa-shield-alt': crop.source === 'admin', 
+                        'fa-user': crop.source === 'farmer'
+                      }"></i>
+                      {{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer') }}
+                    </span>
                   </td>
                   <td>
                     <span class="badge badge-info">{{ crop.category }}</span>

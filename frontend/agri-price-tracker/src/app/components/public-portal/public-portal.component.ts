@@ -16,6 +16,7 @@ interface DisplayCrop {
   name: string;
   category: string;
   unit: string;
+  source: string;
   currentPrice: number;
   previousPrice: number;
   trend: 'up' | 'down' | 'stable';
@@ -64,6 +65,8 @@ export class PublicPortalComponent implements OnInit {
   searchTerm = '';
   selectedCategory = '';
   selectedRegion = '';
+  selectedSource = '';
+
   isLoading = false;
   errorMessage = '';
 
@@ -213,7 +216,7 @@ export class PublicPortalComponent implements OnInit {
     this.isLoading = true;
     const crops$ = this.cropService.getCrops();
     const regions$ = this.cropService.getRegions();
-    const prices$ = this.priceService.getPrices({ limit: 3000 });
+    const prices$ = this.priceService.getPrices({ limit: 20000 });
     const predictions$ = this.priceService.getPredictions();
     const mlStats$ = this.apiService.get<any>('/ml/');
 
@@ -274,8 +277,9 @@ export class PublicPortalComponent implements OnInit {
           return {
             id: item.id || item.crop_id,
             name: item.crop_name || item.name || 'Unknown',
-            category: item.crop_category|| item.category || 'General',
+            category: item.crop_category || item.category || 'General',
             unit: item.crop_unit || item.unit || 'kg',
+            source: item.source || 'kamis',
             currentPrice: currentPrice,
             previousPrice: previousPrice,
             trend: this.calculateTrend(currentPrice, previousPrice),
@@ -343,7 +347,14 @@ export class PublicPortalComponent implements OnInit {
       const matchesRegion = !this.selectedRegion ||
         crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
 
-      return matchesSearch && matchesCategory && matchesRegion;
+      let matchesSource = true;
+      if (this.selectedSource === 'official') {
+        matchesSource = crop.source === 'kamis' || crop.source === 'admin';
+      } else if (this.selectedSource === 'farmer') {
+        matchesSource = crop.source === 'farmer';
+      }
+
+      return matchesSearch && matchesCategory && matchesRegion && matchesSource;
     });
 
     this.currentPage = 1;
