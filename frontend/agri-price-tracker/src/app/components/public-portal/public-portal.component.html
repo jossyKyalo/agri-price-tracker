@@ -248,6 +248,39 @@
     </div>
 
     <div *ngIf="activeTab === 'predictions'" class="tab-content">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="search-filters">
+            <div class="search-group">
+              <label class="form-label">Search Crop/Product</label>
+              <input type="text" class="form-control" placeholder="Search for crops..." [(ngModel)]="searchTerm"
+                (input)="filterCrops()">
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterCrops()">
+                <option value="">All Categories</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Region</label>
+              <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
+                <option value="">All Regions</option>
+                <option *ngFor="let reg of regions" [value]="reg.name">{{ reg.name | titlecase }}</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Data Source</label>
+              <select class="form-select" [(ngModel)]="selectedSource" (change)="filterCrops()">
+                <option value="">All Sources</option>
+                <option value="official">Official & Verified</option>
+                <option value="farmer">Farmer Inputs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="predictions-grid">
         <div class="card">
           <div class="card-header">
@@ -255,22 +288,45 @@
             <span class="badge badge-info">Powered by Machine Learning</span>
           </div>
           <div class="card-body">
-            <div class="prediction-list">
-              <div *ngFor="let crop of filteredCrops" class="prediction-item" [hidden]="crop.prediction === null">
+            <div *ngIf="isLoading" class="text-center py-5">
+              <i class="fas fa-spinner fa-spin fa-3x text-success"></i>
+              <p class="mt-3">Generating forecasts...</p>
+            </div>
+            <div *ngIf="!isLoading && filteredCrops.length === 0" class="text-center py-5">
+              <i class="fas fa-leaf text-muted fa-3x mb-3"></i>
+              <h5>No crops found matching your criteria.</h5>
+            </div>
+            <div class="prediction-list" *ngIf="!isLoading">
+              <div *ngFor="let crop of paginatedCrops" class="prediction-item" [hidden]="crop.prediction === null">
                 <div class="prediction-info">
-                  <div class="crop-name">{{ crop.name }}</div>
-                  <div class="location-badge">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div class="crop-name">{{ crop.name }}</div>
+                      <small class="text-muted">{{ crop.category }}</small>
+                    </div>
+                    <span class="badge" [ngClass]="{
+                      'bg-primary': crop.source === 'kamis', 
+                      'bg-purple text-white': crop.source === 'admin',
+                      'bg-warning text-dark': crop.source === 'farmer'
+                    }">{{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer')
+                      }}</span>
+                  </div>
+                  <div class="location-badge mt-2">
                     <i class="fas fa-map-marker-alt"></i>
                     {{ crop.market }} <span class="text-muted">({{ crop.region }})</span>
+                  </div> 
+                  <div class="current-price mt-2">
+                    Current: <strong>KSh {{ crop.currentPrice }} / {{ crop.unit }}</strong>
                   </div>
-                  <div class="current-price">Current: KSh {{ crop.currentPrice }}/kg</div>
                 </div>
                 <div class="prediction-data">
                   <div class="predicted-price">
-                    <strong>KSh {{ crop.prediction }}/kg</strong>
+                    <strong>KSh {{ crop.prediction }} / {{ crop.unit }}</strong>
                     <small>7-day prediction</small>
                   </div>
-                  <div class="confidence">{{ (crop.confidence * 100) | number:'1.0-0' }}% confidence</div>
+                  <div class="confidence">
+                    <i class="fas fa-shield-alt text-muted"></i>
+                    {{ (crop.confidence * 100) | number:'1.0-0' }}% confidence</div>
                 </div>
                 <div class="prediction-trend"
                   [class]="(crop.currentPrice !== undefined && crop.prediction !== null) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
@@ -278,9 +334,21 @@
                     [class.fa-arrow-up]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
                     [class.fa-arrow-down]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
                     [class.fa-minus]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
-                  {{ getPredictionChange(crop.currentPrice, crop.prediction! ) }}%
+                   <span class="ms-1">
+                    {{ getPredictionChange(crop.currentPrice, crop.prediction! ) }}%
+                    {{ crop.prediction! > crop.currentPrice ? 'Increase' : (crop.prediction! < crop.currentPrice ? 'Decrease' : 'Stable') }}
+                  </span>
                 </div>
               </div>
+            </div>
+            <div class="pagination-footer d-flex justify-content-center align-items-center mt-4" *ngIf="totalPages > 1 && !isLoading">
+              <button class="btn btn-outline-secondary btn-sm me-3" [disabled]="currentPage === 1" (click)="prevPage()">
+                <i class="fas fa-chevron-left"></i> Previous
+              </button>
+              <span class="fw-bold text-muted small">Page {{ currentPage }} of {{ totalPages }}</span>
+              <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                Next <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
           </div>
         </div>
