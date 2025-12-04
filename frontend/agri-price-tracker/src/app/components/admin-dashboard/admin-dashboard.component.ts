@@ -252,8 +252,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  startSystemMonitoring() {
-    // Refresh system health every 30 seconds
+  startSystemMonitoring() { 
     this.monitoringSubscription = interval(30000).subscribe(() => {
       if (this.activeTab === 'monitoring') {
         this.loadSystemHealth();
