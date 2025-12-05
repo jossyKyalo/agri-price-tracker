@@ -478,13 +478,11 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  configureSync() {
-    // Navigate to KAMIS configuration page or open modal
+  configureSync() { 
     alert('KAMIS configuration interface coming soon!');
   }
 
-  manualImport() {
-    // Trigger file upload for manual KAMIS import
+  manualImport() { 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.csv,.xlsx';
