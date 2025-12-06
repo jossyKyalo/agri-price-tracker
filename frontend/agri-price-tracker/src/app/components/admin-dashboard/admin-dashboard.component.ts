@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpEventType, HttpHeaders } from '@angular/common/http';
 import { SmsInterfaceComponent } from '../sms-interface/sms-interface.component';
 import { AdminService } from '../../services/admin.service';
 import { PriceService } from '../../services/price.service';
 import { AuthService } from '../../services/auth.service';
 import { interval, Subscription } from 'rxjs';
 import { CropService } from '../../services/crop.service';
+import { environment } from '../../../environments/environment';
 
 interface AdminRequest {
   id: string;
@@ -56,31 +58,30 @@ interface SystemHealth {
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   activeTab = 'requests';
   isLoading = false;
   errorMessage = '';
   adminName = '';
-  
-  // Stats
+
+  uploadProgress = 0;
+  uploadMessage = '';
+
   pendingRequests = 0;
   totalAdmins = 0;
   todayEntries = 0;
   kamisSync = 'Loading...';
-  
-  // KAMIS data
+
   lastKamisSync = 'Loading...';
   kamisRecords = 0;
   isSyncing = false;
-  
-  // Dynamic data for dropdowns
+
   crops: Crop[] = [];
   regions: Region[] = [];
   markets: string[] = [];
   loadingCrops = false;
   loadingRegions = false;
-  
-  // System monitoring
+
   systemHealth: SystemHealth = {
     database_status: 'healthy',
     api_response_time: 0,
@@ -90,8 +91,7 @@ export class AdminDashboardComponent implements OnInit {
   };
   systemAlerts: any[] = [];
   private monitoringSubscription?: Subscription;
-  
-  // New price entry form
+
   newPriceEntry = {
     crop_id: '',
     price: 0,
@@ -103,12 +103,13 @@ export class AdminDashboardComponent implements OnInit {
   pendingVerifications: PriceEntry[] = [];
 
   constructor(
+    private http: HttpClient,
     private adminService: AdminService,
     private priceService: PriceService,
     private authService: AuthService,
     private cropService: CropService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadAdminInfo();
@@ -163,7 +164,6 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    // Load regions
     this.loadingRegions = true;
     this.cropService.getRegions().subscribe({
       next: (regions) => {
@@ -223,7 +223,6 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    // Load system alerts
     this.adminService.getSystemAlerts().subscribe({
       next: (alerts) => {
         this.systemAlerts = alerts;
@@ -252,7 +251,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  startSystemMonitoring() { 
+  startSystemMonitoring() {
     this.monitoringSubscription = interval(30000).subscribe(() => {
       if (this.activeTab === 'monitoring') {
         this.loadSystemHealth();
@@ -272,7 +271,7 @@ export class AdminDashboardComponent implements OnInit {
         console.error('Error loading admin requests:', error);
         this.errorMessage = 'Failed to load admin requests';
         this.isLoading = false;
-        
+
         // Fallback to mock data
         this.adminRequests = [
           {
@@ -317,7 +316,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading pending verifications:', error);
-        
+
         // Fallback to mock data
         this.pendingVerifications = [
           {
@@ -355,7 +354,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading stats:', error);
-        
+
         // Fallback to mock data
         this.totalAdmins = 45;
         this.todayEntries = 127;
@@ -410,16 +409,14 @@ export class AdminDashboardComponent implements OnInit {
       next: (response) => {
         alert('Price entry added successfully!');
         this.isLoading = false;
-        
-        // Reset form
+
         this.newPriceEntry = {
           crop_id: '',
           price: 0,
           region_id: '',
           market: ''
         };
-        
-        // Reload pending verifications
+
         this.loadPendingVerifications();
       },
       error: (error) => {
@@ -478,11 +475,11 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  configureSync() { 
+  configureSync() {
     alert('KAMIS configuration interface coming soon!');
   }
 
-  manualImport() { 
+  manualImport() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.csv,.xlsx';
@@ -496,20 +493,54 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   uploadKamisFile(file: File) {
+    this.isLoading = true;
+    this.uploadProgress = 0;
+    this.uploadMessage = 'Preparing upload...';
+
     const formData = new FormData();
     formData.append('file', file);
 
-    this.isLoading = true;
-    this.adminService.uploadKamisFile(formData).subscribe({
-      next: (result) => {
-        alert(`Manual import completed! ${result.records_imported || 0} records imported.`);
-        this.loadKamisStatus();
-        this.isLoading = false;
+    const token = localStorage.getItem('authToken') ||
+      localStorage.getItem('admin_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('farmer_token') ||
+      '';
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.post(`${environment.apiUrl}/kamis/upload`, formData, {
+      headers: headers,
+      reportProgress: true,
+      observe: 'events'
+    }).subscribe({
+      next: (event: any) => {
+        if (event.type === HttpEventType.UploadProgress) {
+          if (event.total) {
+            this.uploadProgress = Math.round(100 * (event.loaded / event.total));
+            this.uploadMessage = `Uploading: ${this.uploadProgress}%`;
+          }
+        } else if (event.type === HttpEventType.Response) {
+          this.isLoading = false;
+          this.uploadMessage = '';
+          const result = event.body;
+          alert(`Import successful! ${result?.total_rows || 'Multiple'} records processed.`);
+          this.loadKamisStatus();
+        }
       },
-      error: (error) => {
-        console.error('Error uploading KAMIS file:', error);
-        alert('Failed to import file. Please try again.');
+      error: (err) => {
         this.isLoading = false;
+        console.error('Upload Error:', err);
+
+        let msg = 'Upload failed.';
+        if (err.error && err.error.message) {
+          msg += ` Server says: ${err.error.message}`;
+        } else if (err.status === 500) {
+          msg += ' Internal Server Error. Check backend logs.';
+        }
+
+        alert(msg);
       }
     });
   }
