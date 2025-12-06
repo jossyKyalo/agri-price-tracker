@@ -140,7 +140,7 @@ class PredictionResponse(BaseModel):
     predictions: List[DayPrediction]
     trend: str
     recommendation: str
-    confidence: str
+    confidence: float 
 
  
 
@@ -238,11 +238,9 @@ def predict(request: PredictionRequest):
         )
          
         X_scaled_array = scaler.transform(X)
-         
         X_scaled_df = pd.DataFrame(X_scaled_array, columns=X.columns)
-         
-        predicted_price = float(model.predict(X_scaled_df)[0]) 
         
+        predicted_price = float(model.predict(X_scaled_df)[0])
         change_pct = ((predicted_price - current_price) / current_price) * 100
         
         day_prediction = DayPrediction(
@@ -251,14 +249,27 @@ def predict(request: PredictionRequest):
             change_percentage=round(change_pct, 2)
         )
         
-        if abs(change_pct) > 5:
+        if abs(change_pct) > 1.5:
             trend = "rising" if change_pct > 0 else "falling"
             recommendation = f"Price is predicted to be {trend} by {abs(change_pct):.1f}%. Consider adjusting supply."
         else:
             trend = "stable"
             recommendation = f"Price expected to remain stable around {current_price:.2f} KES."
-
-        confidence = "Medium" 
+ 
+        prices = recent_data['Retail'].values
+         
+        if len(prices) > 0 and np.mean(prices) > 0:
+            volatility = np.std(prices) / np.mean(prices)
+        else:
+            volatility = 0.5  
+        base_score = metadata.get('avg_r2', 0.84) 
+ 
+        volatility_penalty = min(volatility, 0.6)  
+        dynamic_confidence = base_score * (1 - volatility_penalty)
+ 
+        data_bonus = min((len(prices) - 14) * 0.01, 0.1)  
+        dynamic_confidence += data_bonus 
+        confidence = max(0.1, min(0.99, dynamic_confidence)) 
 
         return PredictionResponse(
             current_price=round(current_price, 2),
