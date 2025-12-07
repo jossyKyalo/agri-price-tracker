@@ -1,4 +1,60 @@
 <div class="admin-dashboard-container">
+
+  <div class="auth-overlay" *ngIf="showSyncModal" style="display: flex;">
+    <div class="auth-card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="m-0"><i class="fas fa-cog text-primary"></i> Configure Auto-Sync</h3>
+        <button class="close-btn" (click)="closeSyncModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveSyncConfig()">
+
+          <div class="form-check form-switch mb-3 p-3 bg-light rounded">
+            <input class="form-check-input" type="checkbox" id="autoSync" [(ngModel)]="syncConfig.autoSyncEnabled"
+              name="autoSync">
+            <label class="form-check-label fw-bold ms-2" for="autoSync">Enable Automatic Sync</label>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Sync Frequency</label>
+              <select class="form-select" [(ngModel)]="syncConfig.frequency" name="frequency"
+                [disabled]="!syncConfig.autoSyncEnabled">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="manual">Manual Only</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Run At Time (EAT)</label>
+              <input type="time" class="form-control" [(ngModel)]="syncConfig.syncTime" name="syncTime"
+                [disabled]="!syncConfig.autoSyncEnabled">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Retry Attempts on Failure</label>
+            <input type="number" class="form-control" [(ngModel)]="syncConfig.retryAttempts" name="retries" min="0"
+              max="5">
+          </div>
+
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="notify" [(ngModel)]="syncConfig.notifyOnFailure"
+              name="notify">
+            <label class="form-check-label" for="notify">Notify Admin on Failure (Email/SMS)</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading">
+            <i class="fas" [class.fa-save]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+            {{ isLoading ? 'Saving...' : 'Save Configuration' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <div class="dashboard-header">
       <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
@@ -140,7 +196,8 @@
             <form (ngSubmit)="submitPriceEntry()" #priceForm="ngForm">
               <div class="form-group">
                 <label class="form-label">Crop/Product *</label>
-                <select class="form-select" [(ngModel)]="newPriceEntry.crop_id" name="crop_id" required [disabled]="loadingCrops">
+                <select class="form-select" [(ngModel)]="newPriceEntry.crop_id" name="crop_id" required
+                  [disabled]="loadingCrops">
                   <option value="">{{ loadingCrops ? 'Loading crops...' : 'Select Crop' }}</option>
                   <option *ngFor="let crop of crops" [value]="crop.id">{{ crop.name }}</option>
                 </select>
@@ -148,12 +205,14 @@
 
               <div class="form-group">
                 <label class="form-label">Price (KSh/kg) *</label>
-                <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" min="0" step="0.01" required>
+                <input type="number" class="form-control" [(ngModel)]="newPriceEntry.price" name="price" min="0"
+                  step="0.01" required>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Region *</label>
-                <select class="form-select" [(ngModel)]="newPriceEntry.region_id" name="region_id" required [disabled]="loadingRegions">
+                <select class="form-select" [(ngModel)]="newPriceEntry.region_id" name="region_id" required
+                  [disabled]="loadingRegions">
                   <option value="">{{ loadingRegions ? 'Loading regions...' : 'Select Region' }}</option>
                   <option *ngFor="let region of regions" [value]="region.id">{{ region.name }}</option>
                 </select>
@@ -161,7 +220,8 @@
 
               <div class="form-group">
                 <label class="form-label">Market *</label>
-                <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market" placeholder="e.g., Kiambu Market" required>
+                <input type="text" class="form-control" [(ngModel)]="newPriceEntry.market" name="market"
+                  placeholder="e.g., Kiambu Market" required>
               </div>
 
               <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
@@ -255,8 +315,7 @@
           </div>
           <div class="card-body">
             <div *ngFor="let alert of systemAlerts" [ngClass]="getAlertClass(alert.type)" class="alert">
-              <i class="fas" 
-                 [ngClass]="{
+              <i class="fas" [ngClass]="{
                    'fa-clock': alert.type === 'warning',
                    'fa-info-circle': alert.type === 'info',
                    'fa-check-circle': alert.type === 'success',
@@ -319,7 +378,9 @@
             <div class="kamis-info">
               <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
-                <strong>About KAMIS Integration:</strong> This feature automatically synchronizes market price data from the Kenya Agricultural Market Information System (KAMIS) to keep your database updated with official market prices.
+                <strong>About KAMIS Integration:</strong> This feature automatically synchronizes market price data from
+                the Kenya Agricultural Market Information System (KAMIS) to keep your database updated with official
+                market prices.
               </div>
             </div>
           </div>

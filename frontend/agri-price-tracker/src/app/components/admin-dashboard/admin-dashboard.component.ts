@@ -51,6 +51,15 @@ interface SystemHealth {
   last_updated: string;
 }
 
+interface SyncConfig {
+  autoSyncEnabled: boolean;
+  frequency: 'daily' | 'weekly' | 'manual';
+  syncTime: string;
+  retryAttempts: number;
+  notifyOnFailure: boolean;
+  targetCrops: string[];
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -66,6 +75,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   uploadProgress = 0;
   uploadMessage = '';
+
+  showSyncModal = false;
+  syncConfig: SyncConfig = {
+    autoSyncEnabled: true,
+    frequency: 'daily',
+    syncTime: '06:00',
+    retryAttempts: 3,
+    notifyOnFailure: true,
+    targetCrops: ['all']
+  };
 
   pendingRequests = 0;
   totalAdmins = 0;
@@ -118,6 +137,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.loadKamisStatus();
     this.loadSystemHealth();
     this.startSystemMonitoring();
+    this.loadSyncConfig();
   }
 
   ngOnDestroy() {
@@ -475,8 +495,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadSyncConfig() {
+    const saved = localStorage.getItem('kamis_sync_config');
+    if (saved) {
+      this.syncConfig = JSON.parse(saved);
+    }
+  }
+
   configureSync() {
-    alert('KAMIS configuration interface coming soon!');
+    this.showSyncModal = true;
+  }
+
+  closeSyncModal() {
+    this.showSyncModal = false;
+  }
+
+  saveSyncConfig() {
+    this.isLoading = true; 
+    setTimeout(() => {
+      localStorage.setItem('kamis_sync_config', JSON.stringify(this.syncConfig));
+      this.isLoading = false;
+      this.showSyncModal = false;
+      alert('✅ Sync configuration saved successfully.'); 
+    }, 800);
   }
 
   manualImport() {
