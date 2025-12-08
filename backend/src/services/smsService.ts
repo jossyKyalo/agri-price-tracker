@@ -1,125 +1,153 @@
-import africastalking from 'africastalking';
+import axios from 'axios';
+import { pool } from '../database/connection';
 import { query } from '../database/connection';
 import { logger } from '../utils/logger';
-import type { SmsLog } from '../types/index';
-import dotenv from "dotenv";
-dotenv.config();
+import { ApiError } from '../utils/apiError';
 
-const at = africastalking({
-  apiKey: process.env.AFRICASTALKING_API_KEY as string,
-  username: process.env.AFRICASTALKING_USERNAME as string,
-});
 
-const sms = at.SMS;
+interface SmsLog {
+  recipient: string;
+  message: string;
+  sms_type: string;
+  status: 'sent' | 'failed' | 'pending';
+  external_id?: string;
+  sent_by?: string;
+  error_message?: string;
+}
 
+const SMS_MODE_API_KEY = process.env.SMS_MODE_API_KEY || '';
+const SENDER_ID = 'Agri Price';
+
+const formatPhoneNumber = (phone: string): string => {
+  let formatted = phone.replace(/\D/g, '');
+  if (formatted.startsWith('0')) formatted = '254' + formatted.substring(1);
+  else if (formatted.startsWith('7') || formatted.startsWith('1')) formatted = '254' + formatted;
+  return formatted;
+};
 
 export const sendSmsMessage = async (
   recipient: string,
   message: string,
-  smsType: SmsLog['sms_type'],
+  smsType: string = 'general',
   sentBy?: string
 ): Promise<SmsLog> => {
+  const formattedRecipient = formatPhoneNumber(recipient);
+  let status: 'sent' | 'failed' = 'failed';
+  let externalId = '';
+  let errorMsg = '';
+
+  if (SMS_MODE_API_KEY) {
+    try {
+      const response = await axios.post(
+        'https://rest.smsmode.com/sms/v1/messages',
+        {
+          recipient: { to: formattedRecipient },
+          body: { text: message },
+          from: SENDER_ID
+        },
+        { headers: { 'X-Api-Key': SMS_MODE_API_KEY, 'Content-Type': 'application/json' } }
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        status = 'sent';
+        externalId = response.data.id;
+        logger.info(`SMS sent to ${formattedRecipient}`);
+      } else {
+        errorMsg = JSON.stringify(response.data);
+        logger.error('SMS API Error:', response.data);
+      }
+    } catch (error: any) {
+      errorMsg = error.response?.data?.message || error.message;
+      logger.error('SMS Send Failed:', errorMsg);
+    }
+  } else {
+    status = 'sent';
+    externalId = 'dev-mock-id-' + Date.now();
+    logger.info(`[Mock SMS] To: ${recipient} | Msg: ${message}`);
+  }
+
   try {
-    const response = await sms.send({
-      to: [recipient],
-      message,
-      from: process.env.AFRICASTALKING_SHORTCODE || '',
-    });
-
-    const responseData = response as any;
-    const recipientData = responseData.SMSMessageData.Recipients[0];
-
-    if (!recipientData) {
-      throw new Error('Africa\'s Talking response did not include recipient data.');
-    }
-
-    let dbStatus: SmsLog['status'] = 'pending';
-
-    if (recipientData.status === 'Success' || recipientData.statusCode === 101) {
-      dbStatus = 'sent';
-    } else {
-      dbStatus = 'failed';
-    }
-
-    const messageId = recipientData.messageId;
-    const cost = recipientData.cost.replace(/[^0-9.]/g, '');
-
-    const result = await query(
-      `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, sent_at, cost)
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7)
+    const result = await pool.query(
+      `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, error_message)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [recipient, message, smsType, dbStatus, messageId, sentBy, cost]
+      [formattedRecipient, message, smsType, status, externalId, sentBy, errorMsg]
     );
-
-    logger.info(`📨 SMS sent to ${recipient}: ${messageId}`);
     return result.rows[0];
-
-  } catch (error: any) {
-    logger.error(`❌ Failed to send SMS to ${recipient}:`, error);
-
-    const result = await query(
-      `INSERT INTO sms_logs (recipient, message, sms_type, status, error_message, sent_by)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`,
-      [recipient, message, smsType, 'failed', error.message, sentBy]
-    );
-
-    return result.rows[0];
+  } catch (dbError) {
+    logger.error('Failed to save SMS log', dbError);
+    return { recipient, message, sms_type: smsType, status, external_id: externalId };
   }
 };
+
 
 export const sendBulkSms = async (
   recipients: string[],
   message: string,
-  smsType: SmsLog['sms_type'],
+  smsType: string = 'general',
   sentBy?: string
 ): Promise<SmsLog[]> => {
   const results: SmsLog[] = [];
+  logger.info(`Starting bulk SMS (${smsType}) to ${recipients.length} users`);
 
-  for (const recipient of recipients) {
-    try {
-      const result = await sendSmsMessage(recipient, message, smsType, sentBy);
-      results.push(result);
- 
-      await new Promise(resolve => setTimeout(resolve, 300));
-    } catch (error) {
-      logger.error(`❌ Bulk SMS failed for ${recipient}:`, error);
-    }
+  for (const phone of recipients) {
+    const result = await sendSmsMessage(phone, message, smsType, sentBy);
+    results.push(result);
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
-
   return results;
 };
 
- 
+export const subscribeUser = async (phone: string, cropIds: string[]) => {
+  const client = await pool.connect();
+  try {
+    const formattedPhone = formatPhoneNumber(phone);
+
+    const query = `
+      INSERT INTO sms_subscriptions (phone, crops, is_active, updated_at)
+      VALUES ($1, $2, true, NOW())
+      ON CONFLICT (phone) 
+      DO UPDATE SET crops = $2, is_active = true, updated_at = NOW()
+      RETURNING id;
+    `;
+
+    const result = await client.query(query, [formattedPhone, cropIds]);
+
+    await sendSmsMessage(
+      formattedPhone,
+      `Welcome to AgriPrice! You are now tracking ${cropIds.length} crops. You will receive daily updates.`
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Subscription error:', error);
+    throw new ApiError('Failed to subscribe user', 500);
+  } finally {
+    client.release();
+  }
+};
+
+export const unsubscribeUser = async (phone: string) => {
+  const formattedPhone = formatPhoneNumber(phone);
+  await pool.query('UPDATE sms_subscriptions SET is_active = false WHERE phone = $1', [formattedPhone]);
+  return true;
+};
+
 export const getSubscribedNumbers = async (
-  cropIds?: string[],
-  regionIds?: string[],
-  alertTypes?: string[]
+  cropNames?: string[],
+  regionIds?: string[]
 ): Promise<string[]> => {
   try {
     let whereConditions: string[] = ['is_active = true'];
     const params: any[] = [];
     let paramIndex = 1;
-
-    if (cropIds && cropIds.length > 0) {
-      whereConditions.push(`crops ?| $${paramIndex++}`);
-      params.push(cropIds);
+    if (cropNames && cropNames.length > 0) {
+      whereConditions.push(`crops && $${paramIndex++}::text[]`);
+      params.push(cropNames);
     }
 
-    if (regionIds && regionIds.length > 0) {
-      whereConditions.push(`regions ?| $${paramIndex++}`);
-      params.push(regionIds);
-    }
-
-    if (alertTypes && alertTypes.length > 0) {
-      whereConditions.push(`alert_types ?| $${paramIndex++}`);
-      params.push(alertTypes);
-    }
-
-    const result = await query(
-      `SELECT DISTINCT phone FROM sms_subscriptions WHERE ${whereConditions.join(' AND ')}`,
-      params
-    );
+    const queryStr = `SELECT DISTINCT phone FROM sms_subscriptions WHERE ${whereConditions.join(' AND ')}`;
+    const result = await pool.query(queryStr, params);
 
     return result.rows.map(row => row.phone);
   } catch (error) {
@@ -128,7 +156,6 @@ export const getSubscribedNumbers = async (
   }
 };
 
- 
 export const sendPriceAlert = async (
   cropName: string,
   price: number,
@@ -137,43 +164,23 @@ export const sendPriceAlert = async (
   percentage: number
 ): Promise<void> => {
   try {
-    // Load SMS template
-    const templateResult = await query(
-      'SELECT template FROM sms_templates WHERE name = $1 AND is_active = true',
-      ['Price Alert']
-    );
+    const direction = trend === 'up' ? 'risen' : trend === 'down' ? 'dropped' : 'remained stable';
+    const message = `AgriPrice Alert: ${cropName} prices in ${region} have ${direction} by ${percentage}% to KSh ${price}.`;
 
-    if (templateResult.rows.length === 0) {
-      logger.warn('⚠️ Price alert template not found');
-      return;
-    }
-
-    let message = templateResult.rows[0].template;
-
-    // Replace placeholders
-    message = message
-      .replace('{crop}', cropName)
-      .replace('{trend}', trend === 'up' ? 'increased' : trend === 'down' ? 'decreased' : 'remained stable')
-      .replace('{percentage}', percentage.toString())
-      .replace('{price}', price.toString())
-      .replace('{region}', region)
-      .replace('{market}', 'Local Market');
-
-    // Subscribers for crop & region
-    const subscribers = await getSubscribedNumbers([cropName.toLowerCase()], [region.toLowerCase()], ['price-alert']);
+    const subscribers = await getSubscribedNumbers([cropName]);
 
     if (subscribers.length > 0) {
-      await sendBulkSms(subscribers, message, 'alert');
-      logger.info(`✅ Price alert sent to ${subscribers.length} subscribers for ${cropName} in ${region}`);
+      await sendBulkSms(subscribers, message);
+      logger.info(`✅ Price alert sent to ${subscribers.length} subscribers for ${cropName}`);
     }
   } catch (error) {
     logger.error('❌ Failed to send price alert:', error);
   }
 };
- 
+
 export const sendDailyPriceUpdate = async (): Promise<void> => {
   try {
-    const priceChanges = await query(`
+    const priceChanges = await pool.query(`
       SELECT c.name as crop_name, pe.price, r.name as region_name
       FROM price_entries pe
       JOIN crops c ON pe.crop_id = c.id
@@ -188,38 +195,29 @@ export const sendDailyPriceUpdate = async (): Promise<void> => {
       return;
     }
 
-    // Build SMS message
-    let message = 'AGRI UPDATE: Today\'s prices - ';
+    let message = 'AGRI UPDATE: Today\'s prices: ';
     const priceList = priceChanges.rows
-      .map(row => `${row.crop_name}: KSh ${row.price}/kg (${row.region_name})`)
+      .map(row => `${row.crop_name}: ${row.price}/= (${row.region_name})`)
       .join(', ');
 
-    message += priceList + '. For more info, reply HELP';
-
-    // Subscribers interested in daily updates
-    const subscribers = await getSubscribedNumbers([], [], ['price-update']);
+    message += priceList;
+    const subscribers = await getSubscribedNumbers();
 
     if (subscribers.length > 0) {
-      await sendBulkSms(subscribers, message, 'update');
-      logger.info(`✅ Daily price update sent to ${subscribers.length} subscribers`);
+      await sendBulkSms(subscribers, message);
+      logger.info(`✅ Daily update sent to ${subscribers.length} subscribers`);
     }
   } catch (error) {
     logger.error('❌ Failed to send daily price update:', error);
   }
 };
 
- 
 export const processSmsWebhook = async (req: any): Promise<void> => {
   try {
     const { id, status, phoneNumber } = req.body;
-
-    await query(
-      'UPDATE sms_logs SET status = $1, delivered_at = CURRENT_TIMESTAMP WHERE external_id = $2',
-      [status, id]
-    );
-
+    await
+      query('UPDATE sms_logs SET status = $1, delivered_at = CURRENT_TIMESTAMP WHERE external_id = $2', [status, id]);
     logger.info(`📬 Delivery report updated: ${id} - ${status} (${phoneNumber})`);
-  } catch (error) {
-    logger.error('❌ Failed to process SMS webhook:', error);
   }
+  catch (error) { logger.error('❌ Failed to process SMS webhook:', error); }
 };

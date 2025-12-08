@@ -76,6 +76,12 @@ export class SmsService {
     );
   }
 
+  deleteSmsTemplate(id: string): Observable<any> {
+    return this.apiService.delete<any>(`/sms/templates/${id}`).pipe(
+      map(response => response.data)
+    );
+  }
+
   subscribeSms(subscriptionData: SmsSubscription): Observable<any> {
     return this.apiService.post<any>('/sms/subscribe', subscriptionData).pipe(
       map(response => response.data!)

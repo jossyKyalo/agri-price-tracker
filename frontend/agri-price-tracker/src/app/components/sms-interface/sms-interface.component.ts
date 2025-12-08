@@ -15,13 +15,14 @@ export class SmsInterfaceComponent implements OnInit {
   activeTab = 'send';
   isLoading = false;
   errorMessage = '';
-  
+  successMessage = '';
+
   // Stats
   totalSent = 0;
   subscribedFarmers = 0;
   pendingSms = 0;
   failedSms = 0;
-  
+
   // SMS Form Data
   smsData = {
     type: '',
@@ -31,11 +32,11 @@ export class SmsInterfaceComponent implements OnInit {
     schedule: 'now',
     scheduledTime: ''
   };
-  
+
   selectedTemplate = '';
   showCreateTemplate = false;
   logFilter = '';
-  
+
   // Template Data
   newTemplate = {
     name: '',
@@ -51,7 +52,7 @@ export class SmsInterfaceComponent implements OnInit {
   constructor(
     private smsService: SmsService,
     private cropService: CropService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadInitialData();
@@ -167,21 +168,73 @@ export class SmsInterfaceComponent implements OnInit {
     });
   }
 
+  private formatPhone(phone: string): string | null {
+    let cleaned = phone.replace(/[^0-9+]/g, '');
+
+    if (cleaned.startsWith('0')) {
+      cleaned = '+254' + cleaned.substring(1);
+    }
+
+    else if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+      cleaned = '+254' + cleaned;
+    }
+
+    else if (cleaned.startsWith('254')) {
+      cleaned = '+' + cleaned;
+    }
+
+    if (!cleaned.startsWith('+') || cleaned.length < 10) {
+      return null;
+    }
+    return cleaned;
+  }
+
   sendSms() {
-    if (!this.smsData.type || !this.smsData.recipients || !this.smsData.message) {
-      alert('Please fill in all required fields');
+    if (!this.smsData.type || !this.smsData.message) {
+      this.errorMessage = 'Please fill in message and type fields';
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
-    const recipients = this.smsData.recipients === 'custom' 
-      ? this.smsData.customNumbers.split(',').map(n => n.trim())
-      : [this.smsData.recipients]; 
+    let recipientList: string[] = [];
+
+    if (this.smsData.recipients === 'custom') {
+      const rawInputs = this.smsData.customNumbers.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+      const invalid: string[] = [];
+
+      rawInputs.forEach(num => {
+        const formatted = this.formatPhone(num);
+        if (formatted) {
+          recipientList.push(formatted);
+        } else {
+          invalid.push(num);
+        }
+      });
+
+      if (invalid.length > 0) {
+        this.isLoading = false;
+        this.errorMessage = `Invalid numbers: ${invalid.join(', ')}. Use format 0712...`;
+        return;
+      }
+
+      if (recipientList.length === 0) {
+        this.isLoading = false;
+        this.errorMessage = 'Please enter at least one valid phone number.';
+        return;
+      }
+    } else {
+
+      this.isLoading = false;
+      this.errorMessage = 'Sending to groups is not yet implemented. Please enter numbers manually.';
+      return;
+    }
 
     const smsRequest: SendSmsRequest = {
-      recipients: recipients,
+      recipients: recipientList,
       message: this.smsData.message,
       sms_type: this.smsData.type as any
     };
@@ -189,52 +242,52 @@ export class SmsInterfaceComponent implements OnInit {
     this.smsService.sendSms(smsRequest).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert(`SMS sent successfully to ${response.sent} recipients!`);
-        
-        // Reset form
-        this.smsData = {
-          type: '',
-          recipients: '',
-          customNumbers: '',
-          message: '',
-          schedule: 'now',
-          scheduledTime: ''
-        };
-        
-        // Reload logs and stats
+        const count = response.data?.sent || recipientList.length;
+        this.successMessage = `✅ SMS sent to ${count} recipient(s)!`;
+
+        this.smsData.message = '';
+        this.smsData.customNumbers = '';
+
         this.loadSmsLogs();
         this.loadSmsStats();
+
+        setTimeout(() => this.successMessage = '', 5000);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.userMessage || 'Failed to send SMS';
-        console.error('Error sending SMS:', error);
+        console.error('Send Error:', error);
+        if (error.status === 400) {
+          this.errorMessage = 'Validation Failed: Backend rejected the data format.';
+        } else {
+          this.errorMessage = error.error?.message || 'Failed to send SMS.';
+        }
       }
     });
   }
 
-  sendQuickSms(type: string) { 
+
+  sendQuickSms(type: string) {
     this.activeTab = 'send';
-    
-    switch(type) {
+
+    switch (type) {
       case 'price-spike':
         this.smsData.type = 'alert';
-        this.smsData.recipients = 'region-central';
+        this.smsData.recipients = 'custom';
         this.smsData.message = 'AGRI ALERT: Maize price has increased by 15% to KSh 50/kg in Central Kenya. Consider selling now.';
         break;
       case 'weather-alert':
         this.smsData.type = 'weather';
-        this.smsData.recipients = 'all';
+        this.smsData.recipients = 'custom';
         this.smsData.message = 'AGRI WEATHER: Heavy rains expected in your region for next 3 days. Protect your crops and harvest early if ready.';
         break;
       case 'market-opportunity':
         this.smsData.type = 'general';
-        this.smsData.recipients = 'crop-tomatoes';
+        this.smsData.recipients = 'custom';
         this.smsData.message = 'AGRI OPPORTUNITY: High demand for tomatoes in Nairobi markets. Premium prices available. Contact local buyers.';
         break;
       case 'daily-update':
         this.smsData.type = 'update';
-        this.smsData.recipients = 'all';
+        this.smsData.recipients = 'custom';
         this.smsData.message = 'AGRI UPDATE: Today\'s prices - Maize: KSh 50/kg, Beans: KSh 90/kg, Tomatoes: KSh 42/kg. Predictions rising.';
         break;
     }
@@ -292,9 +345,14 @@ export class SmsInterfaceComponent implements OnInit {
   }
 
   deleteTemplate(id: string) {
-    if (confirm('Are you sure you want to delete this template?')) { 
-      this.smsTemplates = this.smsTemplates.filter(t => t.id !== id);
-      alert('Template deleted successfully!');
+    if (confirm('Are you sure you want to delete this template?')) {
+      this.smsService.deleteSmsTemplate(id).subscribe({
+        next: () => {
+          this.smsTemplates = this.smsTemplates.filter(t => t.id !== id);
+          alert('Template deleted successfully!');
+        },
+        error: (err) => alert('Failed to delete template')
+      });
     }
   }
 
@@ -305,14 +363,12 @@ export class SmsInterfaceComponent implements OnInit {
     return this.smsLogs.filter(log => log.status === this.logFilter);
   }
 
-  resendSms(log: SmsLog) { 
-    log.status = 'pending';
-    
-    setTimeout(() => {
-      log.status = 'sent';
-      this.failedSms--;
-      this.totalSent++;
-    }, 2000);
+  resendSms(log: SmsLog) {
+    this.smsData.customNumbers = log.recipient;
+    this.smsData.message = log.message;
+    this.smsData.recipients = 'custom';
+    this.activeTab = 'send';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   formatDate(dateString: string): string {
