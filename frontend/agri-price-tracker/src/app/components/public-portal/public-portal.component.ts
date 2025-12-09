@@ -84,7 +84,7 @@ export class PublicPortalComponent implements OnInit {
   priceInput = {
     crop: '',
     price: 0,
-    location: '',
+    market: '',
     region: '',
     notes: ''
   };
@@ -539,7 +539,7 @@ export class PublicPortalComponent implements OnInit {
       region_id: region.id,
       price: this.priceInput.price,
       notes: this.priceInput.notes,
-      market: this.priceInput.location
+      market: this.priceInput.market
     };
 
     const token = this.isAdmin
@@ -554,7 +554,7 @@ export class PublicPortalComponent implements OnInit {
       next: (response) => {
         this.isLoading = false;
         alert('✅ Price submitted successfully! It will be verified by our admin team.');
-        this.priceInput = { crop: '', price: 0, location: '', region: '', notes: '' };
+        this.priceInput = { crop: '', price: 0, market: '', region: '', notes: '' };
 
         this.loadData();
       },
