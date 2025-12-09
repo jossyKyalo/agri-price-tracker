@@ -25,6 +25,7 @@ import mlRoutes from './routes/ml.js';
 import analyticsRoutes from './routes/analytics';
 import regionRoutes from './routes/region';
 import alertsRoutes from './routes/alerts';
+import statsRoutes from './routes/stats';
 
 // Load environment variables
 dotenv.config();
@@ -83,6 +84,7 @@ app.use(`/api/${API_VERSION}/ml`, mlRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
 app.use(`/api/${API_VERSION}/regions`, regionRoutes);
 app.use(`/api/${API_VERSION}/admin/alerts`, alertsRoutes)
+app.use(`/api/${API_VERSION}/stats`, statsRoutes)
 
 // 404 handler
 app.use('*', (req, res) => {
