@@ -17,11 +17,11 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
       verified,
       date_from,
       date_to,
-      sort: sortQuery = 'entry_date',  
-      order: orderQuery = 'desc'  
+      sort: sortQuery = 'entry_date',
+      order: orderQuery = 'desc'
     } = req.query as PriceQueryParams;
 
-      
+
     const sortWhitelist = [
       'price', 'entry_date', 'created_at',
       'crop_name', 'region_name', 'market_name'
@@ -32,9 +32,16 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     const offset = (Number(page) - 1) * Number(limit);
     const conditions: string[] = [];
     const params: any[] = [];
-    let paramIndex = 1; 
+    let paramIndex = 1;
 
     conditions.push(`pe.price > 20`);
+
+    if (verified !== undefined) {
+      conditions.push(`pe.is_verified = $${paramIndex++}`);
+      params.push(String(verified).toLowerCase() === 'true');
+    } else {
+      conditions.push(`pe.is_verified = true`);
+    }
 
     if (crop_id) {
       conditions.push(`pe.crop_id = $${paramIndex++}`);
@@ -43,23 +50,20 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     if (region_id) {
       conditions.push(`pe.region_id = $${paramIndex++}`);
       params.push(region_id);
-    } 
+    }
     if (market_id) {
       conditions.push(`pe.market_id = $${paramIndex++}`);
       params.push(market_id);
     }
     if (market) {
-      conditions.push(`pe.market ILIKE $${paramIndex++}`);
-      params.push(market);
+      conditions.push(`pe.market_id IN (SELECT id FROM markets WHERE name ILIKE $${paramIndex++})`);
+      params.push(`%${market}%`);
     }
     if (source) {
       conditions.push(`pe.source = $${paramIndex++}`);
       params.push(source);
     }
-    if (verified !== undefined) {
-      conditions.push(`pe.is_verified = $${paramIndex++}`);
-      params.push(verified);
-    }
+
     if (date_from) {
       conditions.push(`pe.entry_date >= $${paramIndex++}`);
       params.push(date_from);
@@ -70,9 +74,9 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
- 
+
     params.push(limit, offset);
- 
+
     const sqlQuery = `
       WITH RankedPrices AS (
         SELECT 
@@ -102,15 +106,15 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     `;
 
     const result = await query(sqlQuery, params);
- 
+
     const countResult = await query(
       `SELECT COUNT(*) FROM price_entries pe ${whereClause}`,
-      params.slice(0, -2)  
+      params.slice(0, -2)
     );
 
     const total = parseInt(countResult.rows[0].count);
     const pages = Math.ceil(total / Number(limit));
- 
+
     const prices = result.rows.map(item => ({
       ...item,
       previous_price: item.previous_price || null
@@ -119,10 +123,10 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
     const response: ApiResponse<PriceEntry[]> = {
       success: true,
       message: 'Prices retrieved successfully',
-      data: prices,  
+      data: prices,
       pagination: {
         page: Number(page),
-        limit:Number(limit),
+        limit: Number(limit),
         total,
         pages
       }
@@ -155,7 +159,7 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     if (!resolvedMarketId && market) {
       const existingMarket = await query(
         `SELECT id FROM markets WHERE LOWER(name) = LOWER($1) AND region_id = $2 LIMIT 1`,
-        [market, region_id]
+        [market.trim(), region_id]
       );
 
       if (existingMarket.rows.length > 0) {
@@ -163,7 +167,7 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
       } else {
         const insertMarket = await query(
           `INSERT INTO markets (name, region_id, is_active) VALUES ($1, $2, true) RETURNING id`,
-          [market, region_id]
+          [market.trim(), region_id]
         );
         resolvedMarketId = insertMarket.rows[0].id;
         logger.info(`New market added to DB: ${market} (Region: ${region_id})`);
