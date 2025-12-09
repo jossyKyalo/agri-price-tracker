@@ -247,7 +247,11 @@ export class PublicPortalComponent implements OnInit {
         pricesData = pricesData.filter((p: any) => new Date(p.entry_date || p.created_at) <= now);
 
 
-        pricesData.sort((a: any, b: any) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime());
+        pricesData.sort((a: any, b: any) => {
+           const timeA = new Date(a.created_at || a.entry_date).getTime();
+           const timeB = new Date(b.created_at || b.entry_date).getTime();
+           return timeB - timeA;
+        });
 
 
         const uniqueMap = new Map<string, boolean>();
@@ -285,8 +289,8 @@ export class PublicPortalComponent implements OnInit {
             trend: this.calculateTrend(currentPrice, previousPrice),
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
-            lastUpdated: this.formatDate(item.entry_date || item.created_at),
-            date: item.entry_date || item.created_at,
+            lastUpdated: this.formatDate (item.created_at||item.entry_date),
+            date: item.created_at||item.entry_date,
             prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
             confidence: realPrediction ? realPrediction.confidence_score : 0,
             crop_id: item.crop_id,
