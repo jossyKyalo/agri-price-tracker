@@ -1,199 +1,180 @@
- <div class="home-container">
-      <!-- Hero Section -->
-      <section class="hero-section">
-        <div class="container">
-          <div class="hero-content">
-            <div class="hero-text">
-              <h1 class="hero-title">
-                Empowering Farmers with 
-                <span class="highlight">Transparent Pricing</span>
-              </h1>
-              <p class="hero-description">
-                Get real-time agricultural prices, AI-powered predictions, and direct market access. 
-                Say goodbye to middleman exploitation and hello to fair trade.
-              </p>
-              <div class="hero-actions">
-                <button class="btn btn-primary btn-large" (click)="navigateToCurrentPrices()">
-                  <i class="fas fa-chart-line"></i>
-                  View Current Prices
-                </button>
-                <button class="btn btn-outline btn-large" (click)="navigateToSmsAlerts()">
-                  <i class="fas fa-mobile-alt"></i>
-                  SMS Alerts
-                </button>
-              </div>
-            </div>
-            <div class="hero-image">
-              <div class="hero-graphic">
-                <i class="fas fa-seedling"></i>
-                <div class="price-cards">
-                  <div class="price-card">
-                    <span class="crop">Maize</span>
-                    <span class="price">KSh 50/kg</span>
-                    <span class="trend up">↗ +5%</span>
-                  </div>
-                  <div class="price-card">
-                    <span class="crop">Beans</span>
-                    <span class="price">KSh 90/kg</span>
-                    <span class="trend down">↘ -2%</span>
-                  </div>
-                  <div class="price-card">
-                    <span class="crop">Tomatoes</span>
-                    <span class="price">KSh 42/kg</span>
-                    <span class="trend stable">→ 0%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            Empowering Farmers with
+            <span class="highlight">Transparent Pricing</span>
+          </h1>
+          <p class="hero-description">
+            Get real-time agricultural prices, AI-powered predictions, and direct market access.
+            Say goodbye to middleman exploitation and hello to fair trade.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-large" (click)="navigateToCurrentPrices()">
+              <i class="fas fa-chart-line"></i>
+              View Current Prices
+            </button>
+            <button class="btn btn-outline btn-large" (click)="navigateToSmsAlerts()">
+              <i class="fas fa-mobile-alt"></i>
+              SMS Alerts
+            </button>
           </div>
         </div>
-      </section>
+        <div class="hero-image">
+          <div class="hero-graphic">
+            <i class="fas fa-seedling hero-icon-bg"></i>
 
-      <!-- Features Section -->
-      <section class="features-section">
-        <div class="container">
-          <div class="section-header">
-            <h2>Why Choose AgriPrice?</h2>
-            <p>Comprehensive tools designed specifically for Kenyan farmers</p>
-          </div>
-          
-          <div class="features-grid">
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <h3>Real-Time Prices</h3>
-              <p>Get current market prices from KAMIS platform and farmer inputs across all regions in Kenya.</p>
-            </div>
-            
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-brain"></i>
-              </div>
-              <h3>AI Predictions</h3>
-              <p>Machine learning models predict future price trends to help you make informed selling decisions.</p>
-            </div>
-            
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-sms"></i>
-              </div>
-              <h3>SMS Alerts</h3>
-              <p>Receive price updates and alerts on your feature phone. No internet required.</p>
-            </div>
-            
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-robot"></i>
-              </div>
-              <h3>AI Assistant</h3>
-              <p>Chat with our agricultural AI for instant price queries, farming tips, and market insights.</p>
-            </div>
-            
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-users"></i>
-              </div>
-              <h3>Community Input</h3>
-              <p>Farmers can contribute local prices to create a comprehensive pricing database.</p>
-            </div>
-            
-            <div class="feature-card">
-              <div class="feature-icon">
-                <i class="fas fa-shield-alt"></i>
-              </div>
-              <h3>Verified Data</h3>
-              <p>All prices are verified by our admin team to ensure accuracy and reliability.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+            <div class="price-cards">
 
-      <!-- How It Works Section -->
-      <section class="how-it-works-section">
-        <div class="container">
-          <div class="section-header">
-            <h2>How It Works</h2>
-            <p>Simple steps to get started with transparent pricing</p>
-          </div>
-          
-          <div class="steps-container">
-            <div class="step">
-              <div class="step-number">1</div>
-              <div class="step-content">
-                <h3>Access Prices</h3>
-                <p>Visit our public portal or subscribe to SMS alerts to get current market prices.</p>
+              <div *ngIf="isLoadingPrices" class="price-card loading">
+                <span>Loading live prices...</span>
               </div>
-            </div>
-            
-            <div class="step">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <h3>Check Predictions</h3>
-                <p>Use our AI-powered predictions to understand future price trends for better planning.</p>
-              </div>
-            </div>
-            
-            <div class="step">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <h3>Contribute Data</h3>
-                <p>Share local prices from your area to help build a comprehensive database.</p>
-              </div>
-            </div>
-            
-            <div class="step">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <h3>Make Decisions</h3>
-                <p>Use transparent pricing data to negotiate better deals and avoid exploitation.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Stats Section -->
-      <section class="stats-section">
-        <div class="container">
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-number">2,847</div>
-              <div class="stat-label">Active Farmers</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">156</div>
-              <div class="stat-label">Crops and other Products Tracked</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">47</div>
-              <div class="stat-label">Regions Covered</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">95%</div>
-              <div class="stat-label">Accuracy Rate</div>
-            </div>
-          </div>
-        </div>
-      </section>
+              <div *ngFor="let item of heroPrices" class="price-card animate-float">
+                <span class="crop">{{ item.name }}</span>
+                <span class="price">KSh {{ item.price }}/{{ item.unit }}</span>
+                <span class="trend" [ngClass]="item.trend">
+                  <span *ngIf="item.trend === 'up'">↗ +{{ item.change }}%</span>
+                  <span *ngIf="item.trend === 'down'">↘ {{ item.change }}%</span>
+                  <span *ngIf="item.trend === 'stable'">→ 0%</span>
+                </span>
+              </div>
 
-      <!-- CTA Section -->
-      <section class="cta-section">
-        <div class="container">
-          <div class="cta-content">
-            <h2>Ready to Get Fair Prices?</h2>
-            <p>Join thousands of farmers who are already benefiting from transparent agricultural pricing.</p>
-            <div class="cta-actions">
-              <button class="btn btn-primary btn-large" (click)="getStarted()">
-                <i class="fas fa-rocket"></i>
-                Get Started Now
-              </button>
-              <button class="btn btn-outline btn-large" (click)="learnMore()">
-                <i class="fas fa-question-circle"></i>
-                Learn More
-              </button>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose AgriPrice?</h2>
+        <p>Comprehensive tools designed specifically for Kenyan farmers</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Real-Time Prices</h3>
+          <p>Get current market prices from KAMIS platform and farmer inputs across all regions in Kenya.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-brain"></i></div>
+          <h3>AI Predictions</h3>
+          <p>Machine learning models predict future price trends to help you make informed selling decisions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-sms"></i></div>
+          <h3>SMS Alerts</h3>
+          <p>Receive price updates and alerts on your feature phone. No internet required.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-robot"></i></div>
+          <h3>AI Assistant</h3>
+          <p>Chat with our agricultural AI for instant price queries, farming tips, and market insights.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-users"></i></div>
+          <h3>Community Input</h3>
+          <p>Farmers can contribute local prices to create a comprehensive pricing database.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3>Verified Data</h3>
+          <p>All prices are verified by our admin team to ensure accuracy and reliability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>Simple steps to get started with transparent pricing</p>
+      </div>
+
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Access Prices</h3>
+            <p>Visit our public portal or subscribe to SMS alerts to get current market prices.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Check Predictions</h3>
+            <p>Use our AI-powered predictions to understand future price trends for better planning.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Contribute Data</h3>
+            <p>Share local prices from your area to help build a comprehensive database.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Make Decisions</h3>
+            <p>Use transparent pricing data to negotiate better deals and avoid exploitation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{{ activeFarmers | number }}</div>
+          <div class="stat-label">Active Farmers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ trackedProducts }}</div>
+          <div class="stat-label">Crops Tracked</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ regionsCovered }}</div>
+          <div class="stat-label">Regions Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ accuracyRate }}%</div>
+          <div class="stat-label">Accuracy Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Get Fair Prices?</h2>
+        <p>Join thousands of farmers who are already benefiting from transparent agricultural pricing.</p>
+        <div class="cta-actions">
+          <button class="btn btn-primary btn-large" (click)="getStarted()">
+            <i class="fas fa-rocket"></i>
+            Get Started Now
+          </button>
+          <button class="btn btn-outline btn-large" (click)="learnMore()">
+            <i class="fas fa-question-circle"></i>
+            Learn More
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
