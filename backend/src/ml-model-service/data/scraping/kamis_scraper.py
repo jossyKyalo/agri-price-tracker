@@ -6,18 +6,18 @@ from io import StringIO
 import time
 import random
 from datetime import datetime, timedelta
-
+import sys
  
-BASE_URL = "https://kamis.kilimo.go.ke/site/market"
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "../../data/raw")
- 
-MASTER_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")      
-LATEST_FILE = os.path.join(OUTPUT_DIR, "kamis_latest.csv")     
+BASE_URL = "https://kamis.kilimo.go.ke/site/market" 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "../../data/raw")
+MASTER_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")
+LATEST_FILE = os.path.join(OUTPUT_DIR, "kamis_latest.csv")
 
 PER_PAGE = 10000 
  
-LAST_SCRAPE_DATE_STR = "2025-09-17"
-CUTOFF_DATE = datetime.strptime(LAST_SCRAPE_DATE_STR, "%Y-%m-%d")
+days_back = 30
+CUTOFF_DATE = datetime.now() - timedelta(days=days_back) 
 
 PRODUCT_IDS = range(1, 274) 
 
@@ -31,27 +31,33 @@ def scrape_market_data():
     new_data = []
     
     print(f"🚀 Starting scrape for {len(PRODUCT_IDS)} products...")
-    print(f"📅 Fetching online data posted after: {CUTOFF_DATE.strftime('%Y-%m-%d')}")
-
+    print(f"📅 Fetching data from: {CUTOFF_DATE.strftime('%Y-%m-%d')} to TODAY")
+     
+    try:
+        requests.get(BASE_URL, headers=HEADERS, timeout=10)
+    except requests.exceptions.ConnectionError:
+        print("\nCRITICAL: KAMIS site unreachable.")
+        os.makedirs(OUTPUT_DIR, exist_ok=True) 
+        with open(LATEST_FILE, 'w') as f:
+            f.write("Commodity,Classification,Grade,Sex,Market,Wholesale,Retail,Supply Volume,County,Date\n")
+        sys.exit(0)
+ 
     for product_id in PRODUCT_IDS:
         url = f"{BASE_URL}?product={product_id}&per_page={PER_PAGE}"
         
         try:
-            time.sleep(random.uniform(0.5, 1.5))
-            
+            time.sleep(random.uniform(0.5, 1.0)) 
             response = requests.get(url, headers=HEADERS, timeout=30)
-            response.raise_for_status()
+            if response.status_code >= 500: continue
             
             soup = BeautifulSoup(response.text, "html.parser")
             
-            product_name = None
             title_tag = soup.find("h3")
-            if title_tag:
-                product_name = title_tag.get_text(strip=True).replace("Market Prices for ", "")
-
+            product_name = title_tag.get_text(strip=True).replace("Market Prices for ", "") if title_tag else f"Product-{product_id}"
+            
             table = soup.find("table")
             if not table:
-                print(f".", end="", flush=True)
+                print(".", end="", flush=True)
                 continue
 
             df = pd.read_html(StringIO(str(table)))[0]
@@ -60,61 +66,31 @@ def scrape_market_data():
             date_col = next((col for col in df.columns if 'date' in col.lower()), None)
             
             if date_col:
-                df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True)
-                 
+                df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True) 
                 df = df[df[date_col] >= CUTOFF_DATE]
                 
                 if not df.empty:
                     df["ProductID"] = product_id
-                    df["CropName"] = product_name if product_name else f"Unknown-{product_id}"
-                    df["ScrapedDate"] = datetime.now().strftime("%Y-%m-%d")
-                    
+                    df["CropName"] = product_name 
+                    df[date_col] = df[date_col].dt.strftime('%Y-%m-%d')
                     new_data.append(df)
-                    print(f"✅ {product_name}: found {len(df)} new rows")
-            else: 
-                df["ProductID"] = product_id
-                df["CropName"] = product_name if product_name else f"Unknown-{product_id}"
-                df["ScrapedDate"] = datetime.now().strftime("%Y-%m-%d")
-                new_data.append(df)
-
+                    print(f"✅ {product_name}: {len(df)} rows")
+            
         except Exception as e:
-            print(f"\n❌ Error on Product {product_id}: {e}")
             continue
 
-    print("\n\n🔄 Processing Data...")
-
+    print("\n\n🔄 Saving Data...")
+ 
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
     if new_data:
-        new_df = pd.concat(new_data, ignore_index=True)
-        print(f"   Fetched {len(new_df)} relevant rows from KAMIS.")
- 
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        new_df = pd.concat(new_data, ignore_index=True) 
         new_df.to_csv(LATEST_FILE, index=False)
-        print(f"   ⚡ Saved delta file to: {LATEST_FILE} (Use this for DB Import)")
- 
-        if os.path.exists(MASTER_FILE):
-            print(f"   Updating master archive at {MASTER_FILE}...")
-            try:
-                existing_df = pd.read_csv(MASTER_FILE)
-                combined_df = pd.concat([existing_df, new_df], ignore_index=True)
-                 
-                cols_to_check = [c for c in combined_df.columns if c != 'ScrapedDate']
-                combined_df.drop_duplicates(subset=cols_to_check, keep='last', inplace=True)
-                
-                combined_df.to_csv(MASTER_FILE, index=False)
-                print(f"   ✅ Master archive updated. Total rows: {len(combined_df)}")
-            except Exception as e:
-                print(f"   ⚠️ Error updating master file: {e}")
-                new_df.to_csv(MASTER_FILE, index=False)
-        else:
-            print("   Creating new master archive.")
-            new_df.to_csv(MASTER_FILE, index=False)
-            
-        print("------------------------------------------------")
-        print(f"🎉 Done! {len(new_df)} new rows ready for import.")
-        print("------------------------------------------------")
+        print(f"🎉 Success! Scraped {len(new_df)} rows to {LATEST_FILE}")
     else:
-        print(f"⚠️  No new data found. Clearing latest file.") 
-        open(LATEST_FILE, 'w').close() 
+        print("⚠️ No new data found in range.") 
+        with open(LATEST_FILE, 'w') as f:
+             f.write("Commodity,Classification,Grade,Sex,Market,Wholesale,Retail,Supply Volume,County,Date\n")
 
 if __name__ == "__main__":
     scrape_market_data()
