@@ -1,0 +1,1 @@
+{"model_type": "HistGradientBoostingRegressor", "n_features": 6, "avg_r2": 0.6405772711474962, "last_trained": "2025-12-11 21:55:59.556576", "features": ["Commodity", "Market", "County", "month", "year", "week"]}
