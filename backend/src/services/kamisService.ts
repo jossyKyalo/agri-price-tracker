@@ -1,52 +1,82 @@
-import axios from 'axios';
 import { query, transaction } from '../database/connection';
 import { logger } from '../utils/logger';
-import fs from 'fs';
-import path from 'path';
 import { parse as csvParseSync } from 'csv-parse/sync';
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
+import path from 'path';
+import fs from 'fs';
+import { exec } from 'child_process';
+import util from 'util';
 
-interface KamisPriceData {
-  commodity: string;
-  variety?: string;
-  market: string;
-  region: string;
-  price: number;
-  unit: string;
-  date: string;
-}
+const execPromise = util.promisify(exec);
+ 
+const PROJECT_ROOT = path.resolve(__dirname, '../../');
+const DATA_DIR = path.join(PROJECT_ROOT, 'data/raw');
+const LATEST_FILE = path.join(DATA_DIR, 'kamis_latest.csv');
+const SCRAPER_SCRIPT = path.join(PROJECT_ROOT, 'src/scripts/kamis_scraper_optimized.py'); 
+ 
+const categorizeCrop = (commodityName: string): string => {
+  const lowerName = (commodityName || '').toLowerCase();
+  
+  if (lowerName.match(/fertilizer/)) return 'farm_inputs';
+  if (lowerName.match(/sunflower cake|cotton seed cake|bran|pollard/)) return 'animal_feeds';
+  if (lowerName.match(/oil|cooking fat/)) return 'processed_products';
+  if (lowerName.match(/tea|coffee|cotton|macadamia|cashew|korosho|sisal|pyrethrum|sunflower/)) return 'cash_crops';
+  if (lowerName.match(/donkey|cattle|cow|bull|goat|sheep|camel|pig|livestock|heifer|steer|rabbit/)) return 'livestock';
+  if (lowerName.match(/chicken|poultry|turkey|duck|geese|hen/)) return 'poultry';
+  if (lowerName.match(/fish|tilapia|omena|nile perch|catfish|mudfish|haplochromis|trout|carp|protopterus|bass|labeo|mormyrus|eel|synodontis|alestes|barbus|snapper|demersal|barracuda|kasumba|tuna|mackerel|shark|sardine|lobster|kamba|prawn|crab|kaa|shrimp|octopus|pweza|squid|ngisi|oyster|scavenger|changu|tangu|grouper|grunt|taamamba|kora|mullet|fumi|threadfin|bream|jack|trevally|kolekole|halfbeak|anchov|herring|marlin|pelagic|rockcode|tewa/)) return 'fisheries';
+  if (lowerName.match(/egg|milk|honey|beef|mutton|pork|meat/)) return 'animal_products';
+  if (lowerName.match(/maize|rice|wheat|sorghum|millet|barley|oat|cereal/)) return 'cereals';
+  if (lowerName.match(/bean|pea|gram|cowpea|lentil|njahi|dolichos|pulse|soya|ground\s?nut|peanut|njugu mawe/)) return 'legumes';
+  if (lowerName.match(/potato|cassava|yam|arrow root|sweet potato|cocoyam|tuber/)) return 'roots_tubers';
+  if (lowerName.match(/banana|mango|orange|pineapple|pawpaw|watermelon|avocado|passion|lemon|lime|tangerine|guava|jackfruit|berry|berries|melon|grape|apple|dragon\s?fruit|coconut/)) return 'fruits';
+  if (lowerName.match(/tomato|kales|sukuma|cabbage|onion|spinach|carrot|pepper|chilli|brinjal|lettuce|managu|terere|vegetable|broccoli|cauliflower|cucumber|kunda|mrenda|spider\s?flower|saga|jute|pumpkin|butternut|capsicum|crotolaria|mito|miro|courgette|okra|gumbo|lady\'s\s?finger/)) return 'vegetables';
+  if (lowerName.match(/ginger|garlic|coriander|dhania|chives|turmeric|pepper|chilies/)) return 'spices_herbs';
 
-export const syncKamisData = async (): Promise<void> => {
+  return 'general';
+};
+
+const determineUnit = (category: string, commodityName: string): string => {
+  const lowerName = (commodityName || '').toLowerCase();
+  if (category === 'livestock') return 'head';
+  if (category === 'poultry') return 'bird';
+  if (lowerName.match(/milk|oil|juice|honey|yoghurt/)) return 'litre';
+  if (lowerName.match(/egg/)) return 'tray';
+  if (lowerName.match(/timber|post|pole|pineapple|watermelon|coconut|pumpkin|butternut|cabbage/)) return 'piece';
+  return 'kg';
+};
+ 
+
+export const syncKamisData = async (): Promise<any> => {
   const syncId = await startSyncLog();
 
   try {
-    logger.info('Starting KAMIS data synchronization');
-
-    // Fetch data from KAMIS API
-    const kamisData = await fetchKamisData();
-
-    if (!kamisData || kamisData.length === 0) {
-      await updateSyncLog(syncId, 0, 0, 0, 'completed', 'No data received from KAMIS API');
-      return;
-    }
-
-    let inserted = 0;
-    let updated = 0;
-
-    await transaction(async (client) => {
-      for (const item of kamisData) {
-        try {
-          const result = await processKamisItem(client, item);
-          if (result.inserted) inserted++;
-          if (result.updated) updated++;
-        } catch (error) {
-          logger.error(`Failed to process KAMIS item:`, error);
+    logger.info('🔄 Starting KAMIS data synchronization...');
+    logger.info(`   Script Path: ${SCRAPER_SCRIPT}`);
+ 
+    try {
+        const { stdout, stderr } = await execPromise(`python "${SCRAPER_SCRIPT}"`);
+        logger.info(`Scraper stdout: ${stdout}`);
+        if (stderr && !stderr.includes("UserWarning")) {
+             logger.warn(`Scraper stderr: ${stderr}`);
         }
-      }
-    });
-
-    await updateSyncLog(syncId, kamisData.length, inserted, updated, 'completed');
-    logger.info(`KAMIS sync completed: ${inserted} inserted, ${updated} updated`);
+    } catch (err: any) {
+        logger.error(`Scraper execution failed: ${err.message}`); 
+    }
+ 
+    if (!fs.existsSync(LATEST_FILE)) {
+        throw new Error('Scraper finished but no output file found at ' + LATEST_FILE);
+    }
+ 
+    const fileBuffer = fs.readFileSync(LATEST_FILE);
+    const result = await processKamisFile(fileBuffer, 'kamis_latest.csv');
+ 
+    await updateSyncLog(syncId, result.total_rows, result.inserted, 0, 'completed');
+    logger.info(`KAMIS sync completed: ${result.inserted} inserted.`);
+    
+    return { 
+        records_synced: result.inserted,
+        details: result 
+    };
 
   } catch (error: any) {
     logger.error('KAMIS synchronization failed:', error);
@@ -54,302 +84,170 @@ export const syncKamisData = async (): Promise<void> => {
     throw error;
   }
 };
-
-const fetchKamisData = async (): Promise<KamisPriceData[]> => {
-  try {
-    const response = await axios.get(process.env.KAMIS_API_URL + '/prices', {
-      headers: {
-        'Authorization': `Bearer ${process.env.KAMIS_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    });
-
-    return response.data.data || [];
-  } catch (error: any) {
-    if (error.code === 'ECONNABORTED') {
-      throw new Error('KAMIS API request timeout');
-    }
-    if (error.response?.status === 401) {
-      throw new Error('KAMIS API authentication failed');
-    }
-    if (error.response?.status === 429) {
-      throw new Error('KAMIS API rate limit exceeded');
-    }
-
-    logger.error('KAMIS API error:', error.response?.data || error.message);
-    throw new Error(`KAMIS API error: ${error.response?.status || error.message}`);
-  }
-};
-
-const processKamisItem = async (client: any, item: KamisPriceData): Promise<{ inserted: boolean, updated: boolean }> => {
-  try {
-    // Find or create crop
-    const cropResult = await client.query(
-      'SELECT id FROM crops WHERE LOWER(name) = LOWER($1)',
-      [item.commodity]
-    );
-
-    let cropId;
-    if (cropResult.rows.length === 0) {
-      const newCrop = await client.query(
-        'INSERT INTO crops (name, category, unit) VALUES ($1, $2, $3) RETURNING id',
-        [item.commodity, 'general', item.unit || 'kg']
-      );
-      cropId = newCrop.rows[0].id;
-    } else {
-      cropId = cropResult.rows[0].id;
-    }
-
-    // Find or create region
-    const regionResult = await client.query(
-      'SELECT id FROM regions WHERE LOWER(name) = LOWER($1)',
-      [item.region]
-    );
-
-    let regionId;
-    if (regionResult.rows.length === 0) {
-      const newRegion = await client.query(
-        'INSERT INTO regions (name, code) VALUES ($1, $2) RETURNING id',
-        [item.region, item.region.toUpperCase().replace(/\s+/g, '_')]
-      );
-      regionId = newRegion.rows[0].id;
-    } else {
-      regionId = regionResult.rows[0].id;
-    }
-
-    // Find or create market
-    let marketId = null;
-    if (item.market) {
-      const marketResult = await client.query(
-        'SELECT id FROM markets WHERE LOWER(name) = LOWER($1) AND region_id = $2',
-        [item.market, regionId]
-      );
-
-      if (marketResult.rows.length === 0) {
-        const newMarket = await client.query(
-          'INSERT INTO markets (name, region_id) VALUES ($1, $2) RETURNING id',
-          [item.market, regionId]
-        );
-        marketId = newMarket.rows[0].id;
-      } else {
-        marketId = marketResult.rows[0].id;
-      }
-    }
-
-    // Check if price entry already exists
-    const existingEntry = await client.query(
-      `SELECT id FROM price_entries 
-       WHERE crop_id = $1 AND region_id = $2 AND market_id = $3 
-       AND entry_date = $4 AND source = 'kamis'`,
-      [cropId, regionId, marketId, item.date]
-    );
-
-    if (existingEntry.rows.length > 0) {
-      // Update existing entry
-      await client.query(
-        `UPDATE price_entries 
-         SET price = $1, unit = $2, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $3`,
-        [item.price, item.unit || 'kg', existingEntry.rows[0].id]
-      );
-      return { inserted: false, updated: true };
-    } else {
-      // Insert new entry
-      await client.query(
-        `INSERT INTO price_entries (crop_id, region_id, market_id, price, unit, source, is_verified, entry_date)
-         VALUES ($1, $2, $3, $4, $5, 'kamis', true, $6)`,
-        [cropId, regionId, marketId, item.price, item.unit || 'kg', item.date]
-      );
-      return { inserted: true, updated: false };
-    }
-
-  } catch (error) {
-    logger.error('Failed to process KAMIS item:', error);
-    throw error;
-  }
-};
-
-const startSyncLog = async (): Promise<string> => {
-  const result = await query(
-    'INSERT INTO kamis_sync_logs (sync_date, status) VALUES (CURRENT_DATE, $1) RETURNING id',
-    ['running']
-  );
-  return result.rows[0].id;
-};
-
-const updateSyncLog = async (
-  id: string,
-  processed: number,
-  inserted: number,
-  updated: number,
-  status: string,
-  errorMessage?: string
-): Promise<void> => {
-  await query(
-    `UPDATE kamis_sync_logs 
-     SET records_processed = $1, records_inserted = $2, records_updated = $3, 
-         status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP
-     WHERE id = $6`,
-    [processed, inserted, updated, status, errorMessage, id]
-  );
-};
-
-export const getKamisSyncStatus = async (): Promise<any> => {
-  const result = await query(
-    'SELECT * FROM kamis_sync_logs ORDER BY started_at DESC LIMIT 1'
-  );
-
-  if (result.rows.length === 0) {
-    return {
-      last_sync: null,
-      records_synced: 0,
-      is_active: false
-    };
-  }
-  const row = result.rows[0];
-  return {
-    last_sync: row.started_at,
-    records_synced: row.records_imported || 0,
-    is_active: row.status === 'completed'
-  };
-};
-
+ 
 export async function processKamisFile(buffer: Buffer, filename: string) {
-  // Determine extension
   const ext = (path.extname(filename) || '').toLowerCase();
-
   let rows: any[] = [];
-
+ 
   try {
     if (ext === '.xlsx' || ext === '.xls') {
       const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const firstSheetName = workbook.SheetNames[0];
-      if (!firstSheetName) {
-        throw new Error('Uploaded workbook contains no sheets');
+      const sheetName = workbook.SheetNames[0];
+      if (!sheetName) {
+        throw new Error('No sheets found in workbook');
       }
-      const sheet = workbook.Sheets[firstSheetName];
+      const sheet = workbook.Sheets[sheetName];
       if (!sheet) {
-        throw new Error('Uploaded workbook first sheet could not be read');
+        throw new Error('Sheet is undefined');
       }
       rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
     } else {
-      // Treat as CSV
       const text = buffer.toString('utf8');
-      rows = csvParseSync(text, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true
-      });
+      const cleanText = text.replace(/^\uFEFF/, '');  
+      rows = csvParseSync(cleanText, { columns: true, skip_empty_lines: true, trim: true });
     }
   } catch (err) {
-    throw new Error('Failed to parse uploaded file: ' + String(err));
+    throw new Error('Failed to parse file: ' + String(err));
   }
-
-  
-  const inserted: number[] = [];
-  let insertedCount = 0;
-  let skippedCount = 0;
-  let errorCount = 0;
-
-   
-  const client = await query('BEGIN').catch(e => { throw e; });
-
-  try {
-     
-    await query('BEGIN');
+ 
+  return await transaction(async (client) => {
+    let insertedCount = 0;
+    let skippedCount = 0;
+    let errorCount = 0;
 
     for (const rawRow of rows) {
-      try {
-        // Lowercase keys map
+      try { 
         const row: any = {};
         for (const k of Object.keys(rawRow)) {
           row[k.toLowerCase().trim()] = rawRow[k];
         }
-
-        // find values by possible column names
-        const cropName = (row.crop || row.crop_name || row['commodity'] || row['crop name'] || '').toString().trim();
+ 
+        const cropName = (row.crop || row.crop_name || row['commodity'] || row['crop name'] || row['productname'] || '').toString().trim();
         const regionName = (row.region || row.region_name || row['county'] || row['district'] || '').toString().trim();
         const marketName = (row.market || row.market_name || row['market name'] || '').toString().trim();
-        const priceVal = row.price ?? row['unit price'] ?? row['price_kg'] ?? row['value'];
-        const entryDateRaw = row.entry_date || row.date || row['report_date'] || row['entry date'];
+        
+        const priceRaw = row.price ?? row['unit price'] ?? row['wholesale'] ?? row['retail'];
+        const priceVal = parseFloat(String(priceRaw).replace(/,/g, ''));
 
-        if (!cropName || !regionName || priceVal == null || !entryDateRaw) {
-          // skip if mandatory fields missing
+        const dateRaw = row.entry_date || row.date || row['date'] || new Date();
+        const entryDate = new Date(dateRaw).toISOString();
+
+        if (!cropName || !regionName || isNaN(priceVal)) {
           skippedCount++;
           continue;
         }
-
-        // normalize date to YYYY-MM-DD
-        const entryDate = (new Date(entryDateRaw)).toISOString().slice(0, 10);
-
-        // 1) Resolve crop_id
-        let cropRes = await query('SELECT id FROM crops WHERE LOWER(name) = LOWER($1) LIMIT 1', [cropName]);
-        let cropId: string;
+ 
+        let cropId;
+        const cropRes = await client.query('SELECT id FROM crops WHERE LOWER(name) = LOWER($1)', [cropName]);
         if (cropRes.rows.length > 0) {
           cropId = cropRes.rows[0].id;
         } else {
-          // Insert new crop, return id
-          const insertCrop = await query('INSERT INTO crops(name, created_at) VALUES ($1, NOW()) RETURNING id', [cropName]);
-          cropId = insertCrop.rows[0].id;
+          const cat = categorizeCrop(cropName);
+          const unit = determineUnit(cat, cropName);
+          const newCrop = await client.query(
+             'INSERT INTO crops(name, category, unit, is_active) VALUES ($1, $2, $3, true) RETURNING id', 
+             [cropName, cat, unit]
+          );
+          cropId = newCrop.rows[0].id;
         }
-
-        // 2) Resolve region_id
-        let regionRes = await query('SELECT id FROM regions WHERE LOWER(name) = LOWER($1) LIMIT 1', [regionName]);
-        let regionId: string;
+ 
+        let regionId;
+        const regionRes = await client.query('SELECT id FROM regions WHERE LOWER(name) = LOWER($1)', [regionName]);
         if (regionRes.rows.length > 0) {
           regionId = regionRes.rows[0].id;
         } else {
-          const insertRegion = await query('INSERT INTO regions(name, created_at) VALUES ($1, NOW()) RETURNING id', [regionName]);
-          regionId = insertRegion.rows[0].id;
+          const newRegion = await client.query(
+             'INSERT INTO regions(name, code, is_active) VALUES ($1, $2, true) RETURNING id',
+             [regionName, regionName.toUpperCase().replace(/\s/g, '_')]
+          );
+          regionId = newRegion.rows[0].id;
         }
-
-        // 3) Check duplicate by crop_id + region_id + entry_date
-        const dupCheck = await query(
-          'SELECT id FROM price_entries WHERE crop_id = $1 AND region_id = $2 AND DATE(entry_date) = $3 LIMIT 1',
-          [cropId, regionId, entryDate]
+ 
+        let marketId = null;
+        if (marketName) {
+            const marketRes = await client.query('SELECT id FROM markets WHERE LOWER(name) = LOWER($1) AND region_id = $2', [marketName, regionId]);
+            if (marketRes.rows.length > 0) {
+                marketId = marketRes.rows[0].id;
+            } else {
+                const newMarket = await client.query(
+                    'INSERT INTO markets(name, region_id, is_active) VALUES ($1, $2, true) RETURNING id',
+                    [marketName, regionId]
+                );
+                marketId = newMarket.rows[0].id;
+            }
+        } 
+        const dupCheck = await client.query(
+            `SELECT id FROM price_entries WHERE crop_id=$1 AND region_id=$2 AND market_id IS NOT DISTINCT FROM $3 AND DATE(entry_date)=DATE($4)`,
+            [cropId, regionId, marketId, entryDate]
         );
 
-        if (dupCheck.rows.length > 0) {
-          // duplicate found -> skip (policy: skip duplicates)
-          skippedCount++;
-          continue;
+        if (dupCheck.rows.length === 0) {
+            await client.query(
+                `INSERT INTO price_entries (crop_id, region_id, market_id, price, entry_date, source, is_verified)
+                 VALUES ($1, $2, $3, $4, $5, 'kamis', true)`,
+                [cropId, regionId, marketId, priceVal, entryDate]
+            );
+            insertedCount++;
+        } else {
+            skippedCount++;
         }
 
-        // 4) Insert price entry
-        await query(
-          `INSERT INTO price_entries
-           (crop_id, region_id, market_name, price, entry_date, source, created_at, is_verified)
-           VALUES ($1,$2,$3,$4,$5,'kamis', NOW(), false)`,
-          [cropId, regionId, marketName || null, parseFloat(String(priceVal)), entryDate]
-        );
-
-        insertedCount++;
-      } catch (rowErr) {
-        console.error('Error processing row:', rowErr);
+      } catch (rowError) {
         errorCount++;
-        // continue with next row
+        logger.error('Row import error', rowError);
       }
     }
 
-    // commit
-    await query('COMMIT');
-  } catch (txErr) {
-    console.error('Transaction failed:', txErr);
-    await query('ROLLBACK');
-    throw txErr;
-  }
-
-  return {
-    inserted: insertedCount,
-    skipped: skippedCount,
-    errors: errorCount,
-    processed: rows.length
-  };
+    return {
+      inserted: insertedCount,
+      skipped: skippedCount,
+      errors: errorCount,
+      total_rows: rows.length
+    };
+  });
 }
+ 
 
+const startSyncLog = async (): Promise<string> => { 
+    await query(`CREATE TABLE IF NOT EXISTS kamis_sync_logs (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        started_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP,
+        records_processed INT DEFAULT 0,
+        records_inserted INT DEFAULT 0,
+        records_updated INT DEFAULT 0,
+        status VARCHAR(50),
+        error_message TEXT
+    )`);
 
-export const manualKamisSync = async (): Promise<void> => {
-  logger.info('Manual KAMIS sync triggered');
-  await syncKamisData();
+    const result = await query(
+      'INSERT INTO kamis_sync_logs (status) VALUES ($1) RETURNING id',
+      ['running']
+    );
+    return result.rows[0].id;
+};
+  
+const updateSyncLog = async (id: string, processed: number, inserted: number, updated: number, status: string, errorMessage?: string) => {
+    await query(
+      `UPDATE kamis_sync_logs 
+       SET records_processed = $1, records_inserted = $2, records_updated = $3, 
+           status = $4, error_message = $5, completed_at = CURRENT_TIMESTAMP
+       WHERE id = $6`,
+      [processed, inserted, updated, status, errorMessage, id]
+    );
+};
+
+export const getKamisSyncStatus = async (): Promise<any> => {
+    try {
+        const result = await query('SELECT * FROM kamis_sync_logs ORDER BY started_at DESC LIMIT 1');
+        if (result.rows.length === 0) return { last_sync: null, records_synced: 0, is_active: false };
+        const row = result.rows[0];
+        return {
+            last_sync: row.started_at,
+            records_synced: (row.records_inserted || 0) + (row.records_updated || 0),
+            is_active: row.status === 'running'
+        };
+    } catch (e) {
+        return { last_sync: null, records_synced: 0, is_active: false };
+    }
 };

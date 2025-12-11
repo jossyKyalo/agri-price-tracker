@@ -1,115 +1,31 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { syncKamisData, getKamisSyncStatus, manualKamisSync, processKamisFile } from '../services/kamisService';
-import { query } from '../database/connection';
-import type { ApiResponse } from '../types/index';
 import multer from 'multer';
+import { 
+    triggerKamisSync, 
+    uploadKamisData, 
+    getKamisStatus, 
+    getKamisLogs 
+} from '../controllers/kamisController';
+import { authenticate, requireAdmin } from '../middleware/auth'; 
 
 const router = Router();
-
+ 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } 
+  limits: { fileSize: 10 * 1024 * 1024 }  
 });
+ 
+router.use(authenticate);
 
-router.post('/upload', authenticate, requireAdmin, upload.single('file'), async (req, res, next) => {
-  try {
-    if (!req.file || !req.file.buffer) {
-      const err: ApiResponse = {
-        success: false,
-        message: 'No file uploaded'
-      };
-      res.status(400).json(err);
-      return
-    }
+router.use(requireAdmin);
 
-    const filename = req.file.originalname || 'uploaded_file';
-    const buffer = req.file.buffer;
+ 
+router.post('/upload', upload.single('file'), uploadKamisData);
+ 
+router.post('/sync', triggerKamisSync);
+ 
+router.get('/status', getKamisStatus); 
 
-     
-    const result = await processKamisFile(buffer, filename);
-
-    const response: ApiResponse = {
-      success: true,
-      message: 'KAMIS file processed',
-      data: result
-    };
-
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Get KAMIS sync status (admin only)
-router.get('/status', authenticate, requireAdmin, async (req, res, next) => {
-  try {
-    const status = await getKamisSyncStatus();
-
-    const response: ApiResponse = {
-      success: true,
-      message: 'KAMIS sync status retrieved successfully',
-      data: status
-    };
-
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Manual KAMIS sync (admin only)
-router.post('/sync', authenticate, requireAdmin, async (req, res, next) => {
-  try {
-    // Start sync in background
-    manualKamisSync().catch(error => {
-      console.error('Manual KAMIS sync failed:', error);
-    });
-
-    const response: ApiResponse = {
-      success: true,
-      message: 'KAMIS sync started successfully'
-    };
-
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Get KAMIS sync logs (admin only)
-router.get('/logs', authenticate, requireAdmin, async (req, res, next) => {
-  try {
-    const { page = 1, limit = 20 } = req.query;
-    const offset = (Number(page) - 1) * Number(limit);
-
-    const result = await query(
-      `SELECT * FROM kamis_sync_logs 
-       ORDER BY started_at DESC 
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
-
-    const countResult = await query('SELECT COUNT(*) FROM kamis_sync_logs');
-    const total = parseInt(countResult.rows[0].count);
-    const pages = Math.ceil(total / Number(limit));
-
-    const response: ApiResponse = {
-      success: true,
-      message: 'KAMIS sync logs retrieved successfully',
-      data: result.rows,
-      pagination: {
-        page: Number(page),
-        limit: Number(limit),
-        total,
-        pages
-      }
-    };
-
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
+router.get('/logs', getKamisLogs);
 
 export default router;
