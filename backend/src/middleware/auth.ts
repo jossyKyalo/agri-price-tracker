@@ -20,8 +20,7 @@ export interface JwtPayload {
   iat: number;
   exp: number;
 }
-
-// Middleware to authenticate JWT token
+ 
 export const authenticate = async (
   req: Request,
   res: Response,
@@ -40,10 +39,10 @@ export const authenticate = async (
       throw new ApiError('JWT secret not configured', 500);
     }
 
-    // Verify token
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
     
-    // Get user from database
+    
     const result = await query(
       `SELECT id, email, full_name, phone, role, region, organization, 
               is_active, email_verified, last_login, created_at, updated_at
@@ -69,8 +68,7 @@ export const authenticate = async (
     }
   }
 };
-
-// Middleware to authorize specific roles
+ 
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
@@ -86,14 +84,12 @@ export const authorize = (...roles: string[]) => {
     next();
   };
 };
-
-// Middleware for admin-only routes
+ 
 export const requireAdmin = authorize('admin', 'super_admin');
-
-// Middleware for super admin-only routes
+ 
 export const requireSuperAdmin = authorize('super_admin');
 
-// Optional authentication 
+ 
 export const optionalAuth = async (
   req: Request,
   res: Response,
@@ -134,7 +130,7 @@ export const optionalAuth = async (
   }
 };
 
-// Generate JWT token  
+ 
 export const generateToken = (user: User): string => {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -153,8 +149,7 @@ export const generateToken = (user: User): string => {
 
   return jwt.sign(payload, secret, options);
 };
-
-// Generate refresh token  
+   
 export const generateRefreshToken = (user: User): string => {
   const secret = process.env.JWT_REFRESH_SECRET;
   if (!secret) {
@@ -174,8 +169,7 @@ export const generateRefreshToken = (user: User): string => {
 
   return jwt.sign(payload, secret, options);
 };
-
-// Verify refresh token
+ 
 export const verifyRefreshToken = (token: string): JwtPayload => {
   const secret = process.env.JWT_REFRESH_SECRET;
   if (!secret) {
