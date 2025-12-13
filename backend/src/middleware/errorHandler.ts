@@ -13,7 +13,7 @@ export const errorHandler = (
   let message = 'Internal server error';
   let isOperational = false;
 
-  // Handle different types of errors
+  
   if (error instanceof ApiError) {
     statusCode = error.statusCode;
     message = error.message;
@@ -44,7 +44,7 @@ export const errorHandler = (
     isOperational = true;
   }
 
-  // Log error
+  
   if (!isOperational || statusCode >= 500) {
     logger.error(`${req.method} ${req.path} - ${statusCode} - ${message}`, {
       error: error.message,
@@ -60,7 +60,7 @@ export const errorHandler = (
     });
   }
 
-  // Send error response
+  
   const response: ApiResponse = {
     success: false,
     message,
@@ -73,16 +73,14 @@ export const errorHandler = (
   res.status(statusCode).json(response);
 };
 
-// Handle unhandled promise rejections
+
 process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Close server & exit process
   process.exit(1);
 });
 
-// Handle uncaught exceptions
+
 process.on('uncaughtException', (error: Error) => {
   logger.error('Uncaught Exception:', error);
-  // Close server & exit process
   process.exit(1);
 });
