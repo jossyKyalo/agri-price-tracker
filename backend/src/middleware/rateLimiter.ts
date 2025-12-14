@@ -6,36 +6,35 @@ import { logger } from '../utils/logger';
 const rateLimiters = { 
   general: new RateLimiterMemory({
     points: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-    duration: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000') / 1000, // 15 minutes
+    duration: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000') / 1000, 
   }),
 
   
   auth: new RateLimiterMemory({
-    points: 5, // 5 attempts
-    duration: 900, // 15 minutes
-    blockDuration: 900, // Block for 15 minutes
+    points: 5, 
+    duration: 900, 
+    blockDuration: 900, 
   }),
 
-  // SMS rate limiter
+   
   sms: new RateLimiterMemory({
-    points: 10, // 10 SMS per hour
-    duration: 3600, // 1 hour
+    points: 10, 
+    duration: 3600, 
   }),
 
-  // Chat rate limiter
+  
   chat: new RateLimiterMemory({
-    points: 30, // 30 messages per minute
-    duration: 60, // 1 minute
+    points: 30, 
+    duration: 60, 
   }),
 
-  // Price submission rate limiter
+  
   priceSubmission: new RateLimiterMemory({
-    points: 20, // 20 submissions per hour
-    duration: 3600, // 1 hour
+    points: 20, 
+    duration: 3600, 
   }),
 };
-
-// Generic rate limiter middleware
+ 
 export const createRateLimiter = (limiterName: keyof typeof rateLimiters) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -63,15 +62,14 @@ export const createRateLimiter = (limiterName: keyof typeof rateLimiters) => {
     }
   };
 };
-
-// Export specific rate limiters
+ 
 export const rateLimiter = createRateLimiter('general');
 export const authRateLimiter = createRateLimiter('auth');
 export const smsRateLimiter = createRateLimiter('sms');
 export const chatRateLimiter = createRateLimiter('chat');
 export const priceSubmissionRateLimiter = createRateLimiter('priceSubmission');
 
-// IP whitelist middleware (for admin IPs)
+ 
 export const ipWhitelist = (whitelist: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const clientIP = req.ip || 'unknown';
