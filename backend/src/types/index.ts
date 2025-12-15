@@ -1,4 +1,4 @@
-// User types
+
 export interface User {
   id: string;
   email: string;
@@ -34,7 +34,7 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
-// Admin request types
+
 export interface AdminRequest {
   id: string;
   full_name: string;
@@ -58,7 +58,7 @@ export interface CreateAdminRequest {
   reason?: string;
 }
 
-// Crop types
+
 export interface Crop {
   id: string;
   name: string;
@@ -70,7 +70,7 @@ export interface Crop {
   updated_at: Date;
 }
 
-// Region types
+
 export interface Region {
   id: string;
   name: string;
@@ -80,7 +80,6 @@ export interface Region {
   created_at: Date;
 }
 
-// Market types
 export interface Market {
   id: string;
   name: string;
@@ -92,7 +91,6 @@ export interface Market {
   created_at: Date;
 }
 
-// Price entry types
 export interface PriceEntry {
   id: string;
   crop_id: string;
@@ -127,8 +125,7 @@ export interface CreatePriceEntry {
   notes?: string;
   entry_date?: Date;
 }
-
-// Price prediction types
+ 
 export interface PricePrediction {
   id: string;
   crop_id: string;
@@ -144,7 +141,7 @@ export interface PricePrediction {
   created_at: Date;
 }
 
-// SMS types
+ 
 export interface SmsSubscription {
   id: string;
   phone: string;
@@ -192,7 +189,7 @@ export interface SendSmsRequest {
   template_variables?: Record<string, string>;
 }
 
-// Chat types
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -215,7 +212,7 @@ export interface ChatRequest {
   context?: any;
 }
 
-// KAMIS types
+
 export interface KamisSyncLog {
   id: string;
   sync_date: Date;
@@ -228,7 +225,7 @@ export interface KamisSyncLog {
   completed_at?: Date;
 }
 
-// ML types
+
 export interface PredictionRequest {
   crop_id: string;
   region_id: string;
@@ -249,7 +246,7 @@ export interface PredictionResponse {
   model_version: string;
 }
 
-// API Response types
+
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
@@ -263,7 +260,7 @@ export interface ApiResponse<T = any> {
   };
 }
 
-// Query parameters
+
 export interface PaginationParams {
   page?: number;
   limit?: number;
@@ -282,7 +279,7 @@ export interface PriceQueryParams extends PaginationParams {
   date_to?: string;
 }
 
-// Error types
+
 export interface ApiError extends Error {
   statusCode: number;
   isOperational: boolean;
