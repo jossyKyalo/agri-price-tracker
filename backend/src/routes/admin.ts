@@ -11,10 +11,10 @@ import {
 
 const router = Router();
 
-// Public routes
+
 router.post('/request', validate(schemas.adminRequest), createAdminRequest);
 
-// Admin routes
+ 
 router.get('/requests', authenticate, requireAdmin, getAdminRequests);
 router.put('/requests/:id/review', authenticate, requireSuperAdmin, validate(schemas.reviewAdminRequest), reviewAdminRequest);
 router.get('/stats', authenticate, requireAdmin, getAdminStats);
