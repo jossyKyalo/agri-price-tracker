@@ -1,14 +1,19 @@
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideServerRendering } from '@angular/platform-server';
 import { provideServerRouting } from '@angular/ssr';
-import { appConfig } from './app.config';
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { errorInterceptor } from './interceptors/error.interceptor';
+import { routes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
 
-const serverConfig: ApplicationConfig = {
+export const config: ApplicationConfig = {
   providers: [
     provideServerRendering(),
-    provideServerRouting(serverRoutes)
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideServerRouting(serverRoutes),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]))
   ]
 };
-
-export const config = mergeApplicationConfig(appConfig, serverConfig);
