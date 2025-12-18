@@ -1,60 +1,78 @@
-<header class="header">
-  <div class="container">
-    <nav class="navbar">
-      <div class="navbar-brand" (click)="switchPage('home')">
-        <i class="fas fa-seedling"></i>
-        <div class="brand-text">
-          <span class="brand-name">AgriPrice</span>
-          <small class="brand-subtitle">Transparent Agricultural Pricing</small>
-        </div>
+<div class="navbar bg-base-100 border-b border-base-300 px-4 lg:px-8 sticky top-0 z-50 shadow-sm">
+  <div class="navbar-start">
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden" (click)="toggleMenu()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+        </svg>
       </div>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52" [class.hidden]="!isMenuOpen">
+        <li><a (click)="switchPage('home')" [class.active]="currentPage === 'home'">Home</a></li>
+        <li><a (click)="switchPage('public')" [class.active]="currentPage === 'public'">Public Portal</a></li>
+        <li *ngIf="!isAdmin"><a (click)="handleAdminAccess()">Admin Login</a></li>
+        <li *ngIf="isAdmin"><a (click)="switchPage('admin')">Admin Dashboard</a></li>
+      </ul>
+    </div>
+    <a class="btn btn-ghost gap-2 px-2 hover:bg-transparent" (click)="switchPage('home')">
+      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-content shadow-lg">
+        <i class="fas fa-seedling text-xl"></i>
+      </div>
+      <div class="flex flex-col items-start leading-none">
+        <span class="text-xl font-black tracking-tighter text-primary">AgriPrice</span>
+        <span class="text-[10px] font-bold opacity-50 uppercase tracking-widest">Market Intelligence</span>
+      </div>
+    </a>
+  </div>
 
-      <div class="navbar-menu" [class.active]="isMenuOpen">
-        <a href="#" class="nav-link" [class.active]="currentPage === 'home'" (click)="switchPage('home')">
-          <i class="fas fa-home"></i>
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1 gap-2">
+      <li>
+        <a (click)="switchPage('home')" 
+           class="font-bold hover:text-primary transition-colors"
+           [ngClass]="{'text-primary bg-primary/5': currentPage === 'home'}">
           Home
         </a>
-
-        <a href="#" class="nav-link" [class.active]="currentPage === 'public'" (click)="switchPage('public')">
-          <i class="fas fa-chart-line"></i>
+      </li>
+      <li>
+        <a (click)="switchPage('public')" 
+           class="font-bold hover:text-primary transition-colors"
+           [ngClass]="{'text-primary bg-primary/5': currentPage === 'public'}">
           Public Portal
         </a>
-
-        <a href="#" class="nav-link" [class.active]="currentPage === 'admin'" (click)="handleAdminAccess()"
-          *ngIf="!isAdmin">
-          <i class="fas fa-sign-in-alt"></i>
-          Admin Login
-        </a>
-
-        <a href="#" class="nav-link" [class.active]="currentPage === 'admin'" (click)="switchPage('admin')"
-          *ngIf="isAdmin">
-          <i class="fas fa-cog"></i>
+      </li>
+      <li *ngIf="isAdmin">
+        <a (click)="switchPage('admin')" 
+           class="font-bold hover:text-primary transition-colors"
+           [ngClass]="{'text-primary bg-primary/5': currentPage === 'admin'}">
           Admin Dashboard
         </a>
-
-        <button class="btn btn-register" (click)="registerAdmin()" *ngIf="!isAdmin">
-          <i class="fas fa-user-plus"></i>
-          Register as Admin
-        </button>
-      </div>
-
-      <div class="navbar-actions">
-        <!-- Compact Admin Info & Logout -->
-        <div *ngIf="isAdmin" class="user-status-compact">
-          <span class="admin-badge-compact">
-            <i class="fas fa-shield-alt"></i>
-            <span class="admin-name-text">{{ adminName }}</span>
-          </span>
-          <button class="btn btn-logout" (click)="adminLogout()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span class="logout-text">Logout</span>
-          </button>
-        </div>
-
-        <button class="mobile-menu-toggle" (click)="toggleMenu()">
-          <i class="fas" [class.fa-bars]="!isMenuOpen" [class.fa-times]="isMenuOpen"></i>
-        </button>
-      </div>
-    </nav>
+      </li>
+    </ul>
   </div>
-</header>
+
+  <div class="navbar-end gap-4">
+    <div *ngIf="isAdmin" class="hidden md:flex items-center gap-3 px-4 py-1.5 bg-base-200 rounded-full border border-base-300">
+      <div class="avatar placeholder">
+        <div class="bg-primary text-primary-content rounded-full w-6">
+          <span class="text-[10px]">{{ adminName.charAt(0) }}</span>
+        </div>
+      </div>
+      <span class="text-sm font-bold opacity-80">{{ adminName }}</span>
+      <div class="divider divider-horizontal m-0 w-px h-4"></div>
+      <button class="btn btn-ghost btn-xs text-error hover:bg-error/10" (click)="adminLogout()">Logout</button>
+    </div>
+
+    <div *ngIf="!isAdmin" class="flex gap-2">
+      <button class="btn btn-ghost btn-sm hidden md:flex" (click)="handleAdminAccess()">Login</button>
+      <button class="btn btn-primary btn-sm shadow-md" (click)="registerAdmin()">
+        <i class="fas fa-user-plus mr-1"></i>
+        Join as Admin
+      </button>
+    </div>
+
+    <!-- Mobile Logout for Admin -->
+    <button *ngIf="isAdmin" class="btn btn-ghost btn-sm md:hidden text-error" (click)="adminLogout()">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
+  </div>
+</div>

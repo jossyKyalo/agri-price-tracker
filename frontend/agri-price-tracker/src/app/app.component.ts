@@ -27,71 +27,8 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
     AdminLoginComponent,
     ResetPasswordComponent,
   ],
-  template: `
-    <div class="app-container">
-      <app-header 
-        [currentPage]="currentPage" 
-        (pageChange)="switchPage($event)"
-        (adminRegister)="showAdminRegistration()"
-        (adminLogin)="showAdminLogin()">
-      </app-header>
-      
-      <main class="main-content">
-
-        <app-reset-password *ngIf="showResetPasswordPage"></app-reset-password>
-        <!-- Home Page -->
-        <app-home 
-          *ngIf="currentPage === 'home' && !showResetPasswordPage"
-          (navigateToSection)="switchToPublicPortalSection($event)"
-          (navigateToPage)="switchPage(getPageFromEvent($event))">
-        </app-home>
-        
-        <!-- Public Portal (Farmer Dashboard) -->
-        <app-public-portal *ngIf="currentPage === 'public' && !showResetPasswordPage"></app-public-portal>
-        
-        <!-- Admin Dashboard (includes SMS interface) -->
-        <app-admin-dashboard *ngIf="currentPage === 'admin' && isAdmin && !showResetPasswordPage"></app-admin-dashboard>
-        
-        <!-- Admin Registration Modal -->
-        <app-admin-registration 
-          *ngIf="showAdminRegModal"
-          (close)="closeAdminRegistration()"
-          (registered)="onAdminRegistered()">
-        </app-admin-registration>
-        
-        <!-- Admin Login Modal -->
-        <app-admin-login 
-          *ngIf="showAdminLoginModal"
-          (close)="closeAdminLogin()"
-          (login)="onAdminLogin()">
-        </app-admin-login>
-      </main>
-      
-      <app-footer 
-        (navigateToSectionEvent)="switchToPublicPortalSection($event)"
-        (navigateToPageEvent)="switchPage(getPageFromEvent($event))"
-        (openChatbotEvent)="openChatbot()"
-        (showAdminLogin)="showAdminLogin()">
-      </app-footer>
-      
-      <!-- Chatbot Widget (only on home and public portal) -->
-      <app-chatbot-widget 
-        *ngIf="currentPage === 'home' || currentPage === 'public'"
-        [focusOnPrices]="true">
-      </app-chatbot-widget>
-    </div>
-  `,
-  styles: [`
-    .app-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .main-content {
-      flex: 1;
-    }
-  `]
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
   title = 'Agricultural Price Tracker';

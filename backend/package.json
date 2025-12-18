@@ -43,6 +43,7 @@
     "nodemailer": "^7.0.10",
     "papaparse": "^5.5.3",
     "pg": "^8.11.3",
+    "prisma": "^7.1.0",
     "rate-limiter-flexible": "^4.0.1",
     "twilio": "^4.19.0",
     "winston": "^3.11.0",

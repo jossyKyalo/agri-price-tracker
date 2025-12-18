@@ -1,60 +1,81 @@
-   <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-section">
-            <h3>AgriPrice System</h3>
-            <p>Empowering farmers with transparent pricing information and direct market access. 
-               Fighting middleman exploitation through technology.</p>
-            <div class="social-links">
-              <a href="https://www.facebook.com/" class="social-link">
-                <i class="fab fa-facebook"></i>
-              </a>
-              <a href="https://x.com/home" class="social-link">
-                <i class="fab fa-twitter"></i>
-              </a>
-              <a href="https://www.instagram.com/" class="social-link">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="https://www.linkedin.com/feed" class="social-link">
-                <i class="fab fa-linkedin"></i>
-              </a>
-            </div>
+<footer class="bg-neutral text-neutral-content py-16 lg:py-24">
+  <div class="container mx-auto px-6 lg:px-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+      <!-- Brand Section -->
+      <div class="space-y-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-content shadow-lg">
+            <i class="fas fa-seedling text-xl"></i>
           </div>
-          
-          <div class="footer-section">
-            <h4>System Modules</h4>
-            <ul>
-              <li><a href="#" (click)="navigateToPage('public')">Public Portal</a></li>
-              <li><a href="#" (click)="handleAdminDashboard()">Admin Dashboard</a></li>
-              <li><a href="#" (click)="navigateToSection('sms')">SMS Interface</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4>Features</h4>
-            <ul>
-              <li><a href="#" (click)="navigateToSection('prices')">Price Tracking</a></li>
-              <li><a href="#" (click)="navigateToSection('predictions')">ML Predictions</a></li>
-              <li><a href="#" (click)="openChatbot()">AI Chatbot</a></li>
-              <li><a href="#" (click)="navigateToPage('public')">KAMIS Integration</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4>Support</h4>
-            <div class="contact-info">
-              <p><i class="fas fa-phone"></i> SMS: +254-700-AGRI (2474)</p>
-              <p><i class="fas fa-envelope"></i>agriculture.price.system&#64;gmail.com</p>
-              <p><i class="fas fa-map-marker-alt"></i> Agricultural Technology Hub, Kenya</p>
-            </div>
-          </div>
+          <span class="text-2xl font-black tracking-tighter">AgriPrice</span>
         </div>
-        
-        <div class="footer-bottom">
-          <p>&copy; 2025 AgriPrice Agricultural Price Tracking System. All rights reserved. | 
-             <a href="#" (click)="showPrivacyPolicy()">Privacy Policy</a> | 
-             <a href="#" (click)="showTermsOfService()">Terms of Service</a>
-          </p>
+        <p class="opacity-70 leading-relaxed">
+          Empowering Kenyan farmers with transparent pricing information and direct market access through modern technology.
+        </p>
+        <div class="flex gap-4">
+          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
         </div>
       </div>
-    </footer>
+
+      <!-- Modules -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-white">System Modules</h4>
+        <ul class="space-y-4 opacity-70">
+          <li><a (click)="navigateToPage('public')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Public Portal</a></li>
+          <li><a (click)="handleAdminDashboard()" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Admin Dashboard</a></li>
+          <li><a (click)="navigateToSection('sms')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">SMS Interface</a></li>
+          <li><a (click)="navigateToPage('home')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Market Intelligence</a></li>
+        </ul>
+      </div>
+
+      <!-- Features -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-white">Key Features</h4>
+        <ul class="space-y-4 opacity-70">
+          <li><a (click)="navigateToSection('prices')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Price Tracking</a></li>
+          <li><a (click)="navigateToSection('predictions')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">ML Predictions</a></li>
+          <li><a (click)="openChatbot()" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">AI Chatbot</a></li>
+          <li><a (click)="navigateToPage('public')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">KAMIS Integration</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-white">Support & Contact</h4>
+        <ul class="space-y-4 opacity-70">
+          <li class="flex items-start gap-3">
+            <i class="fas fa-phone mt-1 text-primary"></i>
+            <span>SMS: +254-700-AGRI (2474)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fas fa-envelope mt-1 text-primary"></i>
+            <span class="break-all">agriculture.price.system&#64;gmail.com</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fas fa-map-marker-alt mt-1 text-primary"></i>
+            <span>Agricultural Technology Hub, Nairobi, Kenya</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm opacity-50">
+      <p>&copy; 2025 AgriPrice Tracker. All rights reserved.</p>
+      <div class="flex gap-8">
+        <a (click)="showPrivacyPolicy()" class="hover:text-white cursor-pointer">Privacy Policy</a>
+        <a (click)="showTermsOfService()" class="hover:text-white cursor-pointer">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>

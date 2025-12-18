@@ -1,180 +1,241 @@
-<div class="home-container">
+<div class="bg-base-100 text-base-content font-sans">
   <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1 class="hero-title">
-            Empowering Farmers with
-            <span class="highlight">Transparent Pricing</span>
+  <div class="relative overflow-hidden bg-primary text-primary-content py-20 lg:py-32">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none">
+      <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      </svg>
+    </div>
+
+    <div class="container mx-auto px-6 lg:px-12 relative z-10">
+      <div class="flex flex-col lg:flex-row items-center gap-16">
+        <!-- Hero Content -->
+        <div class="lg:w-1/2 text-center lg:text-left">
+          <div class="inline-block px-4 py-1 rounded-full bg-secondary/30 text-secondary-content text-sm font-bold mb-6 tracking-wide uppercase">
+            Official Market Intelligence
+          </div>
+          <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight mb-8">
+            Modernizing <span class="text-accent">Agri-Trade</span> in Kenya
           </h1>
-          <p class="hero-description">
-            Get real-time agricultural prices, AI-powered predictions, and direct market access.
-            Say goodbye to middleman exploitation and hello to fair trade.
+          <p class="text-xl opacity-90 mb-10 max-w-2xl leading-relaxed">
+            Access real-time market data, AI-driven price forecasting, and direct SMS alerts. 
+            We empower farmers with the data they need to thrive in a competitive market.
           </p>
-          <div class="hero-actions">
-            <button class="btn btn-primary btn-large" (click)="navigateToCurrentPrices()">
-              <i class="fas fa-chart-line"></i>
-              View Current Prices
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <button class="btn btn-accent btn-lg px-8 shadow-lg hover:scale-105 transition-transform" (click)="navigateToCurrentPrices()">
+              Explore Market Data
             </button>
-            <button class="btn btn-outline btn-large" (click)="navigateToSmsAlerts()">
-              <i class="fas fa-mobile-alt"></i>
-              SMS Alerts
+            <button class="btn btn-outline btn-lg px-8 border-white text-white hover:bg-white hover:text-primary" (click)="navigateToSmsAlerts()">
+              Setup SMS Alerts
             </button>
           </div>
         </div>
-        <div class="hero-image">
-          <div class="hero-graphic">
-            <i class="fas fa-seedling hero-icon-bg"></i>
 
-            <div class="price-cards">
-
-              <div *ngIf="isLoadingPrices" class="price-card loading">
-                <span>Loading live prices...</span>
+        <!-- Hero Dashboard Widget -->
+        <div class="lg:w-1/2 w-full max-w-lg">
+          <div class="card bg-base-100 text-base-content shadow-2xl border border-base-300 overflow-hidden">
+            <div class="bg-base-200 px-6 py-4 border-b border-base-300 flex justify-between items-center">
+              <h3 class="font-bold text-primary flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                Live Market Snapshot
+              </h3>
+              <span class="text-xs font-medium opacity-60">Updated Just Now</span>
+            </div>
+            <div class="p-0">
+              <div *ngIf="isLoadingPrices" class="p-12 flex flex-col items-center justify-center gap-4">
+                <span class="loading loading-ring loading-lg text-primary"></span>
+                <p class="text-sm font-medium opacity-60">Fetching latest prices...</p>
               </div>
 
-              <div *ngFor="let item of heroPrices" class="price-card animate-float">
-                <span class="crop">{{ item.name }}</span>
-                <span class="price">KSh {{ item.price }}/{{ item.unit }}</span>
-                <span class="trend" [ngClass]="item.trend">
-                  <span *ngIf="item.trend === 'up'">↗ +{{ item.change }}%</span>
-                  <span *ngIf="item.trend === 'down'">↘ {{ item.change }}%</span>
-                  <span *ngIf="item.trend === 'stable'">→ 0%</span>
-                </span>
+              <div *ngIf="!isLoadingPrices" class="divide-y divide-base-200">
+                <div *ngFor="let item of heroPrices" class="px-6 py-4 flex items-center justify-between hover:bg-base-200 transition-colors">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      <i class="fas" [ngClass]="item.name === 'Maize' ? 'fa-seedling' : (item.name === 'Beans' ? 'fa-leaf' : 'fa-carrot')"></i>
+                    </div>
+                    <div>
+                      <p class="font-bold text-sm">{{ item.name }}</p>
+                      <p class="text-xs opacity-60">Per {{ item.unit }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-bold text-lg">KSh {{ item.price }}</p>
+                    <div class="flex items-center justify-end gap-1 text-xs font-bold" 
+                         [ngClass]="item.trend === 'up' ? 'text-success' : (item.trend === 'down' ? 'text-error' : 'text-neutral')">
+                      <i class="fas" [ngClass]="item.trend === 'up' ? 'fa-arrow-up' : (item.trend === 'down' ? 'fa-arrow-down' : 'fa-minus')"></i>
+                      {{ item.change }}%
+                    </div>
+                  </div>
+                </div>
               </div>
-
+            </div>
+            <div class="bg-base-200 p-4 text-center">
+              <button class="text-primary text-sm font-bold hover:underline" (click)="navigateToCurrentPrices()">
+                View All 150+ Commodities →
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="bg-base-200 border-y border-base-300 py-12">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="text-center">
+          <p class="text-4xl font-black text-primary mb-1">{{ activeFarmers | number }}</p>
+          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Active Farmers</p>
+        </div>
+        <div class="text-center">
+          <p class="text-4xl font-black text-primary mb-1">{{ trackedProducts }}</p>
+          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Crops Tracked</p>
+        </div>
+        <div class="text-center">
+          <p class="text-4xl font-black text-primary mb-1">{{ regionsCovered }}</p>
+          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Regions Covered</p>
+        </div>
+        <div class="text-center">
+          <p class="text-4xl font-black text-primary mb-1">{{ accuracyRate }}%</p>
+          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Prediction Accuracy</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Features Section -->
-  <section class="features-section" id="features">
-    <div class="container">
-      <div class="section-header">
-        <h2>Why Choose AgriPrice?</h2>
-        <p>Comprehensive tools designed specifically for Kenyan farmers</p>
+  <section class="py-24 lg:py-32" id="features">
+    <div class="container mx-auto px-6 lg:px-12">
+      <div class="max-w-3xl mx-auto text-center mb-20">
+        <h2 class="text-4xl lg:text-5xl font-black text-primary mb-6">Built for the Modern Farmer</h2>
+        <p class="text-lg opacity-70">AgriPrice combines traditional market wisdom with cutting-edge technology to provide a comprehensive ecosystem for agricultural success.</p>
       </div>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-          <h3>Real-Time Prices</h3>
-          <p>Get current market prices from KAMIS platform and farmer inputs across all regions in Kenya.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <!-- Feature 1 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-primary text-primary-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-chart-line text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Real-Time Intelligence</h3>
+          <p class="opacity-70 leading-relaxed">Direct integration with KAMIS and local market contributors ensures you have the most accurate pricing data available.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-brain"></i></div>
-          <h3>AI Predictions</h3>
-          <p>Machine learning models predict future price trends to help you make informed selling decisions.</p>
+
+        <!-- Feature 2 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-secondary text-secondary-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-brain text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Predictive Analytics</h3>
+          <p class="opacity-70 leading-relaxed">Our AI models analyze historical trends and seasonal patterns to forecast future price movements with high precision.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-sms"></i></div>
-          <h3>SMS Alerts</h3>
-          <p>Receive price updates and alerts on your feature phone. No internet required.</p>
+
+        <!-- Feature 3 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-accent text-accent-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-sms text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Offline Accessibility</h3>
+          <p class="opacity-70 leading-relaxed">No internet? No problem. Receive critical price alerts and market updates directly via SMS on any mobile device.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-robot"></i></div>
-          <h3>AI Assistant</h3>
-          <p>Chat with our agricultural AI for instant price queries, farming tips, and market insights.</p>
+
+        <!-- Feature 4 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-neutral text-neutral-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-robot text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">AI Farming Assistant</h3>
+          <p class="opacity-70 leading-relaxed">Chat with our specialized AI for instant advice on crop management, pest control, and market timing.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-users"></i></div>
-          <h3>Community Input</h3>
-          <p>Farmers can contribute local prices to create a comprehensive pricing database.</p>
+
+        <!-- Feature 5 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-success text-success-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-users text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Community Driven</h3>
+          <p class="opacity-70 leading-relaxed">Join a network of thousands of farmers contributing local data to create a truly transparent marketplace.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-          <h3>Verified Data</h3>
-          <p>All prices are verified by our admin team to ensure accuracy and reliability.</p>
+
+        <!-- Feature 6 -->
+        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
+          <div class="w-14 h-14 rounded-2xl bg-info text-info-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-shield-alt text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Verified Accuracy</h3>
+          <p class="opacity-70 leading-relaxed">Every data point is cross-referenced and verified by our team to ensure you're making decisions based on facts.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- How It Works Section -->
-  <section class="how-it-works-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>How It Works</h2>
-        <p>Simple steps to get started with transparent pricing</p>
+  <section class="py-24 bg-base-200">
+    <div class="container mx-auto px-6 lg:px-12">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl lg:text-5xl font-black text-primary mb-6">How It Works</h2>
+        <p class="text-lg opacity-70 max-w-2xl mx-auto">Simple steps to get started with transparent pricing and market intelligence.</p>
       </div>
 
-      <div class="steps-container">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3>Access Prices</h3>
-            <p>Visit our public portal or subscribe to SMS alerts to get current market prices.</p>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">1</div>
+          <h3 class="text-xl font-bold mb-3">Access Prices</h3>
+          <p class="opacity-70">Visit our portal or subscribe to SMS alerts to get current market prices.</p>
         </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3>Check Predictions</h3>
-            <p>Use our AI-powered predictions to understand future price trends for better planning.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3>Contribute Data</h3>
-            <p>Share local prices from your area to help build a comprehensive database.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <h3>Make Decisions</h3>
-            <p>Use transparent pricing data to negotiate better deals and avoid exploitation.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">2</div>
+          <h3 class="text-xl font-bold mb-3">Check Predictions</h3>
+          <p class="opacity-70">Use AI-powered predictions to understand future price trends for better planning.</p>
+        </div>
 
-  <section class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-number">{{ activeFarmers | number }}</div>
-          <div class="stat-label">Active Farmers</div>
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">3</div>
+          <h3 class="text-xl font-bold mb-3">Contribute Data</h3>
+          <p class="opacity-70">Share local prices from your area to help build a comprehensive database.</p>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">{{ trackedProducts }}</div>
-          <div class="stat-label">Crops Tracked</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">{{ regionsCovered }}</div>
-          <div class="stat-label">Regions Covered</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">{{ accuracyRate }}%</div>
-          <div class="stat-label">Accuracy Rate</div>
+
+        <div class="flex flex-col items-center text-center group">
+          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">4</div>
+          <h3 class="text-xl font-bold mb-3">Make Decisions</h3>
+          <p class="opacity-70">Use transparent data to negotiate better deals and avoid exploitation.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="container">
-      <div class="cta-content">
-        <h2>Ready to Get Fair Prices?</h2>
-        <p>Join thousands of farmers who are already benefiting from transparent agricultural pricing.</p>
-        <div class="cta-actions">
-          <button class="btn btn-primary btn-large" (click)="getStarted()">
-            <i class="fas fa-rocket"></i>
-            Get Started Now
-          </button>
-          <button class="btn btn-outline btn-large" (click)="learnMore()">
-            <i class="fas fa-question-circle"></i>
-            Learn More
-          </button>
+  <section class="py-24 bg-base-100">
+    <div class="container mx-auto px-6 lg:px-12">
+      <div class="bg-primary rounded-[3rem] p-12 lg:p-20 text-primary-content relative overflow-hidden shadow-2xl">
+        <!-- Decorative Circles -->
+        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 rounded-full bg-secondary/20"></div>
+        <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-accent/20"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div class="lg:w-2/3 text-center lg:text-left">
+            <h2 class="text-4xl lg:text-6xl font-black mb-6">Ready to transform your harvest?</h2>
+            <p class="text-xl opacity-90 mb-0">Join the digital revolution in Kenyan agriculture today. It's free, fast, and built for you.</p>
+          </div>
+          <div class="lg:w-1/3 flex flex-col sm:flex-row lg:flex-col gap-4 w-full">
+            <button class="btn btn-accent btn-lg w-full shadow-xl" (click)="getStarted()">Get Started Now</button>
+            <button class="btn btn-outline btn-lg w-full border-white text-white hover:bg-white hover:text-primary" (click)="learnMore()">Learn More</button>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Footer Placeholder -->
+  <footer class="py-12 border-t border-base-300 text-center opacity-60 text-sm">
+    <p>&copy; 2025 AgriPrice Tracker. All rights reserved.</p>
+  </footer>
 </div>

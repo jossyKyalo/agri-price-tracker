@@ -11,7 +11,7 @@ export const seedDatabase = async (): Promise<void> => {
       { name: 'Central Kenya', code: 'CENTRAL' },
       { name: 'Western Kenya', code: 'WESTERN' },
       { name: 'Eastern Kenya', code: 'EASTERN' },
-      { name: 'Rift Valley', code: 'RIFT_VALLEY' },
+      { name: 'Rift Valley', code: 'RIFT_VAL' },
       { name: 'Coast', code: 'COAST' },
       { name: 'Northern Kenya', code: 'NORTHERN' },
       { name: 'Nyanza', code: 'NYANZA' }
