@@ -5,7 +5,7 @@ import type { ApiResponse } from '../types/index';
 
 const router = Router();
 
-// Get price analytics (admin only)
+ 
 router.get('/prices', authenticate, requireAdmin, async (req, res, next) => {
   try {
     const { period = '30', crop_id, region_id } = req.query;
@@ -26,7 +26,7 @@ router.get('/prices', authenticate, requireAdmin, async (req, res, next) => {
 
     const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
-    // Price trends
+    
     const trendsResult = await query(
       `SELECT 
          DATE(pe.entry_date) as date,
@@ -44,8 +44,7 @@ router.get('/prices', authenticate, requireAdmin, async (req, res, next) => {
        ORDER BY date DESC, crop_name, region_name`,
       params
     );
-
-    // Price volatility
+ 
     const volatilityResult = await query(
       `SELECT 
          c.name as crop_name,
@@ -78,12 +77,10 @@ router.get('/prices', authenticate, requireAdmin, async (req, res, next) => {
     next(error);
   }
 });
-
-// Get user analytics (admin only)
+ 
 router.get('/users', authenticate, requireAdmin, async (req, res, next) => {
   try {
-    const stats = await Promise.all([
-      // User registration trends
+    const stats = await Promise.all([ 
       query(`
         SELECT 
           DATE(created_at) as date,
@@ -93,8 +90,7 @@ router.get('/users', authenticate, requireAdmin, async (req, res, next) => {
         GROUP BY DATE(created_at)
         ORDER BY date DESC
       `),
-      
-      // User activity by role
+       
       query(`
         SELECT 
           role,
@@ -104,8 +100,7 @@ router.get('/users', authenticate, requireAdmin, async (req, res, next) => {
         WHERE is_active = true
         GROUP BY role
       `),
-      
-      // Regional distribution
+       
       query(`
         SELECT 
           region,
@@ -132,12 +127,10 @@ router.get('/users', authenticate, requireAdmin, async (req, res, next) => {
     next(error);
   }
 });
-
-// Get system analytics (admin only)
+ 
 router.get('/system', authenticate, requireAdmin, async (req, res, next) => {
   try {
-    const stats = await Promise.all([
-      // Daily activity
+    const stats = await Promise.all([ 
       query(`
         SELECT 
           CURRENT_DATE as date,
@@ -146,8 +139,7 @@ router.get('/system', authenticate, requireAdmin, async (req, res, next) => {
           (SELECT COUNT(*) FROM chat_conversations WHERE DATE(created_at) = CURRENT_DATE) as chat_sessions,
           (SELECT COUNT(*) FROM users WHERE DATE(last_login) = CURRENT_DATE) as active_users
       `),
-      
-      // Data quality metrics
+       
       query(`
         SELECT 
           COUNT(*) as total_entries,
@@ -158,8 +150,7 @@ router.get('/system', authenticate, requireAdmin, async (req, res, next) => {
         FROM price_entries
         WHERE entry_date >= CURRENT_DATE - INTERVAL '30 days'
       `),
-      
-      // Performance metrics
+       
       query(`
         SELECT 
           COUNT(*) as total_predictions,

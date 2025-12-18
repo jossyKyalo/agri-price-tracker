@@ -4,11 +4,9 @@ import { query } from '../database/connection';
 import type { ApiResponse } from '../types/index';
 
 const router = Router();
-
-// Get system alerts (admin only)
+ 
 router.get('/', authenticate, requireAdmin, async (req, res, next) => {
-  try {
-    // 1. KAMIS sync failures
+  try { 
     const kamisAlerts = await query(
       `SELECT id, 
               CASE 
@@ -22,9 +20,8 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
        WHERE status != 'completed'
        ORDER BY started_at DESC
        LIMIT 20`
-    );
+    ); 
 
-    // 2. Low verified price entries in the last 7 days (data quality alert)
     const lowVerifiedEntries = await query(
       `SELECT uuid_generate_v4() AS id,
               'warning' AS type,
@@ -39,7 +36,7 @@ router.get('/', authenticate, requireAdmin, async (req, res, next) => {
        HAVING COUNT(pe.id) < 5`
     );
 
-    // Combine alerts
+     
     const alerts = [...kamisAlerts.rows, ...lowVerifiedEntries.rows];
 
     const response: ApiResponse = {
