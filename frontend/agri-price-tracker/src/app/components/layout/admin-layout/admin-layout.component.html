@@ -1,0 +1,150 @@
+<div class="flex h-screen w-full bg-surface-50 overflow-hidden font-sans">
+
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <aside
+        class="hidden lg:flex flex-col bg-[#052e16] text-white transition-all duration-300 ease-in-out relative z-20 shadow-xl"
+        [class.w-64]="!isSidebarCollapsed" [class.w-20]="isSidebarCollapsed">
+
+        <!-- Brand -->
+        <div class="h-20 flex items-center px-6 border-b border-white/10 overflow-hidden whitespace-nowrap">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#bef264] flex items-center justify-center text-emerald-950 shrink-0">
+                    <i class="fas fa-leaf text-sm"></i>
+                </div>
+                <span class="text-lg font-black tracking-tight" [class.opacity-0]="isSidebarCollapsed">AgriPrice</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex-1 py-6 overflow-y-auto custom-scrollbar">
+            <ul class="space-y-1 px-3">
+                <li *ngFor="let item of menuItems">
+                    <!-- Separator -->
+                    <div *ngIf="item.separator" class="h-px bg-white/10 my-4 mx-2"></div>
+
+                    <!-- Menu Item -->
+                    <a *ngIf="!item.separator" pRipple [routerLink]="item.routerLink"
+                        [routerLinkActive]="item.routerLink ? 'bg-white/10 !text-[#bef264] !font-bold' : ''"
+                        [routerLinkActiveOptions]="{exact: false}"
+                        class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer hover:bg-white/10 hover:text-[#bef264] transition-colors relative group text-emerald-100/80 overflow-hidden"
+                        (click)="item.command ? item.command({}) : null"
+                        [pTooltip]="isSidebarCollapsed ? item.label : ''" tooltipPosition="right">
+
+                        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+                            <i [class]="item.icon + ' text-lg'"></i>
+                        </div>
+
+                        <span class="font-medium whitespace-nowrap overflow-hidden transition-all duration-300"
+                            [class.w-0]="isSidebarCollapsed" [class.w-full]="!isSidebarCollapsed"
+                            [class.opacity-0]="isSidebarCollapsed">
+                            {{ item.label }}
+                        </span>
+
+                        <div *ngIf="isSidebarCollapsed"
+                            class="absolute left-full top-1/2 -translate-y-1/2 ml-2 bg-emerald-950 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg">
+                            {{ item.label }}
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer / Collapse Toggle -->
+        <!-- Footer / User Showcase -->
+        <div class="p-4 border-t border-white/10 mt-auto">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <p-avatar label="{{ adminName.charAt(0) }}" styleClass="!bg-[#bef264] !text-emerald-950 shrink-0"
+                    shape="circle" size="normal"></p-avatar>
+
+                <div class="flex-1 min-w-0 transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed"
+                    [class.hidden]="isSidebarCollapsed">
+                    <p class="text-sm font-bold text-white truncate">{{ adminName }}</p>
+                    <p class="text-xs text-emerald-200/70 truncate">Administrator</p>
+                </div>
+
+                <button (click)="logout()" pTooltip="Logout" tooltipPosition="top" [class.hidden]="isSidebarCollapsed"
+                    class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-red-400 transition-colors ml-auto shrink-0">
+                    <i class="pi pi-sign-out"></i>
+                </button>
+            </div>
+            <!-- Collapsed Logout Button (Centered) -->
+            <button *ngIf="isSidebarCollapsed" (click)="logout()"
+                class="w-full h-10 flex items-center justify-center text-white/70 hover:text-red-400 transition-colors mt-2">
+                <i class="pi pi-sign-out text-lg"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile Drawer (Visible on Mobile) -->
+    <p-drawer [(visible)]="mobileSidebarVisible" [modal]="true"
+        styleClass="!bg-[#052e16] !text-white !border-none !w-64">
+        <ng-template pTemplate="header">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#bef264] flex items-center justify-center text-emerald-950">
+                    <i class="fas fa-leaf text-sm"></i>
+                </div>
+                <span class="text-lg font-black tracking-tight text-white">AgriPrice</span>
+            </div>
+        </ng-template>
+        <div class="py-4">
+            <ul class="space-y-1">
+                <li *ngFor="let item of menuItems">
+                    <div *ngIf="item.separator" class="h-px bg-white/10 my-4"></div>
+                    <a *ngIf="!item.separator" pRipple [routerLink]="item.routerLink"
+                        [routerLinkActive]="item.routerLink ? 'bg-white/10 !text-[#bef264] !font-bold' : ''"
+                        [routerLinkActiveOptions]="{exact: false}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-white/10 hover:text-[#bef264] transition-colors text-emerald-100/80"
+                        (click)="item.command ? item.command({}) : null; mobileSidebarVisible = false">
+                        <i [class]="item.icon + ' text-lg w-6 text-center'"></i>
+                        <span class="font-medium">{{ item.label }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </p-drawer>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-surface-50">
+
+        <!-- Top Navbar -->
+        <header class="h-20 bg-white border-b border-surface-200 flex items-center justify-between px-6 lg:px-8 z-10">
+
+            <!-- Left: Mobile Toggle & Title -->
+            <div class="flex items-center gap-4">
+                <button (click)="mobileSidebarVisible = true"
+                    class="lg:hidden p-2 text-surface-500 hover:text-primary transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <button (click)="isSidebarCollapsed = !isSidebarCollapsed"
+                    class="hidden lg:flex p-2 text-surface-500 hover:text-primary transition-colors rounded-lg hover:bg-surface-100">
+                    <i class="fas" [class.fa-indent]="!isSidebarCollapsed" [class.fa-outdent]="isSidebarCollapsed"></i>
+                </button>
+                <h1 class="text-xl font-bold text-surface-900 hidden md:block">Dashboard</h1>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-4">
+                <button
+                    class="w-10 h-10 rounded-full hover:bg-surface-100 flex items-center justify-center text-surface-500 transition-colors relative">
+                    <i class="far fa-bell text-lg"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+
+                <div class="h-8 w-px bg-surface-200 mx-2"></div>
+
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden md:block">
+                        <p class="text-sm font-bold text-surface-900 leading-none">{{ adminName }}</p>
+                        <p class="text-xs text-surface-500 mt-1">Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <router-outlet></router-outlet>
+        </div>
+
+    </main>
+</div>

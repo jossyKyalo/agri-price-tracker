@@ -1,84 +1,228 @@
-<div class="bg-base-100 text-base-content font-sans">
-  <!-- Hero Section -->
-  <div class="relative overflow-hidden bg-primary text-primary-content py-20 lg:py-32">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 opacity-10 pointer-events-none">
-      <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <defs>
-          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
-          </pattern>
-        </defs>
-        <rect width="100" height="100" fill="url(#grid)" />
+<div class="bg-surface-0 font-sans text-surface-900 selection:bg-emerald-200">
+
+  <!-- 1. Hero Section (Immersive, Rounded Bottom) -->
+  <div
+    class="relative w-full min-h-[95vh] bg-[#052e16] rounded-b-[4rem] overflow-hidden pt-32 pb-20 px-4 sm:px-6 lg:px-8 border-b-8 border-[#bef264]">
+
+    <!-- Abstract Organic Background Pattern -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none">
+      <div
+        class="absolute top-0 right-0 w-[800px] h-[800px] bg-[#bef264] rounded-full blur-[150px] mix-blend-soft-light -translate-y-1/2 translate-x-1/2">
+      </div>
+      <div
+        class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600 rounded-full blur-[120px] mix-blend-overlay translate-y-1/2 -translate-x-1/3">
+      </div>
+      <svg class="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M0 100 C 20 0 50 0 100 100 Z" fill="none" stroke="white" stroke-width="0.5" stroke-dasharray="2 4" />
       </svg>
     </div>
 
-    <div class="container mx-auto px-6 lg:px-12 relative z-10">
-      <div class="flex flex-col lg:flex-row items-center gap-16">
-        <!-- Hero Content -->
-        <div class="lg:w-1/2 text-center lg:text-left">
-          <div class="inline-block px-4 py-1 rounded-full bg-secondary/30 text-secondary-content text-sm font-bold mb-6 tracking-wide uppercase">
-            Official Market Intelligence
+    <!-- Hero Grid Layout -->
+    <div class="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-center">
+
+      <!-- Text Content -->
+      <div class="lg:col-span-7 flex flex-col justify-center text-center lg:text-left">
+        <div
+          class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-[#bef264] text-sm font-bold w-fit mx-auto lg:mx-0 mb-8 border border-white/10">
+          <i class="fas fa-magic"></i>
+          <span>The Future of AgTech</span>
+        </div>
+
+        <h1 class="text-6xl lg:text-[7rem] font-bold text-white leading-[0.9] tracking-tight mb-8">
+          Part of <br />
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-[#bef264] to-emerald-400 font-serif italic pr-4">Future</span>
+          <br /> Market
+        </h1>
+
+        <p class="text-xl text-emerald-100/80 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-light">
+          Elevate your farming operations with real-time market intelligence, AI-driven predictions, and seamless
+          connectivity.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <button
+            class="px-10 py-5 bg-[#bef264] text-emerald-950 text-lg font-bold rounded-full hover:scale-105 hover:bg-white transition-all duration-300 shadow-xl shadow-lime-900/20 flex items-center justify-center gap-3"
+            (click)="navigateToCurrentPrices()">
+            <span>Shop Market Data</span>
+            <i class="fas fa-arrow-right -rotate-45"></i>
+          </button>
+
+          <button
+            class="px-10 py-5 bg-white/5 text-white backdrop-blur-sm border border-white/20 text-lg font-bold rounded-full hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-3"
+            (click)="getStarted()">
+            <span>Join Platform</span>
+            <i class="fas fa-user-plus"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Floating Cards / Visuals -->
+      <div class="lg:col-span-5 relative h-[500px] hidden lg:block">
+        <!-- Card 1: Review -->
+        <div
+          class="absolute top-10 right-0 w-72 bg-[#bef264] p-8 rounded-[2.5rem] shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500 z-20 group">
+          <div class="flex justify-between items-start mb-6">
+            <span class="text-5xl font-black text-emerald-950">4.9<span class="text-3xl">*</span></span>
+            <div
+              class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-emerald-900 rotate-45 group-hover:rotate-0 transition-transform">
+              <i class="fas fa-arrow-up"></i>
+            </div>
           </div>
-          <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight mb-8">
-            Modernizing <span class="text-accent">Agri-Trade</span> in Kenya
-          </h1>
-          <p class="text-xl opacity-90 mb-10 max-w-2xl leading-relaxed">
-            Access real-time market data, AI-driven price forecasting, and direct SMS alerts. 
-            We empower farmers with the data they need to thrive in a competitive market.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button class="btn btn-accent btn-lg px-8 shadow-lg hover:scale-105 transition-transform" (click)="navigateToCurrentPrices()">
-              Explore Market Data
-            </button>
-            <button class="btn btn-outline btn-lg px-8 border-white text-white hover:bg-white hover:text-primary" (click)="navigateToSmsAlerts()">
-              Setup SMS Alerts
-            </button>
+          <p class="font-bold text-emerald-900 mb-4">Farmer Trust Score</p>
+          <div class="flex -space-x-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-800 border-2 border-[#bef264]"></div>
+            <div class="w-10 h-10 rounded-full bg-emerald-700 border-2 border-[#bef264]"></div>
+            <div class="w-10 h-10 rounded-full bg-emerald-600 border-2 border-[#bef264]"></div>
+            <div
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xs font-bold text-emerald-900 border-2 border-[#bef264]">
+              +2k</div>
           </div>
         </div>
 
-        <!-- Hero Dashboard Widget -->
-        <div class="lg:w-1/2 w-full max-w-lg">
-          <div class="card bg-base-100 text-base-content shadow-2xl border border-base-300 overflow-hidden">
-            <div class="bg-base-200 px-6 py-4 border-b border-base-300 flex justify-between items-center">
-              <h3 class="font-bold text-primary flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                Live Market Snapshot
-              </h3>
-              <span class="text-xs font-medium opacity-60">Updated Just Now</span>
-            </div>
-            <div class="p-0">
-              <div *ngIf="isLoadingPrices" class="p-12 flex flex-col items-center justify-center gap-4">
-                <span class="loading loading-ring loading-lg text-primary"></span>
-                <p class="text-sm font-medium opacity-60">Fetching latest prices...</p>
-              </div>
+        <!-- Card 2: Product Highlight (Glass) -->
+        <div
+          class="absolute bottom-20 left-0 w-80 bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[2.5rem] shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500 z-10 flex flex-col gap-4">
+          <div class="h-40 bg-white/5 rounded-3xl flex items-center justify-center relative overflow-hidden group">
+            <i
+              class="fas fa-robot text-8xl text-white/20 absolute group-hover:scale-110 transition-transform duration-500"></i>
+            <span class="relative z-10 bg-white text-emerald-950 text-xs font-bold px-3 py-1 rounded-full">New
+              Arrival</span>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-white mb-1">AgriBot T50</h3>
+            <p class="text-sm text-emerald-200/70 mb-4">Fully automatic AI market analysis.</p>
+            <button
+              class="w-full py-4 bg-white text-emerald-950 font-bold rounded-2xl hover:bg-[#bef264] transition-colors"
+              (click)="navigateToSmsAlerts()">
+              Try Demo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-              <div *ngIf="!isLoadingPrices" class="divide-y divide-base-200">
-                <div *ngFor="let item of heroPrices" class="px-6 py-4 flex items-center justify-between hover:bg-base-200 transition-colors">
-                  <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                      <i class="fas" [ngClass]="item.name === 'Maize' ? 'fa-seedling' : (item.name === 'Beans' ? 'fa-leaf' : 'fa-carrot')"></i>
-                    </div>
-                    <div>
-                      <p class="font-bold text-sm">{{ item.name }}</p>
-                      <p class="text-xs opacity-60">Per {{ item.unit }}</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-bold text-lg">KSh {{ item.price }}</p>
-                    <div class="flex items-center justify-end gap-1 text-xs font-bold" 
-                         [ngClass]="item.trend === 'up' ? 'text-success' : (item.trend === 'down' ? 'text-error' : 'text-neutral')">
-                      <i class="fas" [ngClass]="item.trend === 'up' ? 'fa-arrow-up' : (item.trend === 'down' ? 'fa-arrow-down' : 'fa-minus')"></i>
-                      {{ item.change }}%
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <!-- 2. Elevates Operations (3-Column Features) -->
+  <div class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 mb-4">
+        <span
+          class="w-8 h-8 rounded-full bg-[#052e16] text-[#bef264] flex items-center justify-center font-black text-xs transform -rotate-12">
+          <i class="fas fa-bolt"></i>
+        </span>
+        <span class="font-bold text-emerald-950 uppercase tracking-widest text-sm">Elevates</span>
+      </div>
+      <h2 class="text-5xl lg:text-7xl font-bold text-emerald-950 leading-tight">
+        Market intelligence <br />
+        operations <span class="text-[#052e16] bg-[#bef264] px-4 rounded-full italic font-serif">new heights</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div class="group relative rounded-[2.5rem] overflow-hidden h-[450px]">
+        <!-- Placeholder for Image -->
+        <div class="absolute inset-0 bg-[#f0fdf4] group-hover:scale-105 transition-transform duration-700">
+          <div class="w-full h-full flex items-center justify-center text-emerald-200">
+            <i class="fas fa-chart-line text-9xl opacity-20"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 p-8">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-emerald-950 mb-4 shadow-lg">
+            <i class="fas fa-arrow-right -rotate-45"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-emerald-950">Real-time Prices</h3>
+        </div>
+      </div>
+      <!-- Feature 2 -->
+      <div class="group relative rounded-[2.5rem] overflow-hidden h-[450px] mt-12 md:mt-0">
+        <div class="absolute inset-0 bg-[#ecfccb] group-hover:scale-105 transition-transform duration-700">
+          <div class="w-full h-full flex items-center justify-center text-emerald-800">
+            <i class="fas fa-brain text-9xl opacity-10"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 p-8">
+          <div
+            class="w-12 h-12 bg-emerald-950 rounded-full flex items-center justify-center text-[#bef264] mb-4 shadow-lg">
+            <i class="fas fa-arrow-right -rotate-45"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-emerald-950">AI Predictions</h3>
+        </div>
+      </div>
+      <!-- Feature 3 -->
+      <div class="group relative rounded-[2.5rem] overflow-hidden h-[450px]">
+        <div class="absolute inset-0 bg-[#fefce8] group-hover:scale-105 transition-transform duration-700">
+          <div class="w-full h-full flex items-center justify-center text-amber-200">
+            <i class="fas fa-sms text-9xl opacity-20"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 p-8">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-emerald-950 mb-4 shadow-lg">
+            <i class="fas fa-arrow-right -rotate-45"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-emerald-950">Offline Alerting</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Feature Split 1 (Left Text, Right Image) -->
+  <div class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div class="order-2 lg:order-1">
+        <div class="inline-flex items-center gap-2 mb-6">
+          <span class="w-2 h-8 bg-[#bef264] rounded-full"></span>
+          <span class="text-emerald-950 font-bold uppercase tracking-widest text-sm">Maximize Profits</span>
+        </div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-emerald-950 mb-8 leading-tight">
+          Elevates agricultural <br /> operations to <br />
+          <span class="italic font-serif text-[#052e16]">new heights</span>
+        </h2>
+
+        <div class="space-y-8">
+          <div class="flex gap-4 group cursor-pointer">
+            <div
+              class="w-12 h-1 bg-emerald-200 mt-3 group-hover:w-20 group-hover:bg-emerald-950 transition-all duration-300 rounded-full">
             </div>
-            <div class="bg-base-200 p-4 text-center">
-              <button class="text-primary text-sm font-bold hover:underline" (click)="navigateToCurrentPrices()">
-                View All 150+ Commodities →
-              </button>
+            <div>
+              <h4 class="text-xl font-bold text-emerald-950 mb-2">Track 150+ Crops</h4>
+              <p class="text-emerald-900/60 max-w-sm">Access comprehensive data for cereals, vegetables, and fruits
+                across 47 counties.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 group cursor-pointer">
+            <div
+              class="w-12 h-1 bg-emerald-200 mt-3 group-hover:w-20 group-hover:bg-emerald-950 transition-all duration-300 rounded-full">
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-emerald-950 mb-2">Avoid Middlemen</h4>
+              <p class="text-emerald-900/60 max-w-sm">Direct market access empowers you to negotiate fair prices every
+                harvest.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-1 lg:order-2 relative">
+        <div
+          class="bg-[#f3f4f6] rounded-[3rem] p-12 h-[500px] relative overflow-hidden flex items-center justify-center">
+          <i class="fas fa-mobile-alt text-[15rem] text-emerald-900/10 absolute z-0 transform rotate-12"></i>
+          <div
+            class="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 transform hover:-translate-y-2 transition-transform duration-500 border border-gray-100">
+            <!-- Mock UI Card -->
+            <div class="flex justify-between items-center mb-6">
+              <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700"><i
+                  class="fas fa-chart-pie"></i></div>
+              <span class="bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">+12.5% Profit</span>
+            </div>
+            <div class="space-y-3">
+              <div class="h-2 bg-gray-100 rounded-full w-3/4"></div>
+              <div class="h-2 bg-gray-100 rounded-full w-1/2"></div>
+              <div
+                class="h-24 bg-emerald-50 rounded-xl mt-4 border border-emerald-100 flex items-center justify-center">
+                <span class="text-3xl font-bold text-emerald-900">KSh 45,000</span>
+              </div>
             </div>
           </div>
         </div>
@@ -86,156 +230,198 @@
     </div>
   </div>
 
-  <!-- Stats Bar -->
-  <div class="bg-base-200 border-y border-base-300 py-12">
-    <div class="container mx-auto px-6">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="text-center">
-          <p class="text-4xl font-black text-primary mb-1">{{ activeFarmers | number }}</p>
-          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Active Farmers</p>
+  <!-- 4. Feature Split 2 (Left Image, Right Text) -->
+  <div class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div class="relative h-[600px] rounded-[3rem] overflow-hidden bg-sky-100 group">
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+          style="background-image: url('https://images.unsplash.com/photo-1625246333195-58197bd47d26?q=80&w=1000&auto=format&fit=crop');">
+          <!-- Fallback color if image fails -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
         </div>
-        <div class="text-center">
-          <p class="text-4xl font-black text-primary mb-1">{{ trackedProducts }}</p>
-          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Crops Tracked</p>
+        <div class="absolute bottom-8 left-8 bg-white/90 backdrop-blur rounded-2xl p-6 max-w-xs shadow-xl">
+          <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-shield-alt text-emerald-600 text-xl"></i>
+            <span class="font-bold text-emerald-950">Verified Source</span>
+          </div>
+          <p class="text-xs text-emerald-900/70">Data cross-referenced with KAMIS and local market agents.</p>
         </div>
-        <div class="text-center">
-          <p class="text-4xl font-black text-primary mb-1">{{ regionsCovered }}</p>
-          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Regions Covered</p>
+      </div>
+
+      <div>
+        <div class="inline-flex items-center gap-2 border border-emerald-200 rounded-full px-4 py-1 mb-6">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-bold text-emerald-900 uppercase">System Status: Online</span>
         </div>
-        <div class="text-center">
-          <p class="text-4xl font-black text-primary mb-1">{{ accuracyRate }}%</p>
-          <p class="text-sm font-bold opacity-60 uppercase tracking-widest">Prediction Accuracy</p>
+        <h2 class="text-4xl lg:text-5xl font-bold text-emerald-950 mb-8 leading-tight">
+          Tested for reliability <br />
+          and <span
+            class="text-[#052e16] underline decoration-[#bef264] decoration-4 underline-offset-4">durability</span>
+        </h2>
+        <p class="text-emerald-900/60 mb-12 text-lg">
+          AgriPrice processes thousands of data points daily to ensure you have the most accurate, up-to-the-minute
+          pricing information available in the region.
+        </p>
+
+        <div class="grid grid-cols-2 gap-8">
+          <div>
+            <div
+              class="w-14 h-14 bg-[#bef264] rounded-full flex items-center justify-center text-emerald-950 text-xl mb-4">
+              <i class="fas fa-check"></i>
+            </div>
+            <h4 class="font-bold text-emerald-950 mb-2">Double Verified</h4>
+            <p class="text-sm text-emerald-900/50">Every price point is checked against two independent sources.</p>
+          </div>
+          <div>
+            <div
+              class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-950 text-xl mb-4">
+              <i class="fas fa-server"></i>
+            </div>
+            <h4 class="font-bold text-emerald-950 mb-2">99.9% Uptime</h4>
+            <p class="text-sm text-emerald-900/50">Our servers run 24/7 to provide instant SMS responses.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Features Section -->
-  <section class="py-24 lg:py-32" id="features">
-    <div class="container mx-auto px-6 lg:px-12">
-      <div class="max-w-3xl mx-auto text-center mb-20">
-        <h2 class="text-4xl lg:text-5xl font-black text-primary mb-6">Built for the Modern Farmer</h2>
-        <p class="text-lg opacity-70">AgriPrice combines traditional market wisdom with cutting-edge technology to provide a comprehensive ecosystem for agricultural success.</p>
+  <!-- 5. Why AgriPrice? (Large Beige Section) -->
+  <div class="bg-[#f0f9ff] py-32 rounded-[4rem] mx-4 lg:mx-8 mb-24 relative overflow-hidden">
+    <div class="text-center mb-16 relative z-10">
+      <h2 class="text-5xl lg:text-7xl font-bold text-emerald-950">Why AgriPrice?</h2>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 relative z-10">
+      <!-- Top Stats Card (Mocking the UI in reference) -->
+      <div
+        class="bg-white rounded-[3rem] p-8 lg:p-12 shadow-xl mb-8 flex flex-col md:flex-row items-center gap-12 border border-slate-100">
+        <div class="w-full md:w-1/2">
+          <div class="flex items-center gap-4 mb-8">
+            <div
+              class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl font-bold text-emerald-900">
+              1</div>
+            <div>
+              <h3 class="text-2xl font-bold text-emerald-950">Market Dominance</h3>
+              <p class="text-emerald-900/50">Trusted by top cooperatives</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+              <span class="font-bold text-slate-700">Maize (90kg)</span>
+              <span class="font-bold text-emerald-600">KSh 3,200</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+              <span class="font-bold text-slate-700">Beans (Rosecoco)</span>
+              <span class="font-bold text-emerald-600">KSh 8,500</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+              <span class="font-bold text-slate-700">Potatoes (50kg)</span>
+              <span class="font-bold text-emerald-600">KSh 2,500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph / Visual -->
+        <div class="w-full md:w-1/2 relative h-64 bg-emerald-900 rounded-[2rem] overflow-hidden p-6 flex items-end">
+          <div class="w-full flex items-end gap-2 h-full">
+            <div class="w-1/5 bg-[#bef264] h-[40%] rounded-t-lg opacity-50"></div>
+            <div class="w-1/5 bg-[#bef264] h-[60%] rounded-t-lg opacity-70"></div>
+            <div class="w-1/5 bg-[#bef264] h-[50%] rounded-t-lg opacity-60"></div>
+            <div class="w-1/5 bg-[#bef264] h-[80%] rounded-t-lg opacity-90"></div>
+            <div class="w-1/5 bg-[#bef264] h-[95%] rounded-t-lg"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-        <!-- Feature 1 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-primary text-primary-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-chart-line text-2xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Real-Time Intelligence</h3>
-          <p class="opacity-70 leading-relaxed">Direct integration with KAMIS and local market contributors ensures you have the most accurate pricing data available.</p>
+      <!-- Bottom Action Card -->
+      <div class="bg-[#052e16] rounded-[3rem] p-12 lg:p-20 text-center relative overflow-hidden group cursor-pointer">
+        <div
+          class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=2671&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:opacity-30 transition-opacity duration-700">
         </div>
-
-        <!-- Feature 2 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-secondary text-secondary-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-brain text-2xl"></i>
+        <div class="relative z-10">
+          <div
+            class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-8 hover:scale-110 transition-transform">
+            <i class="fas fa-play ml-1 text-emerald-900 text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4">Predictive Analytics</h3>
-          <p class="opacity-70 leading-relaxed">Our AI models analyze historical trends and seasonal patterns to forecast future price movements with high precision.</p>
-        </div>
-
-        <!-- Feature 3 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-accent text-accent-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-sms text-2xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Offline Accessibility</h3>
-          <p class="opacity-70 leading-relaxed">No internet? No problem. Receive critical price alerts and market updates directly via SMS on any mobile device.</p>
-        </div>
-
-        <!-- Feature 4 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-neutral text-neutral-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-robot text-2xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">AI Farming Assistant</h3>
-          <p class="opacity-70 leading-relaxed">Chat with our specialized AI for instant advice on crop management, pest control, and market timing.</p>
-        </div>
-
-        <!-- Feature 5 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-success text-success-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-users text-2xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Community Driven</h3>
-          <p class="opacity-70 leading-relaxed">Join a network of thousands of farmers contributing local data to create a truly transparent marketplace.</p>
-        </div>
-
-        <!-- Feature 6 -->
-        <div class="group p-8 rounded-3xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-2xl transition-all duration-300">
-          <div class="w-14 h-14 rounded-2xl bg-info text-info-content flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <i class="fas fa-shield-alt text-2xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Verified Accuracy</h3>
-          <p class="opacity-70 leading-relaxed">Every data point is cross-referenced and verified by our team to ensure you're making decisions based on facts.</p>
+          <h3 class="text-3xl lg:text-4xl font-bold text-white max-w-2xl mx-auto leading-tight">
+            "AgriPrice changed how we trade. We no longer sell at a loss."
+          </h3>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- How It Works Section -->
-  <section class="py-24 bg-base-200">
-    <div class="container mx-auto px-6 lg:px-12">
-      <div class="text-center mb-20">
-        <h2 class="text-4xl lg:text-5xl font-black text-primary mb-6">How It Works</h2>
-        <p class="text-lg opacity-70 max-w-2xl mx-auto">Simple steps to get started with transparent pricing and market intelligence.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="flex flex-col items-center text-center group">
-          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">1</div>
-          <h3 class="text-xl font-bold mb-3">Access Prices</h3>
-          <p class="opacity-70">Visit our portal or subscribe to SMS alerts to get current market prices.</p>
-        </div>
-
-        <div class="flex flex-col items-center text-center group">
-          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">2</div>
-          <h3 class="text-xl font-bold mb-3">Check Predictions</h3>
-          <p class="opacity-70">Use AI-powered predictions to understand future price trends for better planning.</p>
-        </div>
-
-        <div class="flex flex-col items-center text-center group">
-          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">3</div>
-          <h3 class="text-xl font-bold mb-3">Contribute Data</h3>
-          <p class="opacity-70">Share local prices from your area to help build a comprehensive database.</p>
-        </div>
-
-        <div class="flex flex-col items-center text-center group">
-          <div class="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-black mb-6 group-hover:scale-110 transition-transform shadow-lg">4</div>
-          <h3 class="text-xl font-bold mb-3">Make Decisions</h3>
-          <p class="opacity-70">Use transparent data to negotiate better deals and avoid exploitation.</p>
-        </div>
+  <!-- 6. Explore Products (Commodities Grid) -->
+  <div class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="flex justify-between items-end mb-12">
+      <h2 class="text-4xl font-bold text-emerald-950">Explore Commodities</h2>
+      <div class="flex gap-2">
+        <button
+          class="w-12 h-12 rounded-full border border-emerald-950 flex items-center justify-center hover:bg-emerald-950 hover:text-white transition-colors"><i
+            class="fas fa-arrow-left"></i></button>
+        <button
+          class="w-12 h-12 rounded-full border border-emerald-950 flex items-center justify-center hover:bg-emerald-950 hover:text-white transition-colors"><i
+            class="fas fa-arrow-right"></i></button>
       </div>
     </div>
-  </section>
 
-  <!-- CTA Section -->
-  <section class="py-24 bg-base-100">
-    <div class="container mx-auto px-6 lg:px-12">
-      <div class="bg-primary rounded-[3rem] p-12 lg:p-20 text-primary-content relative overflow-hidden shadow-2xl">
-        <!-- Decorative Circles -->
-        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 rounded-full bg-secondary/20"></div>
-        <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-accent/20"></div>
-
-        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
-          <div class="lg:w-2/3 text-center lg:text-left">
-            <h2 class="text-4xl lg:text-6xl font-black mb-6">Ready to transform your harvest?</h2>
-            <p class="text-xl opacity-90 mb-0">Join the digital revolution in Kenyan agriculture today. It's free, fast, and built for you.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (item of commodities; track item.name) {
+      <div
+        class="bg-[#f8fafc] p-6 rounded-[2rem] hover:bg-white hover:shadow-xl transition-all duration-300 group cursor-pointer border border-transparent hover:border-emerald-100">
+        <div class="flex justify-between items-start mb-8">
+          <span class="bg-white p-2 rounded-xl shadow-sm"><i [class]="item.image" class="text-emerald-600"></i></span>
+          <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full">-2%</span>
+        </div>
+        <div class="h-32 flex items-center justify-center mb-4">
+          <!-- Using Icon as placeholder for Product Image -->
+          <i [class]="item.image"
+            class="text-8xl text-emerald-900/10 group-hover:text-emerald-900/20 transition-colors"></i>
+        </div>
+        <div class="flex justify-between items-end">
+          <div>
+            <h4 class="font-bold text-lg text-emerald-950">{{ item.name }}</h4>
+            <p class="text-emerald-600 font-bold">KSh {{ item.price }}</p>
           </div>
-          <div class="lg:w-1/3 flex flex-col sm:flex-row lg:flex-col gap-4 w-full">
-            <button class="btn btn-accent btn-lg w-full shadow-xl" (click)="getStarted()">Get Started Now</button>
-            <button class="btn btn-outline btn-lg w-full border-white text-white hover:bg-white hover:text-primary" (click)="learnMore()">Learn More</button>
+          <div
+            class="w-8 h-8 rounded-full bg-emerald-950 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+            <i class="fas fa-arrow-right text-xs -rotate-45"></i>
           </div>
         </div>
       </div>
+      }
     </div>
-  </section>
+  </div>
 
-  <!-- Footer Placeholder -->
-  <footer class="py-12 border-t border-base-300 text-center opacity-60 text-sm">
-    <p>&copy; 2025 AgriPrice Tracker. All rights reserved.</p>
-  </footer>
+  <!-- 7. News & Articles -->
+  <div class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-20">
+    <h2 class="text-4xl font-bold text-emerald-950 mb-12">News & Analysis</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      @for (article of newsArticles; track article.title) {
+      <div class="group cursor-pointer">
+        <div class="h-64 rounded-[2.5rem] bg-emerald-100 overflow-hidden mb-6 relative">
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-emerald-200/50 group-hover:bg-emerald-200/30 transition-colors">
+            <i [class]="article.image" class="text-6xl text-emerald-800/20"></i>
+          </div>
+          <div
+            class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+            <i class="fas fa-arrow-right -rotate-45 text-emerald-950"></i>
+          </div>
+        </div>
+        <div class="px-2">
+          <span class="text-xs font-bold text-[#bef264] bg-emerald-950 px-3 py-1 rounded-full mb-3 inline-block">{{
+            article.category }}</span>
+          <h3 class="text-2xl font-bold text-emerald-950 mb-2 group-hover:text-emerald-700 transition-colors">{{
+            article.title }}</h3>
+          <p class="text-emerald-900/50 text-sm">{{ article.date }} • 5 min read</p>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- 8. Massive Footer -->
+
 </div>

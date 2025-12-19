@@ -1,30 +1,46 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { TooltipModule } from 'primeng/tooltip';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { AdminLoginComponent } from '../admin-login/admin-login.component';
+import { AdminRegistrationComponent } from '../admin-registration/admin-registration.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ButtonModule,
+    MenuModule,
+    AvatarModule,
+    TooltipModule,
+    DynamicDialogModule
+  ],
+  providers: [DialogService],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  @Input() currentPage = 'home'; 
-  @Output() pageChange = new EventEmitter<string>();
-  @Output() adminRegister = new EventEmitter<void>();
-  @Output() adminLogin = new EventEmitter<void>();
-  
-  isMenuOpen = false;
-  isAdmin= false;
+  items: MenuItem[] = [];
+  isAdmin = false;
   adminName = '';
   private authSubscription?: Subscription;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private dialogService: DialogService
+  ) { }
 
   ngOnInit() {
-    // Subscribe to auth state changes
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
       this.updateAuthState(user);
     });
@@ -44,40 +60,56 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.isAdmin = false;
       this.adminName = '';
     }
+    this.setupItems();
   }
 
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
+  setupItems() {
+    this.items = [
+      {
+        label: 'Home',
+        icon: 'pi pi-compass',
+        routerLink: '/'
+      },
+      {
+        label: 'Public Portal',
+        icon: 'pi pi-globe',
+        routerLink: '/public'
+      }
+    ];
+
+    if (this.isAdmin) {
+      this.items.push({
+        label: 'Dashboard',
+        icon: 'pi pi-th-large',
+        routerLink: '/admin'
+      });
+    }
   }
 
-  switchPage(page: string) {
-    this.pageChange.emit(page);
-    this.isMenuOpen = false;
+  showLogin() {
+    this.dialogService.open(AdminLoginComponent, {
+      header: 'Admin Login',
+      width: '400px',
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000,
+      dismissableMask: true
+    });
   }
 
-  registerAdmin() {
-    this.adminRegister.emit();
-    this.isMenuOpen = false;
+  showRegister() {
+    this.dialogService.open(AdminRegistrationComponent, {
+      header: 'Join as Admin',
+      width: '500px',
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000,
+      dismissableMask: true
+    });
   }
 
-  handleAdminAccess() {
-    this.adminLogin.emit();
-    this.isMenuOpen = false;
-  }
-
-  adminLogout() {
+  logout() {
     if (confirm('Are you sure you want to logout?')) {
-      // Clear auth state via service
       this.authService.logout();
-      
-      // Close mobile menu
-      this.isMenuOpen = false;
-      
-      // Navigate to home page
-      this.switchPage('home');
-      
-      // Show success message
-      alert('✅ You have been logged out successfully');
+      this.router.navigate(['/']);
     }
   }
 }

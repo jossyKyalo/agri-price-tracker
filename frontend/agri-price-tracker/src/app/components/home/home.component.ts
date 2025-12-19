@@ -1,21 +1,23 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CropService } from '../../services/crop.service';
 import { PriceService } from '../../services/price.service';
 import { ApiService } from '../../services/api.service';
+import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonModule, ProgressSpinnerModule, AvatarModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  @Output() navigateToSection = new EventEmitter<string>();
-  @Output() navigateToPage = new EventEmitter<string>();
 
   activeFarmers = 0;
   trackedProducts = 0;
@@ -24,6 +26,19 @@ export class HomeComponent implements OnInit {
 
   heroPrices: any[] = [];
   isLoadingPrices = true;
+
+  commodities = [
+    { name: 'Maize', price: 50, trend: 'up', image: 'fas fa-seedling' },
+    { name: 'Beans', price: 90, trend: 'down', image: 'fas fa-leaf' },
+    { name: 'Potatoes', price: 42, trend: 'stable', image: 'fas fa-carrot' },
+    { name: 'Rice', price: 120, trend: 'up', image: 'fas fa-seedling' }
+  ];
+
+  newsArticles = [
+    { title: 'Price Forecast Q1 2025', date: 'Dec 12, 2025', category: 'Market Analysis', image: 'fas fa-chart-line' },
+    { title: 'New KAMIS Integration', date: 'Nov 28, 2025', category: 'Platform Update', image: 'fas fa-link' },
+    { title: 'Farming Tips for 2026', date: 'Nov 15, 2025', category: 'Education', image: 'fas fa-tractor' }
+  ];
 
   private staticHeroPrices = [
     { name: 'Maize', price: 50, unit: 'kg', trend: 'up', change: 5 },
@@ -34,7 +49,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private cropService: CropService,
     private priceService: PriceService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -101,15 +117,15 @@ export class HomeComponent implements OnInit {
   }
 
   navigateToCurrentPrices() {
-    this.navigateToSection.emit('prices');
+    this.router.navigate(['/public']);
   }
 
   navigateToSmsAlerts() {
-    this.navigateToSection.emit('sms');
+    this.router.navigate(['/public'], { queryParams: { section: 'sms' } });
   }
 
   getStarted() {
-    this.navigateToPage.emit('public');
+    this.router.navigate(['/public']);
   }
 
   learnMore() {

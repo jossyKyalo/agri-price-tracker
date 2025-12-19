@@ -1,95 +1,58 @@
-<div class="modal-overlay" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2 *ngIf="!isForgotPasswordMode"><i class="fas fa-sign-in-alt"></i> Admin Login</h2>
-      <h2 *ngIf="isForgotPasswordMode"><i class="fas fa-key"></i> Reset Admin Password</h2>
-      <button class="close-btn" (click)="closeModal()">
-        <i class="fas fa-times"></i>
+<div class="w-full">
+  <!-- Header -->
+  <div class="mb-8">
+    <h2 class="text-3xl font-black text-emerald-950 mb-2">Welcome Back</h2>
+    <p class="text-emerald-900/50 text-sm font-medium">Please enter your details to sign in.</p>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="space-y-5">
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Email Address</label>
+      <div class="relative group">
+        <i
+          class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-emerald-500 transition-colors pointer-events-none"></i>
+        <input type="email" pInputText formControlName="email"
+          class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !pl-10 !pr-6 !py-3.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+          placeholder="admin@agriprice.co.ke" />
+      </div>
+      <small class="text-red-500 pl-3 font-semibold text-xs"
+        *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        Valid email is required.
+      </small>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Password</label>
+      <p-password formControlName="password" [feedback]="false" [toggleMask]="true" styleClass="w-full"
+        inputStyleClass="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !pl-6 !pr-10 !py-3.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+        placeholder="••••••••">
+      </p-password>
+      <small class="text-red-500 pl-3 font-semibold text-xs"
+        *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        Password is required.
+      </small>
+    </div>
+
+    <div class="pt-2">
+      <p-message severity="error" *ngIf="errorMessage" [text]="errorMessage"
+        styleClass="w-full mb-4 rounded-xl"></p-message>
+
+      <button type="submit" [disabled]="loginForm.invalid || loading"
+        class="w-full bg-emerald-950 text-white font-bold text-lg py-4 rounded-full hover:bg-emerald-900 active:scale-95 transition-all shadow-xl shadow-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+        <span *ngIf="!loading">Sign In</span>
+        <i *ngIf="!loading" class="fas fa-arrow-right"></i>
+        <i *ngIf="loading" class="fas fa-circle-notch fa-spin"></i>
       </button>
     </div>
+  </form>
 
-    <div class="modal-body">
-      <ng-container *ngIf="isForgotPasswordMode">
-        <p class="login-info">
-          Enter your email address to receive a password reset link.
-        </p>
-
-        <div class="alert" 
-             [ngClass]="{'alert-success': resetMessage.startsWith('✅'), 'alert-danger': resetMessage.startsWith('❌')}" 
-             *ngIf="resetMessage">
-            {{ resetMessage }}
-        </div>
-
-        <form (ngSubmit)="requestPasswordReset()" #resetForm="ngForm">
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" [(ngModel)]="resetEmail" name="resetEmail" required email>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn btn-outline" (click)="backToLogin()">
-              <i class="fas fa-arrow-left"></i> Back to Login
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="!resetForm.valid || isLoading">
-              <i class="fas fa-paper-plane"></i>
-              {{ isLoading ? 'Sending...' : 'Send Reset Link' }}
-            </button>
-          </div>
-        </form>
-      </ng-container>
-
-      <ng-container *ngIf="!isForgotPasswordMode">
-        <p class="login-info">
-          Sign in to access the admin dashboard and manage the agricultural pricing system.
-        </p>
-
-        <div class="alert alert-danger" *ngIf="errorMessage">
-          {{ errorMessage }}
-        </div>
-
-        <form (ngSubmit)="submitLogin()" #loginForm="ngForm">
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" [(ngModel)]="loginData.email" name="email" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <div class="password-input-wrapper">
-              <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="loginData.password"
-                name="password" placeholder="Enter your password" required>
-              <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword"
-                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" tabindex="-1">
-                <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
-              </button>
-            </div>
-            <small class="text-muted">Click the eye icon to show/hide password</small>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="loginData.rememberMe" name="rememberMe">
-              <span class="checkmark"></span>
-              Remember me
-            </label>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn btn-outline" (click)="closeModal()">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="!loginForm.valid || isLoading">
-              <i class="fas fa-sign-in-alt"></i>
-              {{ isLoading ? 'Signing In...' : 'Sign In' }}
-            </button>
-          </div>
-        </form>
-
-        <div class="login-footer">
-          <p>Don't have admin access? <a href="#" (click)="switchToRegistration()">Request admin access</a></p>
-          <p><a href="#" (click)="showForgotPassword()">Forgot your password?</a></p>
-        </div>
-      </ng-container>
-    </div>
+  <div class="mt-8 text-center">
+    <p class="text-emerald-900/60 text-sm">
+      Don't have an account?
+      <a routerLink="/register"
+        class="text-emerald-700 font-bold hover:text-emerald-500 underline decoration-2 underline-offset-4 cursor-pointer">Register
+        here</a>
+    </p>
   </div>
 </div>

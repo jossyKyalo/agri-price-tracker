@@ -12,142 +12,147 @@
     </div>
 
     <!-- History Modal (Auth Overlay) -->
-    <div class="modal modal-open" *ngIf="showHistory">
-      <div class="modal-box max-w-3xl">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeHistoryModal()">✕</button>
-        
-        <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold flex items-center justify-center gap-2">
-            <i class="fas fa-chart-line text-primary"></i>
-            {{ selectedHistoryCrop?.name }} Trends
-          </h3>
-          <div class="badge badge-outline mt-2">
-            <i class="fas fa-map-marker-alt mr-2"></i> {{ selectedHistoryCrop?.market }}
-          </div>
-        </div>
-
-        <div *ngIf="historyLoading" class="flex flex-col items-center justify-center py-12">
-          <span class="loading loading-spinner loading-lg text-primary"></span>
-          <p class="mt-4 text-base-content/60">Loading historical prices...</p>
-        </div>
-
-        <div *ngIf="!historyLoading && historyData.length > 1" class="space-y-6">
-          <div class="bg-base-200 rounded-xl p-4">
-            <svg viewBox="0 0 600 200" class="w-100 h-48">
-              <line x1="0" y1="50" x2="600" y2="50" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
-              <line x1="0" y1="100" x2="600" y2="100" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
-              <line x1="0" y1="150" x2="600" y2="150" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
-
-              <path [attr.d]="chartPath" fill="none" stroke="currentColor" class="text-primary" stroke-width="3" stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-
-            <div class="flex justify-between mt-2 text-xs font-medium text-base-content/50">
-              <span>{{ historyData[0].entry_date | date }}</span>
-              <span>Today</span>
+    @if (showHistory) {
+      <div class="modal modal-open">
+        <div class="modal-box max-w-3xl">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeHistoryModal()">✕</button>
+          <div class="text-center mb-6">
+            <h3 class="text-2xl font-bold flex items-center justify-center gap-2">
+              <i class="fas fa-chart-line text-primary"></i>
+              {{ selectedHistoryCrop?.name }} Trends
+            </h3>
+            <div class="badge badge-outline mt-2">
+              <i class="fas fa-map-marker-alt mr-2"></i> {{ selectedHistoryCrop?.market }}
             </div>
           </div>
-
-          <div class="alert alert-info shadow-sm">
-            <i class="fas fa-info-circle"></i>
-            <span>
-              Price started at <strong class="text-primary">KSh {{ historyData[0].price }}</strong> and is now <strong class="text-primary">KSh {{
+          @if (historyLoading) {
+            <div class="flex flex-col items-center justify-center py-12">
+              <span class="loading loading-spinner loading-lg text-primary"></span>
+              <p class="mt-4 text-base-content/60">Loading historical prices...</p>
+            </div>
+          }
+          @if (!historyLoading && historyData.length > 1) {
+            <div class="space-y-6">
+              <div class="bg-base-200 rounded-xl p-4">
+                <svg viewBox="0 0 600 200" class="w-100 h-48">
+                  <line x1="0" y1="50" x2="600" y2="50" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
+                  <line x1="0" y1="100" x2="600" y2="100" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
+                  <line x1="0" y1="150" x2="600" y2="150" stroke="currentColor" class="text-base-content/10" stroke-width="1"></line>
+                  <path [attr.d]="chartPath" fill="none" stroke="currentColor" class="text-primary" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+                </svg>
+                <div class="flex justify-between mt-2 text-xs font-medium text-base-content/50">
+                  <span>{{ historyData[0].entry_date | date }}</span>
+                  <span>Today</span>
+                </div>
+              </div>
+              <div class="alert alert-info shadow-sm">
+                <i class="fas fa-info-circle"></i>
+                <span>
+                  Price started at <strong class="text-primary">KSh {{ historyData[0].price }}</strong> and is now <strong class="text-primary">KSh {{
                 historyData[historyData.length-1].price }}</strong>.
-            </span>
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div *ngIf="!historyLoading && historyData.length <= 1" class="text-center py-12">
-          <i class="fas fa-history text-5xl text-base-content/20 mb-4"></i>
-          <p class="text-base-content/60">Not enough historical data to show a chart yet.</p>
-        </div>
+        }
+        @if (!historyLoading && historyData.length <= 1) {
+          <div class="text-center py-12">
+            <i class="fas fa-history text-5xl text-base-content/20 mb-4"></i>
+            <p class="text-base-content/60">Not enough historical data to show a chart yet.</p>
+          </div>
+        }
       </div>
       <div class="modal-backdrop bg-black/50" (click)="closeHistoryModal()"></div>
     </div>
+  }
 
-    <!-- Stats Grid -->
-    <div class="stats stats-vertical lg:stats-horizontal shadow-xl w-full mb-12 bg-base-100">
-      <div class="stat">
-        <div class="stat-figure text-primary">
-          <i class="fas fa-seedling text-3xl"></i>
-        </div>
-        <div class="stat-title">Products Tracked</div>
-        <div class="stat-value text-primary">{{ totalCrops }}</div>
-        <div class="stat-desc">Across all regions</div>
+  <!-- Stats Grid -->
+  <div class="stats stats-vertical lg:stats-horizontal shadow-xl w-full mb-12 bg-base-100">
+    <div class="stat">
+      <div class="stat-figure text-primary">
+        <i class="fas fa-seedling text-3xl"></i>
       </div>
-      
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <i class="fas fa-map-marker-alt text-3xl"></i>
-        </div>
-        <div class="stat-title">Regions Covered</div>
-        <div class="stat-value text-secondary">{{ totalRegions }}</div>
-        <div class="stat-desc">Major markets included</div>
-      </div>
-      
-      <div class="stat">
-        <div class="stat-figure text-accent">
-          <i class="fas fa-clock text-3xl"></i>
-        </div>
-        <div class="stat-title">Last Update</div>
-        <div class="stat-value text-accent text-2xl">{{ lastUpdated }}</div>
-        <div class="stat-desc">Real-time data sync</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-figure text-success">
-          <div class="radial-progress text-success" [style.--value]="aiAccuracy" style="--size:3rem; --thickness: 4px;">
-            <span class="text-[10px] font-bold">{{ aiAccuracy }}%</span>
-          </div>
-        </div>
-        <div class="stat-title">AI Accuracy</div>
-        <div class="stat-value text-success">{{ aiAccuracy | number:'1.0-0' }}%</div>
-        <div class="stat-desc">Predictive confidence</div>
-      </div>
+      <div class="stat-title">Products Tracked</div>
+      <div class="stat-value text-primary">{{ totalCrops }}</div>
+      <div class="stat-desc">Across all regions</div>
     </div>
 
-    <!-- Portal Tabs -->
-    <div class="tabs tabs-boxed bg-base-100 p-2 mb-8 inline-flex w-full lg:w-auto justify-center lg:justify-start">
-      <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'prices'" (click)="activeTab = 'prices'">
-        <i class="fas fa-chart-bar"></i>
-        Current Prices
-      </a>
-      <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'predictions'" (click)="activeTab = 'predictions'">
-        <i class="fas fa-brain"></i>
-        AI Predictions
-      </a>
-      <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'input'" (click)="activeTab = 'input'">
-        <i class="fas fa-plus-circle"></i>
-        Submit Price
-      </a>
-      <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
-        <i class="fas fa-sms"></i>
-        SMS Alerts
-      </a>
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <i class="fas fa-map-marker-alt text-3xl"></i>
+      </div>
+      <div class="stat-title">Regions Covered</div>
+      <div class="stat-value text-secondary">{{ totalRegions }}</div>
+      <div class="stat-desc">Major markets included</div>
     </div>
 
-    <!-- Prices Tab Content -->
-    <div *ngIf="activeTab === 'prices'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div class="stat">
+      <div class="stat-figure text-accent">
+        <i class="fas fa-clock text-3xl"></i>
+      </div>
+      <div class="stat-title">Last Update</div>
+      <div class="stat-value text-accent text-2xl">{{ lastUpdated }}</div>
+      <div class="stat-desc">Real-time data sync</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-success">
+        <div class="radial-progress text-success" [style.--value]="aiAccuracy" style="--size:3rem; --thickness: 4px;">
+          <span class="text-[10px] font-bold">{{ aiAccuracy }}%</span>
+        </div>
+      </div>
+      <div class="stat-title">AI Accuracy</div>
+      <div class="stat-value text-success">{{ aiAccuracy | number:'1.0-0' }}%</div>
+      <div class="stat-desc">Predictive confidence</div>
+    </div>
+  </div>
+
+  <!-- Portal Tabs -->
+  <div class="tabs tabs-boxed bg-base-100 p-2 mb-8 inline-flex w-full lg:w-auto justify-center lg:justify-start">
+    <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'prices'" (click)="activeTab = 'prices'">
+      <i class="fas fa-chart-bar"></i>
+      Current Prices
+    </a>
+    <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'predictions'" (click)="activeTab = 'predictions'">
+      <i class="fas fa-brain"></i>
+      AI Predictions
+    </a>
+    <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'input'" (click)="activeTab = 'input'">
+      <i class="fas fa-plus-circle"></i>
+      Submit Price
+    </a>
+    <a class="tab tab-lg gap-2" [class.tab-active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
+      <i class="fas fa-sms"></i>
+      SMS Alerts
+    </a>
+  </div>
+
+  <!-- Prices Tab Content -->
+  @if (activeTab === 'prices') {
+    <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div class="card bg-base-100 shadow-xl overflow-hidden">
         <div class="p-6 border-b border-base-200 bg-base-50/50">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="relative lg:col-span-2">
               <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></i>
-              <input type="text" placeholder="Search products or markets..." 
+              <input type="text" placeholder="Search products or markets..."
                 class="input input-bordered w-full pl-12 bg-base-200/50 focus:bg-base-100 transition-all"
                 [(ngModel)]="searchTerm" (input)="filterCrops()">
             </div>
             <select class="select select-bordered bg-base-200/50" [(ngModel)]="selectedCategory" (change)="filterCrops()">
               <option value="">All Categories</option>
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
+              @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat | titlecase }}</option>
+              }
             </select>
             <select class="select select-bordered bg-base-200/50" [(ngModel)]="selectedRegion" (change)="filterCrops()">
               <option value="">All Regions</option>
-              <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
+              @for (region of regions; track region) {
+                <option [value]="region.name">{{ region.name }}</option>
+              }
             </select>
           </div>
         </div>
-
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
@@ -161,27 +166,30 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngIf="isLoading">
-                <td colspan="6" class="text-center py-12">
-                  <span class="loading loading-spinner loading-lg text-primary"></span>
-                  <p class="mt-4 text-base-content/60 font-medium">Loading latest prices...</p>
-                </td>
-              </tr>
-              <tr *ngFor="let crop of paginatedCrops" class="hover:bg-base-200/30 transition-colors">
-                <td>
-                  <div class="flex items-center gap-3">
-                    <div class="avatar placeholder">
-                      <div class="bg-primary/10 text-primary rounded-lg w-10 h-10">
-                        <i class="fas fa-leaf"></i>
+              @if (isLoading) {
+                <tr>
+                  <td colspan="6" class="text-center py-12">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                    <p class="mt-4 text-base-content/60 font-medium">Loading latest prices...</p>
+                  </td>
+                </tr>
+              }
+              @for (crop of paginatedCrops; track crop) {
+                <tr class="hover:bg-base-200/30 transition-colors">
+                  <td>
+                    <div class="flex items-center gap-3">
+                      <div class="avatar placeholder">
+                        <div class="bg-primary/10 text-primary rounded-lg w-10 h-10">
+                          <i class="fas fa-leaf"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="font-bold">{{ crop.name }}</div>
+                        <div class="text-xs opacity-50">{{ crop.category }}</div>
                       </div>
                     </div>
-                    <div>
-                      <div class="font-bold">{{ crop.name }}</div>
-                      <div class="text-xs opacity-50">{{ crop.category }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
+                  </td>
+                  <td>
                   <div class="badge badge-sm gap-1" [ngClass]="{
                     'badge-primary': crop.source === 'kamis', 
                     'badge-secondary': crop.source === 'admin',
@@ -192,57 +200,65 @@
                       'fa-shield-alt': crop.source === 'admin', 
                       'fa-user': crop.source === 'farmer'
                     }"></i>
-                    {{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer') }}
-                  </div>
-                </td>
-                <td class="font-mono font-bold text-primary">
-                  KSh {{ crop.currentPrice }}/{{ crop.unit }}
-                </td>
-                <td>
-                  <div class="flex items-center gap-1" [class]="crop.trend">
-                    <i class="fas" [class.fa-arrow-up]="crop.trend === 'up'"
+                      {{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer') }}
+                    </div>
+                  </td>
+                  <td class="font-mono font-bold text-primary">
+                    KSh {{ crop.currentPrice }}/{{ crop.unit }}
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-1" [class]="crop.trend">
+                      <i class="fas" [class.fa-arrow-up]="crop.trend === 'up'"
                       [class.fa-arrow-down]="crop.trend === 'down'" [class.fa-minus]="crop.trend === 'stable'"></i>
-                    <span class="text-xs font-medium" *ngIf="crop.trend !== 'stable'">
-                      {{ getPriceChange(crop.currentPrice, crop.previousPrice) }}%
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <div class="flex flex-col">
-                    <span class="text-sm font-medium">{{ crop.market }}</span>
-                    <span class="text-xs opacity-50">{{ crop.region }}</span>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <button class="btn btn-ghost btn-sm text-primary hover:bg-primary/10" (click)="openHistoryModal(crop)">
-                    <i class="fas fa-chart-line mr-2"></i> Trend
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="!isLoading && filteredCrops.length === 0">
-                <td colspan="6" class="text-center py-12">
-                  <div class="flex flex-col items-center opacity-30">
-                    <i class="fas fa-search text-5xl mb-4"></i>
-                    <p class="text-xl font-medium">No products found matching your criteria</p>
-                  </div>
-                </td>
-              </tr>
+                      @if (crop.trend !== 'stable') {
+                        <span class="text-xs font-medium">
+                          {{ getPriceChange(crop.currentPrice, crop.previousPrice) }}%
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex flex-col">
+                      <span class="text-sm font-medium">{{ crop.market }}</span>
+                      <span class="text-xs opacity-50">{{ crop.region }}</span>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm text-primary hover:bg-primary/10" (click)="openHistoryModal(crop)">
+                      <i class="fas fa-chart-line mr-2"></i> Trend
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (!isLoading && filteredCrops.length === 0) {
+                <tr>
+                  <td colspan="6" class="text-center py-12">
+                    <div class="flex flex-col items-center opacity-30">
+                      <i class="fas fa-search text-5xl mb-4"></i>
+                      <p class="text-xl font-medium">No products found matching your criteria</p>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-
-        <div class="p-4 border-t border-base-200 bg-base-50/30 flex justify-center" *ngIf="totalPages > 1 && !isLoading">
-          <div class="join">
-            <button class="join-item btn btn-sm" [disabled]="currentPage === 1" (click)="prevPage()">«</button>
-            <button class="join-item btn btn-sm no-animation">Page {{ currentPage }} of {{ totalPages }}</button>
-            <button class="join-item btn btn-sm" [disabled]="currentPage === totalPages" (click)="nextPage()">»</button>
+        @if (totalPages > 1 && !isLoading) {
+          <div class="p-4 border-t border-base-200 bg-base-50/30 flex justify-center">
+            <div class="join">
+              <button class="join-item btn btn-sm" [disabled]="currentPage === 1" (click)="prevPage()">«</button>
+              <button class="join-item btn btn-sm no-animation">Page {{ currentPage }} of {{ totalPages }}</button>
+              <button class="join-item btn btn-sm" [disabled]="currentPage === totalPages" (click)="nextPage()">»</button>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
+  }
 
-    <!-- Predictions Tab Content -->
-    <div *ngIf="activeTab === 'predictions'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <!-- Predictions Tab Content -->
+  @if (activeTab === 'predictions') {
+    <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div class="alert alert-warning shadow-lg">
         <i class="fas fa-robot text-2xl"></i>
         <div>
@@ -250,213 +266,230 @@
           <div class="text-xs">Predictions are based on historical trends and seasonal patterns. Use as a guide for planning.</div>
         </div>
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let crop of filteredCrops" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-200 group">
-          <div class="card-body p-6">
-            <div class="flex justify-between items-start mb-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl">
-                  <i class="fas fa-seedling"></i>
-                </div>
-                <div>
-                  <h3 class="font-bold text-lg">{{ crop.name }}</h3>
-                  <div class="badge badge-ghost badge-sm">{{ crop.category }}</div>
-                </div>
-              </div>
-              <div class="radial-progress text-primary" [style.--value]="aiAccuracy" style="--size:3rem; --thickness: 4px;">
-                <span class="text-[10px] font-bold">{{ aiAccuracy }}%</span>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg">
-                <span class="text-sm opacity-70">Current Price</span>
-                <span class="font-bold text-primary">KSh {{ crop.currentPrice }}</span>
-              </div>
-              <div class="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/10">
-                <span class="text-sm font-medium">Predicted (7d)</span>
-                <div class="flex flex-col items-end">
-                  <span class="font-bold text-primary text-lg">KSh {{ crop.prediction || (crop.currentPrice * 1.05 | number:'1.0-0') }}</span>
-                  <span class="text-[10px] flex items-center gap-1" [ngClass]="crop.prediction! > crop.currentPrice ? 'text-success' : 'text-error'">
-                    <i class="fas" [ngClass]="crop.prediction! > crop.currentPrice ? 'fa-caret-up' : 'fa-caret-down'"></i>
-                    {{ getPredictionChange(crop.currentPrice, crop.prediction!) }}% expected
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-actions mt-6">
-              <button class="btn btn-primary btn-block btn-sm" (click)="openHistoryModal(crop)">
-                <i class="fas fa-chart-line mr-2"></i> View Detailed Analysis
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Input Tab Content -->
-    <div *ngIf="activeTab === 'input'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <!-- Auth Section -->
-      <div *ngIf="!isLoggedIn" class="card bg-base-100 shadow-xl max-w-2xl mx-auto overflow-hidden">
-        <div class="flex flex-col lg:flex-row">
-          <div class="lg:w-1/3 bg-primary p-8 text-primary-content flex flex-col justify-center items-center text-center">
-            <i class="fas fa-user-circle text-6xl mb-4 opacity-50"></i>
-            <h3 class="text-2xl font-bold mb-2">{{ showLogin ? 'Welcome Back' : 'Join Us' }}</h3>
-            <p class="text-sm opacity-80">Help build a transparent market for all farmers.</p>
-          </div>
-          
-          <div class="lg:w-2/3 p-8">
-            <!-- Registration Form -->
-            <div *ngIf="!showLogin && !isForgotPasswordMode">
-              <h3 class="text-xl font-bold mb-4">Create Farmer Account</h3>
-              <form (ngSubmit)="quickRegister()" #regForm="ngForm" class="space-y-4">
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Full Name</span></label>
-                  <input type="text" class="input input-bordered focus:input-primary" [(ngModel)]="registration.name" name="regName" required>
-                </div>
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Phone Number</span></label>
-                  <input type="tel" class="input input-bordered focus:input-primary" [(ngModel)]="registration.phone" name="regPhone" placeholder="+254..." required>
-                </div>
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Region</span></label>
-                  <select class="select select-bordered w-full" [(ngModel)]="registration.region" name="regRegion">
-                    <option value="">Select Region</option>
-                    <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
-                  </select>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block" [disabled]="!regForm.valid || isLoading">
-                  <span *ngIf="isLoading" class="loading loading-spinner"></span>
-                  Register Account
-                </button>
-              </form>
-              <div class="divider">OR</div>
-              <p class="text-center text-sm">
-                Already have an account? <button class="link link-primary font-bold" (click)="showLogin = true">Login here</button>
-              </p>
-            </div>
-
-            <!-- Login Form -->
-            <div *ngIf="showLogin && !isForgotPasswordMode">
-              <h3 class="text-xl font-bold mb-4">Farmer Login</h3>
-              <form (ngSubmit)="farmerLogin()" #loginForm="ngForm" class="space-y-4">
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Phone Number</span></label>
-                  <input type="tel" class="input input-bordered focus:input-primary" [(ngModel)]="login.phone" name="loginPhone" required>
-                </div>
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Password</span></label>
-                  <input type="password" class="input input-bordered focus:input-primary" [(ngModel)]="login.password" name="loginPassword" required>
-                </div>
-                <div class="flex justify-end">
-                  <button type="button" class="link link-hover text-xs opacity-50" (click)="showForgotPassword()">Forgot password?</button>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block" [disabled]="!loginForm.valid || isLoading">
-                  <span *ngIf="isLoading" class="loading loading-spinner"></span>
-                  Login
-                </button>
-              </form>
-              <div class="divider">OR</div>
-              <p class="text-center text-sm">
-                New here? <button class="link link-success font-bold" (click)="showLogin = false">Register here</button>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Logged In State & Input Form -->
-      <div *ngIf="isLoggedIn" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 space-y-6">
-          <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body">
-              <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-4">
-                  <div class="avatar online placeholder">
-                    <div class="bg-neutral text-neutral-content rounded-full w-12">
-                      <span class="text-xl">{{ farmerName.charAt(0) }}</span>
-                    </div>
+        @for (crop of filteredCrops; track crop) {
+          <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-200 group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl">
+                    <i class="fas fa-seedling"></i>
                   </div>
                   <div>
-                    <h3 class="font-bold text-lg">Welcome, {{ farmerName }}</h3>
-                    <p class="text-xs opacity-50">{{ isAdmin ? 'Administrator Access' : 'Verified Farmer' }}</p>
+                    <h3 class="font-bold text-lg">{{ crop.name }}</h3>
+                    <div class="badge badge-ghost badge-sm">{{ crop.category }}</div>
                   </div>
                 </div>
-                <button class="btn btn-ghost btn-sm text-error" (click)="logoutPortal()">
-                  <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                <div class="radial-progress text-primary" [style.--value]="aiAccuracy" style="--size:3rem; --thickness: 4px;">
+                  <span class="text-[10px] font-bold">{{ aiAccuracy }}%</span>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg">
+                  <span class="text-sm opacity-70">Current Price</span>
+                  <span class="font-bold text-primary">KSh {{ crop.currentPrice }}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/10">
+                  <span class="text-sm font-medium">Predicted (7d)</span>
+                  <div class="flex flex-col items-end">
+                    <span class="font-bold text-primary text-lg">KSh {{ crop.prediction || (crop.currentPrice * 1.05 | number:'1.0-0') }}</span>
+                    <span class="text-[10px] flex items-center gap-1" [ngClass]="crop.prediction! > crop.currentPrice ? 'text-success' : 'text-error'">
+                      <i class="fas" [ngClass]="crop.prediction! > crop.currentPrice ? 'fa-caret-up' : 'fa-caret-down'"></i>
+                      {{ getPredictionChange(crop.currentPrice, crop.prediction!) }}% expected
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-actions mt-6">
+                <button class="btn btn-primary btn-block btn-sm" (click)="openHistoryModal(crop)">
+                  <i class="fas fa-chart-line mr-2"></i> View Detailed Analysis
                 </button>
               </div>
-
-              <div class="divider">Submit Local Price</div>
-
-              <form (ngSubmit)="submitPrice()" #priceForm="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control md:col-span-2">
-                  <label class="label"><span class="label-text font-medium">Product</span></label>
-                  <select class="select select-bordered w-full" [(ngModel)]="priceInput.crop" name="crop" required>
-                    <option value="">Select Crop/Product</option>
-                    <option *ngFor="let crop of crops" [value]="crop.name">{{ crop.name }}</option>
-                  </select>
-                </div>
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Price (KSh)</span></label>
-                  <div class="join">
-                    <span class="join-item btn btn-disabled bg-base-200 border-base-300">KSh</span>
-                    <input type="number" class="input input-bordered join-item w-full" [(ngModel)]="priceInput.price" name="price" required>
-                  </div>
-                </div>
-                <div class="form-control">
-                  <label class="label"><span class="label-text font-medium">Region</span></label>
-                  <select class="select select-bordered w-full" [(ngModel)]="priceInput.region" name="region" required>
-                    <option value="">Select Region</option>
-                    <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
-                  </select>
-                </div>
-                <div class="form-control md:col-span-2">
-                  <label class="label"><span class="label-text font-medium">Market Location</span></label>
-                  <input type="text" class="input input-bordered w-full" [(ngModel)]="priceInput.market" name="market" placeholder="e.g., Nakuru Market">
-                </div>
-                <div class="form-control md:col-span-2">
-                  <label class="label"><span class="label-text font-medium">Additional Notes</span></label>
-                  <textarea class="textarea textarea-bordered h-24" [(ngModel)]="priceInput.notes" name="notes" placeholder="Quality, quantity, market conditions..."></textarea>
-                </div>
-                <div class="md:col-span-2 mt-4">
-                  <button type="submit" class="btn btn-primary btn-block" [disabled]="!priceForm.valid || isLoading">
-                    <span *ngIf="isLoading" class="loading loading-spinner"></span>
-                    Submit Price Data
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
-        </div>
-
-        <div class="space-y-6">
-          <div class="card bg-primary text-primary-content shadow-xl">
-            <div class="card-body">
-              <h3 class="card-title"><i class="fas fa-info-circle"></i> Why Contribute?</h3>
-              <ul class="space-y-4 mt-4">
-                <li class="flex gap-3 items-start">
-                  <i class="fas fa-check-circle mt-1"></i>
-                  <span class="text-sm">Help other farmers get accurate local pricing in real-time.</span>
-                </li>
-                <li class="flex gap-3 items-start">
-                  <i class="fas fa-chart-line mt-1"></i>
-                  <span class="text-sm">Improve AI prediction accuracy for your specific region.</span>
-                </li>
-                <li class="flex gap-3 items-start">
-                  <i class="fas fa-shield-alt mt-1"></i>
-                  <span class="text-sm">All submissions are verified to maintain data integrity.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        }
       </div>
     </div>
-    <!-- SMS Tab Content -->
-    <div *ngIf="activeTab === 'sms'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+  }
+
+  <!-- Input Tab Content -->
+  @if (activeTab === 'input') {
+    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <!-- Auth Section -->
+      @if (!isLoggedIn) {
+        <div class="card bg-base-100 shadow-xl max-w-2xl mx-auto overflow-hidden">
+          <div class="flex flex-col lg:flex-row">
+            <div class="lg:w-1/3 bg-primary p-8 text-primary-content flex flex-col justify-center items-center text-center">
+              <i class="fas fa-user-circle text-6xl mb-4 opacity-50"></i>
+              <h3 class="text-2xl font-bold mb-2">{{ showLogin ? 'Welcome Back' : 'Join Us' }}</h3>
+              <p class="text-sm opacity-80">Help build a transparent market for all farmers.</p>
+            </div>
+            <div class="lg:w-2/3 p-8">
+              <!-- Registration Form -->
+              @if (!showLogin && !isForgotPasswordMode) {
+                <div>
+                  <h3 class="text-xl font-bold mb-4">Create Farmer Account</h3>
+                  <form (ngSubmit)="quickRegister()" #regForm="ngForm" class="space-y-4">
+                    <div class="form-control">
+                      <label class="label"><span class="label-text font-medium">Full Name</span></label>
+                      <input type="text" class="input input-bordered focus:input-primary" [(ngModel)]="registration.name" name="regName" required>
+                    </div>
+                    <div class="form-control">
+                      <label class="label"><span class="label-text font-medium">Phone Number</span></label>
+                      <input type="tel" class="input input-bordered focus:input-primary" [(ngModel)]="registration.phone" name="regPhone" placeholder="+254..." required>
+                    </div>
+                    <div class="form-control">
+                      <label class="label"><span class="label-text font-medium">Region</span></label>
+                      <select class="select select-bordered w-full" [(ngModel)]="registration.region" name="regRegion">
+                        <option value="">Select Region</option>
+                        @for (region of regions; track region) {
+                          <option [value]="region.name">{{ region.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" [disabled]="!regForm.valid || isLoading">
+                      @if (isLoading) {
+                        <span class="loading loading-spinner"></span>
+                      }
+                      Register Account
+                    </button>
+                  </form>
+                  <div class="divider">OR</div>
+                  <p class="text-center text-sm">
+                    Already have an account? <button class="link link-primary font-bold" (click)="showLogin = true">Login here</button>
+                  </p>
+                </div>
+              }
+              <!-- Login Form -->
+              @if (showLogin && !isForgotPasswordMode) {
+                <div>
+                  <h3 class="text-xl font-bold mb-4">Farmer Login</h3>
+                  <form (ngSubmit)="farmerLogin()" #loginForm="ngForm" class="space-y-4">
+                    <div class="form-control">
+                      <label class="label"><span class="label-text font-medium">Phone Number</span></label>
+                      <input type="tel" class="input input-bordered focus:input-primary" [(ngModel)]="login.phone" name="loginPhone" required>
+                    </div>
+                    <div class="form-control">
+                      <label class="label"><span class="label-text font-medium">Password</span></label>
+                      <input type="password" class="input input-bordered focus:input-primary" [(ngModel)]="login.password" name="loginPassword" required>
+                    </div>
+                    <div class="flex justify-end">
+                      <button type="button" class="link link-hover text-xs opacity-50" (click)="showForgotPassword()">Forgot password?</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" [disabled]="!loginForm.valid || isLoading">
+                      @if (isLoading) {
+                        <span class="loading loading-spinner"></span>
+                      }
+                      Login
+                    </button>
+                  </form>
+                  <div class="divider">OR</div>
+                  <p class="text-center text-sm">
+                    New here? <button class="link link-success font-bold" (click)="showLogin = false">Register here</button>
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Logged In State & Input Form -->
+      @if (isLoggedIn) {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="lg:col-span-2 space-y-6">
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+              <div class="card-body">
+                <div class="flex items-center justify-between mb-6">
+                  <div class="flex items-center gap-4">
+                    <div class="avatar online placeholder">
+                      <div class="bg-neutral text-neutral-content rounded-full w-12">
+                        <span class="text-xl">{{ farmerName.charAt(0) }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-lg">Welcome, {{ farmerName }}</h3>
+                      <p class="text-xs opacity-50">{{ isAdmin ? 'Administrator Access' : 'Verified Farmer' }}</p>
+                    </div>
+                  </div>
+                  <button class="btn btn-ghost btn-sm text-error" (click)="logoutPortal()">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                  </button>
+                </div>
+                <div class="divider">Submit Local Price</div>
+                <form (ngSubmit)="submitPrice()" #priceForm="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control md:col-span-2">
+                    <label class="label"><span class="label-text font-medium">Product</span></label>
+                    <select class="select select-bordered w-full" [(ngModel)]="priceInput.crop" name="crop" required>
+                      <option value="">Select Crop/Product</option>
+                      @for (crop of crops; track crop) {
+                        <option [value]="crop.name">{{ crop.name }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Price (KSh)</span></label>
+                    <div class="join">
+                      <span class="join-item btn btn-disabled bg-base-200 border-base-300">KSh</span>
+                      <input type="number" class="input input-bordered join-item w-full" [(ngModel)]="priceInput.price" name="price" required>
+                    </div>
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text font-medium">Region</span></label>
+                    <select class="select select-bordered w-full" [(ngModel)]="priceInput.region" name="region" required>
+                      <option value="">Select Region</option>
+                      @for (region of regions; track region) {
+                        <option [value]="region.name">{{ region.name }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="form-control md:col-span-2">
+                    <label class="label"><span class="label-text font-medium">Market Location</span></label>
+                    <input type="text" class="input input-bordered w-full" [(ngModel)]="priceInput.market" name="market" placeholder="e.g., Nakuru Market">
+                  </div>
+                  <div class="form-control md:col-span-2">
+                    <label class="label"><span class="label-text font-medium">Additional Notes</span></label>
+                    <textarea class="textarea textarea-bordered h-24" [(ngModel)]="priceInput.notes" name="notes" placeholder="Quality, quantity, market conditions..."></textarea>
+                  </div>
+                  <div class="md:col-span-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-block" [disabled]="!priceForm.valid || isLoading">
+                      @if (isLoading) {
+                        <span class="loading loading-spinner"></span>
+                      }
+                      Submit Price Data
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <div class="card bg-primary text-primary-content shadow-xl">
+              <div class="card-body">
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> Why Contribute?</h3>
+                <ul class="space-y-4 mt-4">
+                  <li class="flex gap-3 items-start">
+                    <i class="fas fa-check-circle mt-1"></i>
+                    <span class="text-sm">Help other farmers get accurate local pricing in real-time.</span>
+                  </li>
+                  <li class="flex gap-3 items-start">
+                    <i class="fas fa-chart-line mt-1"></i>
+                    <span class="text-sm">Improve AI prediction accuracy for your specific region.</span>
+                  </li>
+                  <li class="flex gap-3 items-start">
+                    <i class="fas fa-shield-alt mt-1"></i>
+                    <span class="text-sm">All submissions are verified to maintain data integrity.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  <!-- SMS Tab Content -->
+  @if (activeTab === 'sms') {
+    <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div class="card bg-base-100 shadow-xl border border-base-200 overflow-hidden">
         <div class="flex flex-col lg:flex-row">
           <div class="lg:w-1/2 p-8 lg:p-12 bg-base-200/50">
@@ -465,7 +498,6 @@
             <p class="text-base-content/70 mb-8">
               Stay updated even without an internet connection. Subscribe to receive daily price updates and alerts directly on your phone.
             </p>
-            
             <div class="space-y-6">
               <div class="flex gap-4">
                 <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -487,29 +519,29 @@
               </div>
             </div>
           </div>
-
           <div class="lg:w-1/2 p-8 lg:p-12">
             <form (ngSubmit)="subscribeToSms()" class="space-y-6">
-              <div *ngIf="smsSubMessage" class="alert" [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
-                <i class="fas" [ngClass]="smsSubIsError ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
-                <span>{{ smsSubMessage }}</span>
-              </div>
-
+              @if (smsSubMessage) {
+                <div class="alert" [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
+                  <i class="fas" [ngClass]="smsSubIsError ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
+                  <span>{{ smsSubMessage }}</span>
+                </div>
+              }
               <div class="form-control">
                 <label class="label"><span class="label-text font-bold">Phone Number</span></label>
                 <input type="tel" class="input input-bordered focus:input-primary w-full" placeholder="+254 700 000 000" [(ngModel)]="smsSubPhone" name="smsSubPhone" required>
               </div>
-
               <div class="form-control">
                 <label class="label"><span class="label-text font-bold">Select Products to Track</span></label>
                 <div class="grid grid-cols-2 gap-2 mt-2">
-                  <label *ngFor="let crop of crops" class="label cursor-pointer justify-start gap-3 bg-base-200/50 rounded-lg px-4 hover:bg-base-200 transition-colors">
-                    <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
-                    <span class="label-text text-xs font-medium">{{ crop.name }}</span>
-                  </label>
+                  @for (crop of crops; track crop) {
+                    <label class="label cursor-pointer justify-start gap-3 bg-base-200/50 rounded-lg px-4 hover:bg-base-200 transition-colors">
+                      <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
+                      <span class="label-text text-xs font-medium">{{ crop.name }}</span>
+                    </label>
+                  }
                 </div>
               </div>
-
               <button type="submit" class="btn btn-primary btn-block mt-4" [disabled]="isLoading">
                 <i class="fas fa-bell mr-2"></i>
                 {{ isLoading ? 'Subscribing...' : 'Subscribe to SMS Alerts' }}
@@ -519,6 +551,7 @@
         </div>
       </div>
     </div>
+  }
 
-  </div>
+</div>
 </div>

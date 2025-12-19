@@ -1,81 +1,117 @@
-<footer class="bg-neutral text-neutral-content py-16 lg:py-24">
+<footer class="bg-[#052e16] text-white pt-24 pb-12 rounded-t-[3rem] mt-[-2rem] relative z-10">
   <div class="container mx-auto px-6 lg:px-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-      <!-- Brand Section -->
+
+    <!-- Top Section: Brand & Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20 border-b border-white/10 pb-16">
+
+      <!-- Brand Column -->
       <div class="space-y-6">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-content shadow-lg">
-            <i class="fas fa-seedling text-xl"></i>
+        <a routerLink="/" class="flex items-center gap-3 no-underline">
+          <div
+            class="w-12 h-12 bg-[#bef264] rounded-full flex items-center justify-center text-emerald-950 shadow-lg shadow-[#bef264]/20 transition-transform hover:scale-105">
+            <i class="fas fa-leaf text-xl"></i>
           </div>
-          <span class="text-2xl font-black tracking-tighter">AgriPrice</span>
-        </div>
-        <p class="opacity-70 leading-relaxed">
-          Empowering Kenyan farmers with transparent pricing information and direct market access through modern technology.
+          <span class="text-2xl font-black tracking-tight text-white">AgriPrice</span>
+        </a>
+        <p class="text-emerald-100/60 leading-relaxed text-sm max-w-xs">
+          Empowering Kenyan farmers with transparent, real-time market intelligence and direct access to fair pricing.
         </p>
-        <div class="flex gap-4">
-          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+        <div class="flex gap-3">
+          <button
+            class="w-10 h-10 rounded-full bg-white/5 hover:bg-[#bef264] hover:text-emerald-950 text-emerald-100 transition-all flex items-center justify-center">
             <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+          </button>
+          <button
+            class="w-10 h-10 rounded-full bg-white/5 hover:bg-[#bef264] hover:text-emerald-950 text-emerald-100 transition-all flex items-center justify-center">
             <i class="fab fa-twitter"></i>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-base-content/10 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all">
+          </button>
+          <button
+            class="w-10 h-10 rounded-full bg-white/5 hover:bg-[#bef264] hover:text-emerald-950 text-emerald-100 transition-all flex items-center justify-center">
             <i class="fab fa-linkedin-in"></i>
-          </a>
+          </button>
         </div>
       </div>
 
-      <!-- Modules -->
+      <!-- Links Column 1 -->
       <div>
-        <h4 class="text-lg font-bold mb-6 text-white">System Modules</h4>
-        <ul class="space-y-4 opacity-70">
-          <li><a (click)="navigateToPage('public')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Public Portal</a></li>
-          <li><a (click)="handleAdminDashboard()" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Admin Dashboard</a></li>
-          <li><a (click)="navigateToSection('sms')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">SMS Interface</a></li>
-          <li><a (click)="navigateToPage('home')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Market Intelligence</a></li>
+        <h4 class="text-[#bef264] font-bold uppercase tracking-widest text-xs mb-8">Platform</h4>
+        <ul class="space-y-4">
+          <li><a routerLink="/"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">Market
+              Intelligence</a></li>
+          <li><a routerLink="/public"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">Public Portal</a>
+          </li>
+          <li><a routerLink="/admin/dashboard"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">Admin Dashboard</a>
+          </li>
         </ul>
       </div>
 
-      <!-- Features -->
+      <!-- Links Column 2 -->
       <div>
-        <h4 class="text-lg font-bold mb-6 text-white">Key Features</h4>
-        <ul class="space-y-4 opacity-70">
-          <li><a (click)="navigateToSection('prices')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">Price Tracking</a></li>
-          <li><a (click)="navigateToSection('predictions')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">ML Predictions</a></li>
-          <li><a (click)="openChatbot()" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">AI Chatbot</a></li>
-          <li><a (click)="navigateToPage('public')" class="hover:text-primary hover:opacity-100 transition-all cursor-pointer">KAMIS Integration</a></li>
+        <h4 class="text-[#bef264] font-bold uppercase tracking-widest text-xs mb-8">Features</h4>
+        <ul class="space-y-4">
+          <li><a (click)="navigateToSection('prices')"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">Price Tracking</a>
+          </li>
+          <li><a (click)="navigateToSection('predictions')"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">ML Predictions</a>
+          </li>
+          <li><a (click)="openChatbot()"
+              class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">AI Chatbot</a></li>
+          <li><a class="text-emerald-100/70 hover:text-white transition-colors cursor-pointer text-sm">SMS Interface</a>
+          </li>
         </ul>
       </div>
 
-      <!-- Support -->
+      <!-- Contact Column -->
       <div>
-        <h4 class="text-lg font-bold mb-6 text-white">Support & Contact</h4>
-        <ul class="space-y-4 opacity-70">
-          <li class="flex items-start gap-3">
-            <i class="fas fa-phone mt-1 text-primary"></i>
-            <span>SMS: +254-700-AGRI (2474)</span>
+        <h4 class="text-[#bef264] font-bold uppercase tracking-widest text-xs mb-8">Contact</h4>
+        <ul class="space-y-4 text-emerald-100/70 text-sm">
+          <li class="flex items-start gap-4">
+            <div
+              class="w-8 h-8 rounded-full bg-emerald-900/50 flex items-center justify-center shrink-0 text-[#bef264]">
+              <i class="fas fa-phone-alt text-xs"></i>
+            </div>
+            <div>
+              <span class="block text-white font-bold">SMS Support</span>
+              <span>+254-700-AGRI</span>
+            </div>
           </li>
-          <li class="flex items-start gap-3">
-            <i class="fas fa-envelope mt-1 text-primary"></i>
-            <span class="break-all">agriculture.price.system&#64;gmail.com</span>
+          <li class="flex items-start gap-4">
+            <div
+              class="w-8 h-8 rounded-full bg-emerald-900/50 flex items-center justify-center shrink-0 text-[#bef264]">
+              <i class="fas fa-envelope text-xs"></i>
+            </div>
+            <div>
+              <span class="block text-white font-bold">Email Us</span>
+              <span>info@agriprice.ke</span>
+            </div>
           </li>
-          <li class="flex items-start gap-3">
-            <i class="fas fa-map-marker-alt mt-1 text-primary"></i>
-            <span>Agricultural Technology Hub, Nairobi, Kenya</span>
+          <li class="flex items-start gap-4">
+            <div
+              class="w-8 h-8 rounded-full bg-emerald-900/50 flex items-center justify-center shrink-0 text-[#bef264]">
+              <i class="fas fa-map-marker-alt text-xs"></i>
+            </div>
+            <div>
+              <span class="block text-white font-bold">Visit Us</span>
+              <span>Tech Hub, Nairobi, KE</span>
+            </div>
           </li>
         </ul>
       </div>
+
     </div>
 
-    <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm opacity-50">
+    <!-- Bottom Section -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-emerald-100/40">
       <p>&copy; 2025 AgriPrice Tracker. All rights reserved.</p>
-      <div class="flex gap-8">
-        <a (click)="showPrivacyPolicy()" class="hover:text-white cursor-pointer">Privacy Policy</a>
-        <a (click)="showTermsOfService()" class="hover:text-white cursor-pointer">Terms of Service</a>
+      <div class="flex gap-8 font-medium">
+        <a (click)="showPrivacyPolicy()" class="hover:text-white cursor-pointer transition-colors">Privacy</a>
+        <a (click)="showTermsOfService()" class="hover:text-white cursor-pointer transition-colors">Terms</a>
       </div>
     </div>
+
   </div>
 </footer>

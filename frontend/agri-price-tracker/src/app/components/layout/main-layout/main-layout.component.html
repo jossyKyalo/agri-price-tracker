@@ -1,0 +1,13 @@
+<div class="min-h-screen flex flex-col bg-surface-0 dark:bg-surface-950 text-surface-900 dark:text-surface-0">
+    <app-header></app-header>
+
+    <main class="flex-grow">
+        <router-outlet></router-outlet>
+    </main>
+
+    <app-footer></app-footer>
+
+    @if (showChatbot) {
+    <app-chatbot-widget></app-chatbot-widget>
+    }
+</div>

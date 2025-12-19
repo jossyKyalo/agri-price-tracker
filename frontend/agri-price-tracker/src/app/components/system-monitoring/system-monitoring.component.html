@@ -1,0 +1,119 @@
+<div class="space-y-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- System Health Card -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center text-surface-600">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">System Health</h3>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" [ngClass]="{
+               'bg-green-100 text-green-700': systemHealth.database_status === 'healthy',
+               'bg-yellow-100 text-yellow-700': systemHealth.database_status === 'degraded',
+               'bg-red-100 text-red-700': systemHealth.database_status === 'down'
+           }">
+                    {{ systemHealth.database_status }}
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-surface-50 rounded-2xl">
+                    <span class="text-sm font-medium text-gray-600">API Response Time</span>
+                    <span class="text-lg font-bold text-gray-900">{{ systemHealth.api_response_time }}ms</span>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-surface-50 rounded-2xl">
+                    <span class="text-sm font-medium text-gray-600">Active Users</span>
+                    <span class="text-lg font-bold text-gray-900">{{ systemHealth.active_users }}</span>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-surface-50 rounded-2xl">
+                    <span class="text-sm font-medium text-gray-600">SMS Queue</span>
+                    <span class="text-lg font-bold text-gray-900">{{ systemHealth.sms_queue }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KAMIS Sync Card -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                        <i class="fas fa-sync"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">KAMIS Sync Status</h3>
+                </div>
+                <div class="flex gap-2">
+                    <button pButton icon="fas fa-cog" class="p-button-rounded p-button-text p-button-secondary"
+                        (click)="configureSync()"></button>
+                    <button pButton icon="fas fa-sync-alt" label="Sync Now"
+                        class="p-button-rounded p-button-sm p-button-outlined" [loading]="isSyncing"
+                        (click)="syncKamisData()"></button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="p-4 bg-surface-50 rounded-2xl border border-surface-100">
+                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Status</p>
+                    <p class="text-lg font-bold text-purple-700">{{ kamisSync }}</p>
+                </div>
+                <div class="p-4 bg-surface-50 rounded-2xl border border-surface-100">
+                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Last Sync</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ lastKamisSync }}</p>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/50">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm text-blue-900 font-medium mb-1">Records Processed</p>
+                        <p class="text-2xl font-black text-blue-700">{{ kamisRecords | number }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SMS Interface -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <i class="fas fa-comment-alt"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">SMS Gateway Interface</h3>
+        </div>
+        <app-sms-interface></app-sms-interface>
+    </div>
+
+    <!-- Sync Config Dialog -->
+    <p-dialog header="KAMIS Sync Configuration" [(visible)]="showSyncModal" [modal]="true" [style]="{width: '450px'}"
+        styleClass="p-dialog-rounded">
+        <div class="flex flex-col gap-4 py-4">
+            <div class="flex items-center justify-between">
+                <label class="font-bold text-gray-700">Auto-Sync Enabled</label>
+                <p-checkbox [(ngModel)]="syncConfig.autoSyncEnabled" [binary]="true"></p-checkbox>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-gray-700">Frequency</label>
+                <p-select [options]="['daily', 'weekly', 'manual']" [(ngModel)]="syncConfig.frequency"
+                    styleClass="w-full"></p-select>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-gray-700">Sync Time</label>
+                <input type="time" pInputText [(ngModel)]="syncConfig.syncTime" class="w-full">
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton label="Cancel" class="p-button-text" (click)="closeSyncModal()"></button>
+            <button pButton label="Save Changes" class="p-button-success" (click)="saveSyncConfig()"
+                [loading]="isLoading"></button>
+        </ng-template>
+    </p-dialog>
+
+</div>

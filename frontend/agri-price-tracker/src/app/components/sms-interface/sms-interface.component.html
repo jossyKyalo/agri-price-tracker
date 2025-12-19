@@ -1,367 +1,289 @@
-<div class="sms-interface-container">
-      <div class="interface-header">
-        <h1><i class="fas fa-sms"></i> SMS Interface & Management</h1>
-        <p class="text-muted">Manage SMS communications for farmers with feature phones</p>
+<div class="space-y-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black text-gray-900 flex items-center gap-3">
+        <i class="fas fa-sms text-emerald-600"></i>
+        SMS Interface & Management
+      </h1>
+      <p class="text-gray-500 mt-1">Manage SMS communications for farmers with feature phones</p>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Sent Today -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-green-100 rounded-xl text-green-600">
+          <i class="fas fa-paper-plane text-xl"></i>
+        </div>
+        <span class="text-sm font-bold text-gray-500">Sent Today</span>
       </div>
+      <p class="text-3xl font-black text-gray-900">{{ totalSent }}</p>
+    </div>
 
-      <!-- SMS Stats -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-paper-plane" style="color: var(--success);"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ totalSent }}</h3>
-            <p>SMS Sent Today</p>
-          </div>
+    <!-- Subscribers -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-blue-100 rounded-xl text-blue-600">
+          <i class="fas fa-users text-xl"></i>
         </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-users" style="color: var(--info);"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ subscribedFarmers }}</h3>
-            <p>Subscribed Farmers</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-clock" style="color: var(--warning);"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ pendingSms }}</h3>
-            <p>Pending SMS</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ failedSms }}</h3>
-            <p>Failed SMS</p>
-          </div>
-        </div>
+        <span class="text-sm font-bold text-gray-500">Subscribers</span>
       </div>
+      <p class="text-3xl font-black text-gray-900">{{ subscribedFarmers }}</p>
+    </div>
 
-      <!-- SMS Tabs -->
-      <div class="sms-tabs">
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'send'"
-          (click)="activeTab = 'send'">
-          <i class="fas fa-paper-plane"></i>
-          Send SMS
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'templates'"
-          (click)="activeTab = 'templates'">
-          <i class="fas fa-file-alt"></i>
-          Templates
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'logs'"
-          (click)="activeTab = 'logs'">
-          <i class="fas fa-list"></i>
-          SMS Logs
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'subscriptions'"
-          (click)="activeTab = 'subscriptions'">
-          <i class="fas fa-user-plus"></i>
-          Subscriptions
-        </button>
+    <!-- Pending -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-yellow-100 rounded-xl text-yellow-600">
+          <i class="fas fa-clock text-xl"></i>
+        </div>
+        <span class="text-sm font-bold text-gray-500">Pending</span>
       </div>
+      <p class="text-3xl font-black text-gray-900">{{ pendingSms }}</p>
+    </div>
 
-      <!-- Send SMS Tab -->
-      <div *ngIf="activeTab === 'send'" class="tab-content">
-        <div class="send-sms-grid">
-          <!-- SMS Composer -->
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-paper-plane"></i> Compose SMS</h3>
-            </div>
-            <div class="card-body">
-              <form (ngSubmit)="sendSms()" #smsForm="ngForm">
-                <div class="form-group">
-                  <label class="form-label">SMS Type</label>
-                  <select class="form-select" [(ngModel)]="smsData.type" name="type" required>
-                    <option value="">Select SMS Type</option>
-                    <option value="price-alert">Price Alert</option>
-                    <option value="price-update">Price Update</option>
-                    <option value="prediction">Price Prediction</option>
-                    <option value="weather">Weather Alert</option>
-                    <option value="general">General Information</option>
-                  </select>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Recipients</label>
-                  <select class="form-select" [(ngModel)]="smsData.recipients" name="recipients" required>
-                    <option value="">Select Recipients</option>
-                    <option value="all">All Subscribers</option>
-                    <option value="region-central">Central Kenya</option>
-                    <option value="region-western">Western Kenya</option>
-                    <option value="region-eastern">Eastern Kenya</option>
-                    <option value="region-rift-valley">Rift Valley</option>
-                    <option value="crop-maize">Maize Farmers</option>
-                    <option value="crop-beans">Beans Farmers</option>
-                    <option value="custom">Custom List</option>
-                  </select>
-                </div>
-                
-                <div class="form-group" *ngIf="smsData.recipients === 'custom'">
-                  <label class="form-label">Phone Numbers (comma separated)</label>
-                  <textarea class="form-control" rows="3" [(ngModel)]="smsData.customNumbers" name="customNumbers" 
-                            placeholder="+254700123456, +254722987654"></textarea>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Template</label>
-                  <select class="form-select" [(ngModel)]="selectedTemplate" (change)="loadTemplate()">
-                    <option value="">Select Template (Optional)</option>
-                    <option *ngFor="let template of smsTemplates" [value]="template.id">
-                      {{ template.name }}
-                    </option>
-                  </select>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Message</label>
-                  <textarea class="form-control" rows="4" [(ngModel)]="smsData.message" name="message" 
-                            placeholder="Type your SMS message here..." required maxlength="160"></textarea>
-                  <small class="text-muted">{{ smsData.message.length || 0 }}/160 characters</small>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Schedule</label>
-                  <select class="form-select" [(ngModel)]="smsData.schedule" name="schedule">
-                    <option value="now">Send Now</option>
-                    <option value="schedule">Schedule for Later</option>
-                  </select>
-                </div>
-                
-                <div class="form-group" *ngIf="smsData.schedule === 'schedule'">
-                  <label class="form-label">Send Date & Time</label>
-                  <input type="datetime-local" class="form-control" [(ngModel)]="smsData.scheduledTime" name="scheduledTime">
-                </div>
-                
-                <button type="submit" class="btn btn-primary" [disabled]="!smsForm.valid">
-                  <i class="fas fa-paper-plane"></i>
-                  {{ smsData.schedule === 'now' ? 'Send SMS' : 'Schedule SMS' }}
-                </button>
-              </form>
-            </div>
-          </div>
+    <!-- Failed -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-surface-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-red-100 rounded-xl text-red-600">
+          <i class="fas fa-exclamation-triangle text-xl"></i>
+        </div>
+        <span class="text-sm font-bold text-gray-500">Failed</span>
+      </div>
+      <p class="text-3xl font-black text-gray-900">{{ failedSms }}</p>
+    </div>
+  </div>
 
-          <!-- Quick SMS Actions -->
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-            </div>
-            <div class="card-body">
-              <div class="quick-sms-actions">
-                <button class="quick-action-btn" (click)="sendQuickSms('price-spike')">
-                  <i class="fas fa-arrow-up"></i>
-                  <span>Price Spike Alert</span>
-                  <small>Maize +15% in Central</small>
-                </button>
-                
-                <button class="quick-action-btn" (click)="sendQuickSms('weather-alert')">
-                  <i class="fas fa-cloud-rain"></i>
-                  <span>Weather Alert</span>
-                  <small>Heavy rains expected</small>
-                </button>
-                
-                <button class="quick-action-btn" (click)="sendQuickSms('market-opportunity')">
-                  <i class="fas fa-handshake"></i>
-                  <span>Market Opportunity</span>
-                  <small>High demand for tomatoes</small>
-                </button>
-                
-                <button class="quick-action-btn" (click)="sendQuickSms('daily-update')">
-                  <i class="fas fa-calendar-day"></i>
-                  <span>Daily Price Update</span>
-                  <small>All regions</small>
-                </button>
+  <!-- Main Content Tabs -->
+  <div class="bg-white rounded-3xl shadow-sm border border-surface-200 overflow-hidden">
+    <p-tabs [value]="activeTab" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="send">
+          <i class="fas fa-paper-plane mr-2"></i> Send SMS
+        </p-tab>
+        <p-tab value="templates">
+          <i class="fas fa-file-alt mr-2"></i> Templates
+        </p-tab>
+        <p-tab value="logs">
+          <i class="fas fa-list mr-2"></i> SMS Logs
+        </p-tab>
+        <p-tab value="subscriptions">
+          <i class="fas fa-user-plus mr-2"></i> Subscriptions
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="send">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
+            <div class="lg:col-span-2 space-y-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i class="fas fa-edit text-emerald-600"></i> Compose Message
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label class="font-bold text-gray-700 text-sm">SMS Type</label>
+                  <p-select [options]="[
+                                        {label: 'Price Alert', value: 'price-alert'},
+                                        {label: 'Price Update', value: 'price-update'},
+                                        {label: 'Prediction', value: 'prediction'},
+                                        {label: 'Weather Alert', value: 'weather'},
+                                        {label: 'General Info', value: 'general'}
+                                    ]" [(ngModel)]="smsData.type" placeholder="Select Type"
+                    styleClass="w-full !bg-white !text-gray-900 !border-gray-300 shadow-sm"></p-select>
+                </div>
+                <div class="space-y-2">
+                  <label class="font-bold text-gray-700 text-sm">Recipients</label>
+                  <p-select [options]="[
+                                        {label: 'All Subscribers', value: 'all'},
+                                        {label: 'Central Kenya', value: 'region-central'},
+                                        {label: 'Western Kenya', value: 'region-western'},
+                                        {label: 'Custom List', value: 'custom'}
+                                    ]" [(ngModel)]="smsData.recipients" placeholder="Select Recipients"
+                    styleClass="w-full !bg-white !text-gray-900 !border-gray-300 shadow-sm"></p-select>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Templates Tab -->
-      <div *ngIf="activeTab === 'templates'" class="tab-content">
-        <div class="templates-grid">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fas fa-file-alt"></i> SMS Templates</h3>
-              <button class="btn btn-primary btn-sm" (click)="showCreateTemplate = true">
-                <i class="fas fa-plus"></i>
-                New Template
-              </button>
-            </div>
-            <div class="card-body">
-              <div class="templates-list">
-                <div *ngFor="let template of smsTemplates" class="template-item">
-                  <div class="template-info">
-                    <h4>{{ template.name }}</h4>
-                    <p>{{ template.template }}</p>
-                    <small class="text-muted">Variables: {{ template.variables?.join(', ') }}</small>
-                  </div>
-                  <div class="template-actions">
-                    <button class="btn btn-outline btn-sm" (click)="editTemplate(template)">
-                      <i class="fas fa-edit"></i>
-                      Edit
-                    </button>
-                    <button class="btn btn-danger btn-sm" (click)="deleteTemplate(template.id)">
-                      <i class="fas fa-trash"></i>
-                      Delete
-                    </button>
+              <div *ngIf="smsData.recipients === 'custom'" class="space-y-2">
+                <label class="font-bold text-gray-700 text-sm">Phone Numbers (Comma Separated)</label>
+                <textarea pTextarea [(ngModel)]="smsData.customNumbers" rows="2"
+                  class="w-full !bg-white !text-gray-900 !border-gray-300 shadow-sm"
+                  placeholder="+2547..., +2547..."></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="font-bold text-gray-700 text-sm">Message</label>
+                  <span class="text-xs text-gray-500 font-mono">{{ smsData.message.length }}/160</span>
+                </div>
+                <textarea pTextarea [(ngModel)]="smsData.message" rows="5"
+                  class="w-full !bg-white !text-gray-900 !text-lg !border-gray-300 shadow-sm"
+                  placeholder="Type your message here..."></textarea>
+              </div>
+
+              <!-- Schedule Option -->
+              <div class="space-y-2">
+                <label class="font-bold text-gray-700 text-sm">Schedule (Optional)</label>
+                <div class="flex flex-col gap-2">
+                  <p-select
+                    [options]="[{label: 'Send Now', value: 'now'}, {label: 'Schedule Later', value: 'schedule'}]"
+                    [(ngModel)]="smsData.schedule"
+                    styleClass="w-full !bg-white !text-gray-900 !border-gray-300 shadow-sm"></p-select>
+
+                  <div *ngIf="smsData.schedule === 'schedule'" class="mt-2">
+                    <p-datepicker [(ngModel)]="smsData.scheduledTime" [showTime]="true" hourFormat="24"
+                      [showIcon]="true" placeholder="Select Date & Time"
+                      styleClass="w-full !bg-white !text-gray-900 !border-gray-300 shadow-sm"></p-datepicker>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Create/Edit Template Form -->
-          <div class="card" *ngIf="showCreateTemplate">
-            <div class="card-header">
-              <h3><i class="fas fa-plus"></i> Create SMS Template</h3>
+              <div class="flex items-center justify-end gap-3 pt-4 border-t border-surface-100">
+                <button pButton label="Send SMS" icon="fas fa-paper-plane"
+                  class="p-button-success p-button-rounded px-6" (click)="sendSms()" [loading]="isLoading"></button>
+              </div>
             </div>
-            <div class="card-body">
-              <form (ngSubmit)="saveTemplate()" #templateForm="ngForm">
-                <div class="form-group">
-                  <label class="form-label">Template Name</label>
-                  <input type="text" class="form-control" [(ngModel)]="newTemplate.name" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Template Message</label>
-                  <textarea class="form-control" rows="4" [(ngModel)]="newTemplate.template" name="template" 
-                            placeholder="Use {variable} for dynamic content" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">Variables (comma separated)</label>
-                  <input type="text" class="form-control" [(ngModel)]="newTemplate.variablesString" name="variables"
-                         placeholder="crop, price, region">
-                </div>
-                
-                <div class="template-form-actions">
-                  <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Save Template
-                  </button>
-                  <button type="button" class="btn btn-outline" (click)="cancelTemplate()">
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- SMS Logs Tab -->
-      <div *ngIf="activeTab === 'logs'" class="tab-content">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="fas fa-list"></i> SMS Delivery Logs</h3>
-            <div class="log-filters">
-              <select class="form-select" [(ngModel)]="logFilter">
-                <option value="">All Status</option>
-                <option value="sent">Sent</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
+            <div class="space-y-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i class="fas fa-bolt text-yellow-500"></i> Quick Actions
+              </h3>
+              <div class="grid grid-cols-1 gap-3">
+                <button pButton label="Price Spike Alert" icon="fas fa-arrow-up"
+                  class="p-button-outlined p-button-warning text-left justify-start"
+                  (click)="sendQuickSms('price-spike')"></button>
+                <button pButton label="Weather Alert" icon="fas fa-cloud-showers-heavy"
+                  class="p-button-outlined p-button-info text-left justify-start"
+                  (click)="sendQuickSms('weather-alert')"></button>
+                <button pButton label="Market Opportunity" icon="fas fa-hand-holding-usd"
+                  class="p-button-outlined p-button-success text-left justify-start"
+                  (click)="sendQuickSms('market-opportunity')"></button>
+              </div>
             </div>
           </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="sms-logs-table">
-                <thead>
-                  <tr>
-                    <th>Recipient</th>
-                    <th>Message</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Timestamp</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let log of getFilteredLogs()">
-                    <td>{{ log.recipient }}</td>
-                    <td>
-                      <div class="message-preview">
-                        {{ log.message.length > 50 ? (log.message.substring(0, 50) + '...') : log.message }}
-                      </div>
-                    </td>
-                    <td>
-                      <span class="badge badge-info">{{ log.sms_type }}</span>
-                    </td>
-                    <td>
-                      <span class="badge" 
-                            [class.badge-success]="log.status === 'sent'"
-                            [class.badge-warning]="log.status === 'pending'"
-                            [class.badge-danger]="log.status === 'failed'">
-                        {{ log.status }}
-                      </span>
-                    </td>
-                    <td>{{ formatDate(log.created_at) }}</td>
-                    <td>
-                      <button class="btn btn-outline btn-sm" (click)="resendSms(log)" *ngIf="log.status === 'failed'">
-                        <i class="fas fa-redo"></i>
-                        Resend
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+        </p-tabpanel>
 
-      <!-- Subscriptions Tab -->
-      <div *ngIf="activeTab === 'subscriptions'" class="tab-content">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="fas fa-user-plus"></i> SMS Subscriptions Management</h3>
-          </div>
-          <div class="card-body">
-            <div class="subscription-info">
-              <h4>SMS Subscription Instructions</h4>
-              <div class="instruction-grid">
-                <div class="instruction-item">
-                  <h5>For Farmers to Subscribe:</h5>
-                  <ul>
-                    <li>Send SMS to: <strong>21234</strong></li>
-                    <li>Format: <strong>AGRI SUBSCRIBE [CROP]</strong></li>
-                    <li>Example: <strong>AGRI SUBSCRIBE MAIZE</strong></li>
-                    <li>Cost: <strong>Free</strong></li>
-                  </ul>
+        <p-tabpanel value="templates">
+          <div class="p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-bold text-gray-900">Manage Templates</h3>
+              <button pButton label="New Template" icon="fas fa-plus" class="p-button-sm p-button-rounded"
+                (click)="showCreateTemplate = true"></button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div *ngFor="let template of smsTemplates"
+                class="bg-surface-50 p-6 rounded-2xl border border-surface-200 hover:border-emerald-300 transition-colors cursor-pointer group relative">
+                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                  <button pButton icon="fas fa-edit" class="p-button-rounded p-button-text p-button-sm"
+                    (click)="editTemplate(template)"></button>
+                  <button pButton icon="fas fa-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                    (click)="deleteTemplate(template.id)"></button>
                 </div>
-                
-                <div class="instruction-item">
-                  <h5>Available Commands:</h5>
-                  <ul>
-                    <li><strong>AGRI PRICE MAIZE</strong> - Get current maize prices</li>
-                    <li><strong>AGRI WEATHER</strong> - Get weather forecast</li>
-                    <li><strong>AGRI STOP</strong> - Unsubscribe from all alerts</li>
-                    <li><strong>AGRI HELP</strong> - Get help information</li>
-                  </ul>
+                <h4 class="font-bold text-gray-900 mb-2">{{ template.name }}</h4>
+                <p class="text-gray-600 text-sm mb-4 bg-white p-3 rounded-xl border border-dashed border-surface-300">{{
+                  template.template }}</p>
+                <div class="flex gap-2 flex-wrap">
+                  <p-tag *ngFor="let v of template.variables" [value]="v" severity="info" styleClass="text-xs"></p-tag>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="logs">
+          <div class="p-6 md:p-8">
+            <p-table [value]="getFilteredLogs()" [paginator]="true" [rows]="10" styleClass="p-datatable-lg">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="!bg-surface-50 !text-gray-900 p-4">Recipient</th>
+                  <th class="!bg-surface-50 !text-gray-900 p-4">Message</th>
+                  <th class="!bg-surface-50 !text-gray-900 p-4">Status</th>
+                  <th class="!bg-surface-50 !text-gray-900 p-4">Time</th>
+                  <th class="!bg-surface-50 !text-gray-900 p-4">Action</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-log>
+                <tr class="border-b border-surface-100">
+                  <td class="p-4 font-mono text-sm text-gray-700">{{ log.recipient }}</td>
+                  <td class="p-4 text-sm text-gray-600 max-w-xs truncate">{{ log.message }}</td>
+                  <td class="p-4">
+                    <p-tag [value]="log.status"
+                      [severity]="log.status === 'sent' ? 'success' : (log.status === 'failed' ? 'danger' : 'warn')"></p-tag>
+                  </td>
+                  <td class="p-4 text-sm text-gray-500">{{ formatDate(log.created_at) }}</td>
+                  <td class="p-4">
+                    <button *ngIf="log.status === 'failed'" pButton icon="fas fa-redo"
+                      class="p-button-rounded p-button-text p-button-sm" (click)="resendSms(log)"></button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="subscriptions">
+          <div class="max-w-2xl mx-auto text-center space-y-8 py-8 p-6 md:p-8">
+            <div
+              class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-mobile-alt text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900">SMS Subscription Service</h3>
+            <p class="text-gray-600">Farmers can subscribe to price alerts by sending specific keywords to our
+              shortcode.</p>
+
+            <div class="bg-gray-900 text-white p-8 rounded-3xl text-left font-mono space-y-4 shadow-xl">
+              <div>
+                <span class="text-gray-400 block text-xs uppercase tracking-widest mb-1">Shortcode</span>
+                <span class="text-3xl font-bold text-yellow-400">21234</span>
+              </div>
+              <div class="h-px bg-white/20 my-4"></div>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-emerald-400">AGRI PRICE MAIZE</span>
+                  <span class="text-gray-400">Get current maize prices</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-emerald-400">AGRI STOP</span>
+                  <span class="text-gray-400">Unsubscribe</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+
+  <!-- Create Template Dialog -->
+  <p-dialog header="Create Template" [(visible)]="showCreateTemplate" [modal]="true" [style]="{width: '500px'}"
+    styleClass="p-dialog-rounded">
+    <div class="flex flex-col gap-4 py-4">
+      <div class="space-y-2">
+        <label class="font-bold text-gray-700">Template Name</label>
+        <input type="text" pInputText [(ngModel)]="newTemplate.name"
+          class="w-full !bg-white !text-gray-900 !border-gray-300">
+      </div>
+      <div class="space-y-2">
+        <label class="font-bold text-gray-700">Message Content</label>
+        <textarea pTextarea [(ngModel)]="newTemplate.template" rows="4"
+          class="w-full !bg-white !text-gray-900 !border-gray-300"
+          placeholder="Use {variable} for dynamic content"></textarea>
+      </div>
+      <div class="space-y-2">
+        <label class="font-bold text-gray-700">Variables (Comma separated)</label>
+        <input type="text" pInputText [(ngModel)]="newTemplate.variablesString"
+          class="w-full !bg-white !text-gray-900 !border-gray-300" placeholder="crop, price, region">
       </div>
     </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" class="p-button-text" (click)="cancelTemplate()"></button>
+      <button pButton label="Save Template" class="p-button-success" (click)="saveTemplate()"></button>
+    </ng-template>
+  </p-dialog>
+
+</div>

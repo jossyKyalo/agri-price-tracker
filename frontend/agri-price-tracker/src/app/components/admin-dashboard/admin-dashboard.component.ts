@@ -1,15 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient, HttpEventType, HttpHeaders } from '@angular/common/http';
-import { SmsInterfaceComponent } from '../sms-interface/sms-interface.component';
 import { AdminService } from '../../services/admin.service';
 import { PriceService } from '../../services/price.service';
 import { AuthService } from '../../services/auth.service';
-import { interval, Subscription } from 'rxjs';
-import { CropService } from '../../services/crop.service';
-import { environment } from '../../../environments/environment';
+
+// PrimeNG Imports
+import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { ToastModule } from 'primeng/toast';
 
 interface AdminRequest {
   id: string;
@@ -33,117 +37,52 @@ interface PriceEntry {
   is_verified: boolean;
 }
 
-interface Crop {
-  id: string;
-  name: string;
-}
-
-interface Region {
-  id: string;
-  name: string;
-}
-
-interface SystemHealth {
-  database_status: 'healthy' | 'degraded' | 'down';
-  api_response_time: number;
-  active_users: number;
-  sms_queue: number;
-  last_updated: string;
-}
-
-interface SyncConfig {
-  autoSyncEnabled: boolean;
-  frequency: 'daily' | 'weekly' | 'manual';
-  syncTime: string;
-  retryAttempts: number;
-  notifyOnFailure: boolean;
-  targetCrops: string[];
-}
-
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, SmsInterfaceComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    DialogModule,
+    TagModule,
+    ButtonModule,
+    InputTextModule,
+    SelectModule, // Corrected from DropdownModule
+    ToastModule
+  ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnInit, OnDestroy {
+export class AdminDashboardComponent implements OnInit {
   activeTab = 'requests';
   isLoading = false;
   errorMessage = '';
   adminName = '';
 
-  uploadProgress = 0;
-  uploadMessage = '';
-
-  showSyncModal = false;
-  syncConfig: SyncConfig = {
-    autoSyncEnabled: true,
-    frequency: 'daily',
-    syncTime: '06:00',
-    retryAttempts: 3,
-    notifyOnFailure: true,
-    targetCrops: ['all']
-  };
-
+  // Stats
   pendingRequests = 0;
   totalAdmins = 0;
   todayEntries = 0;
-  kamisSync = 'Loading...';
 
-  lastKamisSync = 'Loading...';
-  kamisRecords = 0;
-  isSyncing = false;
-
-  crops: Crop[] = [];
-  regions: Region[] = [];
-  markets: string[] = [];
-  loadingCrops = false;
-  loadingRegions = false;
-
-  systemHealth: SystemHealth = {
-    database_status: 'healthy',
-    api_response_time: 0,
-    active_users: 0,
-    sms_queue: 0,
-    last_updated: new Date().toISOString()
-  };
-  systemAlerts: any[] = [];
-  private monitoringSubscription?: Subscription;
-
-  newPriceEntry = {
-    crop_id: '',
-    price: 0,
-    region_id: '',
-    market: ''
-  };
-
+  // Data
   adminRequests: AdminRequest[] = [];
   pendingVerifications: PriceEntry[] = [];
 
+  // Dialog State
+  requestDialogVisible = false;
+  selectedRequest: AdminRequest | null = null;
+
   constructor(
-    private http: HttpClient,
     private adminService: AdminService,
     private priceService: PriceService,
     private authService: AuthService,
-    private cropService: CropService,
     private router: Router
   ) { }
 
   ngOnInit() {
     this.loadAdminInfo();
     this.loadDashboardData();
-    this.loadCropsAndRegions();
-    this.loadKamisStatus();
-    this.loadSystemHealth();
-    this.startSystemMonitoring();
-    this.loadSyncConfig();
-  }
-
-  ngOnDestroy() {
-    if (this.monitoringSubscription) {
-      this.monitoringSubscription.unsubscribe();
-    }
   }
 
   loadAdminInfo() {
@@ -161,124 +100,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.loadStats();
   }
 
-  loadCropsAndRegions() {
-    // Load crops
-    this.loadingCrops = true;
-    this.cropService.getCrops().subscribe({
-      next: (crops) => {
-        this.crops = crops;
-        this.loadingCrops = false;
-      },
-      error: (error) => {
-        console.error('Error loading crops:', error);
-        this.loadingCrops = false;
-        // Fallback data
-        this.crops = [
-          { id: '1', name: 'Maize' },
-          { id: '2', name: 'Beans' },
-          { id: '3', name: 'Tomatoes' },
-          { id: '4', name: 'Potatoes' },
-          { id: '5', name: 'Onions' },
-          { id: '6', name: 'Bananas' }
-        ];
-      }
-    });
-
-    this.loadingRegions = true;
-    this.cropService.getRegions().subscribe({
-      next: (regions) => {
-        this.regions = regions;
-        this.loadingRegions = false;
-      },
-      error: (error) => {
-        console.error('Error loading regions:', error);
-        this.loadingRegions = false;
-        // Fallback data
-        this.regions = [
-          { id: '1', name: 'Central Kenya' },
-          { id: '2', name: 'Western Kenya' },
-          { id: '3', name: 'Eastern Kenya' },
-          { id: '4', name: 'Rift Valley' },
-          { id: '5', name: 'Coast' },
-          { id: '6', name: 'Nairobi' }
-        ];
-      }
-    });
-  }
-
-  loadKamisStatus() {
-    this.adminService.getKamisStatus().subscribe({
-      next: (status) => {
-        this.lastKamisSync = this.formatDate(status.last_sync);
-        this.kamisRecords = status.records_synced;
-        this.kamisSync = status.is_active ? 'Active' : 'Inactive';
-      },
-      error: (error) => {
-        console.error('Error loading KAMIS status:', error);
-        // Fallback data
-        const twoHoursAgo = new Date();
-        twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
-        this.lastKamisSync = this.formatDate(twoHoursAgo.toISOString());
-        this.kamisRecords = 1247;
-        this.kamisSync = 'Active';
-      }
-    });
-  }
-
-  loadSystemHealth() {
-    this.adminService.getSystemHealth().subscribe({
-      next: (health) => {
-        this.systemHealth = health;
-      },
-      error: (error) => {
-        console.error('Error loading system health:', error);
-        // Fallback data
-        this.systemHealth = {
-          database_status: 'healthy',
-          api_response_time: Math.floor(Math.random() * 50) + 100,
-          active_users: Math.floor(Math.random() * 500) + 2500,
-          sms_queue: Math.floor(Math.random() * 50) + 10,
-          last_updated: new Date().toISOString()
-        };
-      }
-    });
-
-    this.adminService.getSystemAlerts().subscribe({
-      next: (alerts) => {
-        this.systemAlerts = alerts;
-      },
-      error: (error) => {
-        console.error('Error loading system alerts:', error);
-        // Fallback alerts
-        this.systemAlerts = [
-          {
-            type: 'warning',
-            message: 'KAMIS data sync delayed by 2 hours',
-            timestamp: new Date().toISOString()
-          },
-          {
-            type: 'info',
-            message: 'Scheduled maintenance tonight at 2 AM',
-            timestamp: new Date().toISOString()
-          },
-          {
-            type: 'success',
-            message: 'All SMS services operational',
-            timestamp: new Date().toISOString()
-          }
-        ];
-      }
-    });
-  }
-
-  startSystemMonitoring() {
-    this.monitoringSubscription = interval(30000).subscribe(() => {
-      if (this.activeTab === 'monitoring') {
-        this.loadSystemHealth();
-      }
-    });
-  }
-
   loadAdminRequests() {
     this.isLoading = true;
     this.adminService.getAdminRequests(1, 50, 'pending').subscribe({
@@ -289,9 +110,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading admin requests:', error);
-        this.errorMessage = 'Failed to load admin requests';
         this.isLoading = false;
-
         // Fallback to mock data
         this.adminRequests = [
           {
@@ -370,17 +189,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.pendingRequests = stats.pendingRequests;
         this.totalAdmins = stats.totalAdmins;
         this.todayEntries = stats.todayEntries;
-        this.kamisSync = 'Active';
       },
       error: (error) => {
         console.error('Error loading stats:', error);
-
         // Fallback to mock data
         this.totalAdmins = 45;
         this.todayEntries = 127;
-        this.kamisSync = 'Active';
       }
     });
+  }
+
+  viewRequest(request: AdminRequest) {
+    this.selectedRequest = request;
+    this.requestDialogVisible = true;
   }
 
   approveRequest(id: string) {
@@ -418,35 +239,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  submitPriceEntry() {
-    if (!this.newPriceEntry.crop_id || !this.newPriceEntry.price || !this.newPriceEntry.region_id || !this.newPriceEntry.market) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    this.isLoading = true;
-    this.priceService.createPriceEntry(this.newPriceEntry).subscribe({
-      next: (response) => {
-        alert('Price entry added successfully!');
-        this.isLoading = false;
-
-        this.newPriceEntry = {
-          crop_id: '',
-          price: 0,
-          region_id: '',
-          market: ''
-        };
-
-        this.loadPendingVerifications();
-      },
-      error: (error) => {
-        console.error('Error adding price entry:', error);
-        alert('Failed to add price entry. Please try again.');
-        this.isLoading = false;
-      }
-    });
-  }
-
   verifyEntry(id: string) {
     this.priceService.verifyPriceEntry(id).subscribe({
       next: () => {
@@ -474,159 +266,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  syncKamisData() {
-    if (this.isSyncing) {
-      return;
-    }
-
-    this.isSyncing = true;
-    this.adminService.syncKamisData().subscribe({
-      next: (result) => {
-        this.lastKamisSync = 'Just now';
-        this.kamisRecords = result.records_synced || (this.kamisRecords + 50);
-        this.isSyncing = false;
-        alert(`KAMIS data sync completed successfully! ${result.records_synced || 50} records synced.`);
-      },
-      error: (error) => {
-        console.error('Error syncing KAMIS data:', error);
-        this.isSyncing = false;
-        alert('Failed to sync KAMIS data. Please try again.');
-      }
-    });
-  }
-
-  loadSyncConfig() {
-    const saved = localStorage.getItem('kamis_sync_config');
-    if (saved) {
-      this.syncConfig = JSON.parse(saved);
-    }
-  }
-
-  configureSync() {
-    this.showSyncModal = true;
-  }
-
-  closeSyncModal() {
-    this.showSyncModal = false;
-  }
-
-  saveSyncConfig() {
-    this.isLoading = true; 
-    setTimeout(() => {
-      localStorage.setItem('kamis_sync_config', JSON.stringify(this.syncConfig));
-      this.isLoading = false;
-      this.showSyncModal = false;
-      alert('✅ Sync configuration saved successfully.'); 
-    }, 800);
-  }
-
-  manualImport() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.csv,.xlsx';
-    input.onchange = (e: any) => {
-      const file = e.target.files[0];
-      if (file) {
-        this.uploadKamisFile(file);
-      }
-    };
-    input.click();
-  }
-
-  uploadKamisFile(file: File) {
-    this.isLoading = true;
-    this.uploadProgress = 0;
-    this.uploadMessage = 'Preparing upload...';
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const token = localStorage.getItem('authToken') ||
-      localStorage.getItem('admin_token') ||
-      localStorage.getItem('token') ||
-      localStorage.getItem('farmer_token') ||
-      '';
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    this.http.post(`${environment.apiUrl}/kamis/upload`, formData, {
-      headers: headers,
-      reportProgress: true,
-      observe: 'events'
-    }).subscribe({
-      next: (event: any) => {
-        if (event.type === HttpEventType.UploadProgress) {
-          if (event.total) {
-            this.uploadProgress = Math.round(100 * (event.loaded / event.total));
-            this.uploadMessage = `Uploading: ${this.uploadProgress}%`;
-          }
-        } else if (event.type === HttpEventType.Response) {
-          this.isLoading = false;
-          this.uploadMessage = '';
-          const result = event.body;
-          alert(`Import successful! ${result?.total_rows || 'Multiple'} records processed.`);
-          this.loadKamisStatus();
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Upload Error:', err);
-
-        let msg = 'Upload failed.';
-        if (err.error && err.error.message) {
-          msg += ` Server says: ${err.error.message}`;
-        } else if (err.status === 500) {
-          msg += ' Internal Server Error. Check backend logs.';
-        }
-
-        alert(msg);
-      }
-    });
-  }
-
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  }
-
-  getHealthStatusClass(): string {
-    switch (this.systemHealth.database_status) {
-      case 'healthy':
-        return 'healthy';
-      case 'degraded':
-        return 'warning';
-      case 'down':
-        return 'danger';
-      default:
-        return 'healthy';
-    }
-  }
-
-  getAlertClass(type: string): string {
-    switch (type) {
-      case 'warning':
-        return 'alert-warning';
-      case 'info':
-        return 'alert-info';
-      case 'success':
-        return 'alert-success';
-      case 'danger':
-        return 'alert-danger';
-      default:
-        return 'alert-info';
-    }
-  }
-
-  logout() {
-    if (confirm('Are you sure you want to logout?')) {
-      this.authService.logout();
-      localStorage.removeItem('token');
-      localStorage.removeItem('admin_name');
-      localStorage.removeItem('user');
-      alert('✅ You have been logged out successfully');
-      window.location.reload();
-    }
   }
 }

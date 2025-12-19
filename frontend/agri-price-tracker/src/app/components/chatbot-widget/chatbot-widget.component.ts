@@ -11,16 +11,28 @@ export interface ChatMessage {
   type?: 'text' | 'price' | 'weather' | 'suggestion';
 }
 
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { AvatarModule } from 'primeng/avatar';
+import { TooltipModule } from 'primeng/tooltip';
+
 @Component({
   selector: 'app-chatbot-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    InputTextModule,
+    AvatarModule,
+    TooltipModule
+  ],
   templateUrl: './chatbot-widget.component.html',
   styleUrls: ['./chatbot-widget.component.css']
 })
 export class ChatbotWidgetComponent implements OnInit {
   @Input() focusOnPrices = true;
-  
+
   isOpen = false;
   currentMessage = '';
   isTyping = false;
@@ -35,7 +47,7 @@ export class ChatbotWidgetComponent implements OnInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private chatbotService: ChatbotService
-  ) {}
+  ) { }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -79,14 +91,14 @@ export class ChatbotWidgetComponent implements OnInit {
       sender: 'user',
       timestamp: new Date()
     };
-    
+
     this.messages.push(userMessage);
-    
+
     // Clear input and show typing
     const messageToProcess = this.currentMessage;
     this.currentMessage = '';
     this.isTyping = true;
-    
+
     // Send message to backend
     const chatRequest: ChatRequest = {
       message: messageToProcess,
@@ -97,7 +109,7 @@ export class ChatbotWidgetComponent implements OnInit {
     this.chatbotService.sendMessage(chatRequest).subscribe({
       next: (response) => {
         this.isTyping = false;
-        
+
         const botMessage: ChatMessage = {
           id: this.messages.length + 1,
           content: response.response,
@@ -105,14 +117,14 @@ export class ChatbotWidgetComponent implements OnInit {
           timestamp: new Date(),
           type: 'text'
         };
-        
+
         this.messages.push(botMessage);
         this.scrollToBottom();
       },
       error: (error) => {
         this.isTyping = false;
         console.error('Chat error:', error);
-        
+
         // Fallback response
         const botMessage: ChatMessage = {
           id: this.messages.length + 1,
@@ -121,12 +133,12 @@ export class ChatbotWidgetComponent implements OnInit {
           timestamp: new Date(),
           type: 'text'
         };
-        
+
         this.messages.push(botMessage);
         this.scrollToBottom();
       }
     });
-    
+
     this.scrollToBottom();
   }
 
@@ -135,7 +147,7 @@ export class ChatbotWidgetComponent implements OnInit {
     this.sendMessage();
   }
 
-   
+
   generateBotResponse(userMessage: string) {
     setTimeout(() => {
       this.addBotResponse(userMessage);
@@ -147,9 +159,9 @@ export class ChatbotWidgetComponent implements OnInit {
   addBotResponse(userMessage: string) {
     let response = '';
     let type: 'text' | 'price' | 'weather' | 'suggestion' = 'text';
-    
+
     const lowerMessage = userMessage.toLowerCase();
-    
+
     if (lowerMessage.includes('price') || lowerMessage.includes('cost')) {
       type = 'price';
       if (lowerMessage.includes('maize')) {
@@ -239,7 +251,7 @@ export class ChatbotWidgetComponent implements OnInit {
       timestamp: new Date(),
       type: type
     };
-    
+
     this.messages.push(botMessage);
   }
 

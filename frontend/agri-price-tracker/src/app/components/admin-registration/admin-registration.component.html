@@ -1,67 +1,90 @@
- <div class="modal-overlay" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2><i class="fas fa-user-plus"></i> Register as Admin</h2>
-          <button class="close-btn" (click)="closeModal()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <div class="modal-body">
-          <p class="registration-info">
-            Apply to become an admin to help manage agricultural prices and support farmers in your region.
-          </p>
-          
-          <form (ngSubmit)="submitRegistration()" #adminForm="ngForm">
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <input type="text" class="form-control" [(ngModel)]="adminData.fullName" name="fullName" required>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input type="email" class="form-control" [(ngModel)]="adminData.email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-label">Phone Number</label>
-              <input type="tel" class="form-control" [(ngModel)]="adminData.phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-label">Region</label>
-              <select class="form-select" [(ngModel)]="adminData.region" name="region" required>
-                <option value="">Select Region</option>
-                <option value="central">Central Kenya</option>
-                <option value="western">Western Kenya</option>
-                <option value="eastern">Eastern Kenya</option>
-                <option value="rift-valley">Rift Valley</option>
-                <option value="coast">Coast</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-label">Organization</label>
-              <input type="text" class="form-control" [(ngModel)]="adminData.organization" name="organization" 
-                     placeholder="e.g., Ministry of Agriculture, Farmers Cooperative" required>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-label">Reason for Application</label>
-              <textarea class="form-control" rows="4" [(ngModel)]="adminData.reason" name="reason"
-                        placeholder="Explain why you want to become an admin and how you'll help farmers..."></textarea>
-            </div>
-            
-            <div class="form-actions">
-              <button type="button" class="btn btn-outline" (click)="closeModal()">
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="!adminForm.valid">
-                <i class="fas fa-paper-plane"></i>
-                Submit Application
-              </button>
-            </div>
-          </form>
-        </div>
+<div class="w-full">
+  <div class="mb-6">
+    <h2 class="text-3xl font-black text-emerald-950 mb-2">Join the Platform</h2>
+    <p class="text-emerald-900/50 text-sm font-medium">Submit your request to become a verified admin.</p>
+  </div>
+
+  <form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="space-y-4">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Full Name -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Full Name</label>
+        <input type="text" pInputText formControlName="fullName"
+          class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !px-5 !py-2.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+          placeholder="John Doe" />
+        <small *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"
+          class="text-red-500 pl-3 text-xs">Required</small>
+      </div>
+
+      <!-- Email -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Email</label>
+        <input type="email" pInputText formControlName="email"
+          class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !px-5 !py-2.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+          placeholder="john@example.com" />
+        <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          class="text-red-500 pl-3 text-xs">Valid email required</small>
       </div>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Phone -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Phone</label>
+        <input type="text" pInputText formControlName="phone"
+          class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !px-5 !py-2.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+          placeholder="+254..." />
+        <small *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
+          class="text-red-500 pl-3 text-xs">Required</small>
+      </div>
+      <!-- Region -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Region</label>
+        <input type="text" pInputText formControlName="region"
+          class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !px-5 !py-2.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+          placeholder="Nairobi" />
+        <small *ngIf="registerForm.get('region')?.invalid && registerForm.get('region')?.touched"
+          class="text-red-500 pl-3 text-xs">Required</small>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Organization</label>
+      <input type="text" pInputText formControlName="organization"
+        class="w-full !rounded-full !text-black !bg-gray-50 !border-gray-200 !px-5 !py-2.5 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold placeholder:!text-gray-400"
+        placeholder="Cooperative / Company Name" />
+      <small *ngIf="registerForm.get('organization')?.invalid && registerForm.get('organization')?.touched"
+        class="text-red-500 pl-3 text-xs">Required</small>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-widest ml-3">Reason for Request</label>
+      <textarea pInputTextarea formControlName="reason" rows="2"
+        class="w-full !rounded-[2rem] !text-black !bg-gray-50 !border-gray-200 !px-5 !py-3 hover:!border-emerald-300 focus:!border-emerald-500 focus:!bg-white transition-all font-bold resize-none placeholder:!text-gray-400"
+        placeholder="Briefly describe why you need admin access..."></textarea>
+      <small *ngIf="registerForm.get('reason')?.invalid && registerForm.get('reason')?.touched"
+        class="text-red-500 pl-3 text-xs">Required</small>
+    </div>
+
+    <div class="pt-2">
+      <p-message severity="error" *ngIf="errorMessage" [text]="errorMessage"
+        styleClass="w-full mb-4 rounded-xl"></p-message>
+
+      <button type="submit" [disabled]="registerForm.invalid || loading"
+        class="w-full bg-emerald-950 text-white font-bold text-lg py-4 rounded-full hover:bg-emerald-900 active:scale-95 transition-all shadow-xl shadow-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+        <span *ngIf="!loading">Submit Request</span>
+        <i *ngIf="!loading" class="fas fa-paper-plane"></i>
+        <i *ngIf="loading" class="fas fa-circle-notch fa-spin"></i>
+      </button>
+    </div>
+
+    <div class="mt-4 text-center">
+      <p class="text-emerald-900/60 text-sm">
+        Already have an account?
+        <a routerLink="/login"
+          class="text-emerald-700 font-bold hover:text-emerald-500 underline decoration-2 underline-offset-4 cursor-pointer">Login</a>
+      </p>
+    </div>
+  </form>
+</div>

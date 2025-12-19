@@ -1,33 +1,37 @@
-import { Component, EventEmitter, Output} from '@angular/core';
+import { Component } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule, ButtonModule],
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
-  @Output() navigateToSectionEvent = new EventEmitter<string>();
-  @Output() navigateToPageEvent = new EventEmitter<string>();
-  @Output() openChatbotEvent = new EventEmitter<void>();
-  @Output() showAdminLogin = new EventEmitter<void>();
+
+  constructor(private router: Router) { }
 
   navigateToSection(section: string) {
-    this.navigateToSectionEvent.emit(section);
-  }
-
-  navigateToPage(page: string) {
-    this.navigateToPageEvent.emit(page);
+    if (this.router.url === '/' || this.router.url === '/home') {
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      this.router.navigate(['/'], { fragment: section });
+    }
   }
 
   handleAdminDashboard() {
-    this.showAdminLogin.emit();
+    this.router.navigate(['/admin']);
   }
 
   openChatbot() {
-    this.openChatbotEvent.emit();
+    const event = new CustomEvent('openChatbot');
+    window.dispatchEvent(event);
   }
 
   showPrivacyPolicy() {

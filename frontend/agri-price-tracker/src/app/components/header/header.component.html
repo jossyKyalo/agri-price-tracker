@@ -1,78 +1,65 @@
-<div class="navbar bg-base-100 border-b border-base-300 px-4 lg:px-8 sticky top-0 z-50 shadow-sm">
-  <div class="navbar-start">
-    <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden" (click)="toggleMenu()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
-        </svg>
+<div class="fixed top-6 left-0 right-0 z-[1000] px-4 flex justify-center">
+  <div
+    class="w-full max-w-6xl bg-white/90 backdrop-blur-md shadow-xl rounded-full px-6 py-2 flex items-center justify-between border border-surface-200/50 transition-all duration-300">
+
+    <!-- Logo Section -->
+    <a routerLink="/" class="flex items-center gap-2 no-underline group">
+      <div
+        class="w-10 h-10 bg-emerald-900 rounded-full flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-105">
+        <i class="fas fa-leaf text-lg"></i>
       </div>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52" [class.hidden]="!isMenuOpen">
-        <li><a (click)="switchPage('home')" [class.active]="currentPage === 'home'">Home</a></li>
-        <li><a (click)="switchPage('public')" [class.active]="currentPage === 'public'">Public Portal</a></li>
-        <li *ngIf="!isAdmin"><a (click)="handleAdminAccess()">Admin Login</a></li>
-        <li *ngIf="isAdmin"><a (click)="switchPage('admin')">Admin Dashboard</a></li>
-      </ul>
-    </div>
-    <a class="btn btn-ghost gap-2 px-2 hover:bg-transparent" (click)="switchPage('home')">
-      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-content shadow-lg">
-        <i class="fas fa-seedling text-xl"></i>
-      </div>
-      <div class="flex flex-col items-start leading-none">
-        <span class="text-xl font-black tracking-tighter text-primary">AgriPrice</span>
-        <span class="text-[10px] font-bold opacity-50 uppercase tracking-widest">Market Intelligence</span>
-      </div>
+      <span class="text-xl font-bold text-emerald-950 tracking-tight">AgriPrice</span>
     </a>
-  </div>
 
-  <div class="navbar-center hidden lg:flex">
-    <ul class="menu menu-horizontal px-1 gap-2">
-      <li>
-        <a (click)="switchPage('home')" 
-           class="font-bold hover:text-primary transition-colors"
-           [ngClass]="{'text-primary bg-primary/5': currentPage === 'home'}">
-          Home
-        </a>
-      </li>
-      <li>
-        <a (click)="switchPage('public')" 
-           class="font-bold hover:text-primary transition-colors"
-           [ngClass]="{'text-primary bg-primary/5': currentPage === 'public'}">
-          Public Portal
-        </a>
-      </li>
-      <li *ngIf="isAdmin">
-        <a (click)="switchPage('admin')" 
-           class="font-bold hover:text-primary transition-colors"
-           [ngClass]="{'text-primary bg-primary/5': currentPage === 'admin'}">
-          Admin Dashboard
-        </a>
-      </li>
-    </ul>
-  </div>
-
-  <div class="navbar-end gap-4">
-    <div *ngIf="isAdmin" class="hidden md:flex items-center gap-3 px-4 py-1.5 bg-base-200 rounded-full border border-base-300">
-      <div class="avatar placeholder">
-        <div class="bg-primary text-primary-content rounded-full w-6">
-          <span class="text-[10px]">{{ adminName.charAt(0) }}</span>
-        </div>
-      </div>
-      <span class="text-sm font-bold opacity-80">{{ adminName }}</span>
-      <div class="divider divider-horizontal m-0 w-px h-4"></div>
-      <button class="btn btn-ghost btn-xs text-error hover:bg-error/10" (click)="adminLogout()">Logout</button>
+    <!-- Desktop Navigation (Centered) -->
+    <div class="hidden md:flex items-center gap-1 bg-surface-100/50 rounded-full px-2 py-1">
+      @for (item of items; track item.label) {
+      @if (item.visible !== false) {
+      <a [routerLink]="item.routerLink" routerLinkActive="bg-white text-emerald-900 shadow-sm"
+        [routerLinkActiveOptions]="{exact: true}"
+        class="px-5 py-2 rounded-full text-sm font-semibold text-surface-600 hover:text-emerald-900 transition-all duration-200 no-underline cursor-pointer">
+        {{ item.label }}
+      </a>
+      }
+      }
     </div>
 
-    <div *ngIf="!isAdmin" class="flex gap-2">
-      <button class="btn btn-ghost btn-sm hidden md:flex" (click)="handleAdminAccess()">Login</button>
-      <button class="btn btn-primary btn-sm shadow-md" (click)="registerAdmin()">
-        <i class="fas fa-user-plus mr-1"></i>
-        Join as Admin
+    <!-- Actions Section -->
+    <div class="flex items-center gap-3">
+      <!-- Search Placeholder -->
+      <button
+        class="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center text-surface-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors hidden sm:flex">
+        <i class="fas fa-search text-sm"></i>
       </button>
-    </div>
 
-    <!-- Mobile Logout for Admin -->
-    <button *ngIf="isAdmin" class="btn btn-ghost btn-sm md:hidden text-error" (click)="adminLogout()">
-      <i class="fas fa-sign-out-alt"></i>
-    </button>
+      @if (isAdmin) {
+      <div class="flex items-center gap-2 pl-2 border-l border-surface-200">
+        <p-avatar [label]="adminName.charAt(0).toUpperCase()" shape="circle"
+          styleClass="bg-emerald-800 text-white w-9 h-9 font-bold text-sm"></p-avatar>
+        <p-button icon="pi pi-sign-out" [rounded]="true" [text]="true" severity="danger" (onClick)="logout()"
+          styleClass="w-9 h-9"></p-button>
+      </div>
+      } @else {
+      <a routerLink="/register"
+        class="hidden sm:block text-emerald-900 hover:text-emerald-700 font-bold text-sm mr-4 transition-colors no-underline">
+        Register
+      </a>
+      <a routerLink="/login"
+        class="hidden sm:flex items-center justify-center bg-emerald-900 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-emerald-900/20 hover:bg-emerald-800 transition-colors no-underline">
+        Login
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button
+        class="w-10 h-10 rounded-full bg-emerald-900 text-white md:hidden flex items-center justify-center shadow-lg"
+        (click)="menu.toggle($event)">
+        <i class="fas fa-bars"></i>
+      </button>
+      }
+    </div>
   </div>
 </div>
+
+<!-- Mobile Menu (PrimeNG Menu) -->
+<p-menu #menu [model]="items" [popup]="true"
+  styleClass="w-64 mt-4 rounded-xl border-none shadow-2xl font-semibold"></p-menu>

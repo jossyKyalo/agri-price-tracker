@@ -1,121 +1,66 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AuthService, LoginRequest, PasswordResetRequest } from '../../services/auth.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { MessageModule } from 'primeng/message';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    ButtonModule,
+    InputTextModule,
+    PasswordModule,
+    MessageModule
+  ],
   templateUrl: './admin-login.component.html',
   styleUrls: ['./admin-login.component.css']
 })
 export class AdminLoginComponent {
-  @Output() close = new EventEmitter<void>();
-  @Output() login = new EventEmitter<void>();
+  loginForm: FormGroup;
+  errorMessage: string = '';
+  loading: boolean = false;
 
-  isLoading = false;
-  errorMessage = '';
-  showPassword = false;
-
-  isForgotPasswordMode = false;
-  resetEmail = '';              
-  resetMessage = '';
-
-  loginData = {
-    email: '',
-    password: '',
-    rememberMe: false
-  };
-
-  constructor(private authService: AuthService) {}
-
-  closeModal() {
-    this.isForgotPasswordMode = false;  
-    this.resetMessage = '';
-    this.close.emit();
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
   }
 
   submitLogin() {
-    if (!this.loginData.email || !this.loginData.password) {
-      this.errorMessage = 'Please fill in all required fields';
-      return;
+    if (this.loginForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
+
+      this.authService.login({ email: this.loginForm.value.email, password: this.loginForm.value.password }).subscribe({
+        next: (success) => {
+          this.loading = false;
+          if (success) {
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.errorMessage = 'Invalid email or password.';
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = 'Login failed. Please try again.';
+          console.error(err);
+        }
+      });
+    } else {
+      this.loginForm.markAllAsTouched();
     }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    const loginRequest: LoginRequest = {
-      email: this.loginData.email,
-      password: this.loginData.password
-    };
-
-    this.authService.login(loginRequest).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        
-        // Emit login event to close modal
-        this.login.emit();
-        
-        // Reset form
-        this.loginData = {
-          email: '',
-          password: '',
-          rememberMe: false
-        };
-        this.showPassword = false;
-        
-        // Show success message
-        alert(`✅ Welcome back, ${response.user.full_name}!`);
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error.userMessage || error.error?.message || 'Login failed. Please check your credentials.';
-      }
-    });
-  }
-
-  showForgotPassword() {
-    this.isForgotPasswordMode = true;
-    this.errorMessage = '';  
-    this.resetMessage = ''; 
-    this.loginData.email = '';  
-  }
-
-  backToLogin() {
-    this.isForgotPasswordMode = false;
-    this.resetMessage = '';  
-    this.errorMessage = '';
-    this.resetEmail = '';  
-  }
-
-  requestPasswordReset() {
-    if (!this.resetEmail || !this.resetEmail.includes('@')) {
-      this.resetMessage = 'Please enter a valid email address.';
-      return;
-    }
-
-    this.isLoading = true;
-    this.resetMessage = '';
-
-    this.authService.requestPasswordReset(this.resetEmail).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.resetMessage = `If an account with ${this.resetEmail} exists, a password reset link has been sent. Please check your inbox.`;
-        this.resetEmail = '';  
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.resetMessage = error.error?.message || 'Failed to send reset link. Please try again later.';
-      }
-    });
-  }
-
-  switchToRegistration() {
-    this.close.emit();
-    setTimeout(() => {
-      const event = new CustomEvent('showAdminRegistration');
-      window.dispatchEvent(event);
-    }, 100);
   }
 }

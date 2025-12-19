@@ -1,13 +1,43 @@
 import { Component, OnInit } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SmsService, SmsTemplate, SmsLog, SendSmsRequest } from '../../services/sms.service';
 import { CropService, Crop, Region } from '../../services/crop.service';
 
+// PrimeNG Imports
+import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { SelectModule } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
+import { ToastModule } from 'primeng/toast';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+
 @Component({
   selector: 'app-sms-interface',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    DialogModule,
+    TagModule,
+    ButtonModule,
+    InputTextModule,
+    TextareaModule,
+    SelectModule,
+    DatePickerModule,
+    TabsModule,
+    ToastModule,
+    InputGroupModule,
+    InputGroupAddonModule
+  ],
   templateUrl: './sms-interface.component.html',
   styleUrls: ['./sms-interface.component.css']
 })
@@ -56,6 +86,12 @@ export class SmsInterfaceComponent implements OnInit {
 
   ngOnInit() {
     this.loadInitialData();
+  }
+
+  onTabChange(event: string | number | undefined) {
+    if (typeof event === 'string') {
+      this.activeTab = event;
+    }
   }
 
   loadInitialData() {
