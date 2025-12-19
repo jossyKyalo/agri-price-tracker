@@ -11,8 +11,7 @@ import { rateLimiter } from './middleware/rateLimiter';
 import { requestLogger } from './middleware/requestLogger';
 import { connectDatabase } from './database/connection';
 import { startCronJobs } from './services/cronService';
-
-// Import routes
+ 
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import cropRoutes from './routes/crops';
@@ -26,41 +25,33 @@ import analyticsRoutes from './routes/analytics';
 import regionRoutes from './routes/region';
 import alertsRoutes from './routes/alerts';
 import statsRoutes from './routes/stats';
-
-// Load environment variables
+ 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_VERSION = process.env.API_VERSION || 'v1';
-
-// Security middleware
+ 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
-
-// CORS configuration
+ 
 app.use(cors({
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:4200'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
-
-// Compression middleware
+ 
 app.use(compression());
-
-// Body parsing middleware
+ 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Request logging
+ 
 app.use(requestLogger);
-
-// Rate limiting
+ 
 app.use(rateLimiter);
-
-// Health check endpoint
+ 
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -70,8 +61,7 @@ app.get('/health', (req, res) => {
     version: process.env.npm_package_version || '1.0.0'
   });
 });
-
-// API routes
+ 
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/crops`, cropRoutes);
@@ -86,7 +76,7 @@ app.use(`/api/${API_VERSION}/regions`, regionRoutes);
 app.use(`/api/${API_VERSION}/admin/alerts`, alertsRoutes)
 app.use(`/api/${API_VERSION}/stats`, statsRoutes)
 
-// 404 handler
+ 
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -94,14 +84,11 @@ app.use('*', (req, res) => {
     path: req.originalUrl
   });
 });
-
-// Global error handler
+ 
 app.use(errorHandler);
-
-// Create HTTP server
+ 
 const server = createServer(app);
-
-// Graceful shutdown
+ 
 const gracefulShutdown = (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
   
@@ -109,8 +96,7 @@ const gracefulShutdown = (signal: string) => {
     logger.info('HTTP server closed');
     process.exit(0);
   });
-
-  // Force close after 30 seconds
+ 
   setTimeout(() => {
     logger.error('Could not close connections in time, forcefully shutting down');
     process.exit(1);
@@ -119,19 +105,16 @@ const gracefulShutdown = (signal: string) => {
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-// Start server
+ 
 const startServer = async () => {
-  try {
-    // Connect to database
+  try { 
     await connectDatabase();
     logger.info('Database connected successfully');
-
-    // Start cron jobs
+ 
     startCronJobs();
     logger.info('Cron jobs started');
 
-    // Start HTTP server
+     
     server.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`📚 API Documentation: http://localhost:${PORT}/api/${API_VERSION}`);

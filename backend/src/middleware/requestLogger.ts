@@ -3,8 +3,7 @@ import { logger } from '../utils/logger';
 
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const start = Date.now();
-  
-  // Log request
+   
   logger.http(`${req.method} ${req.path}`, {
     ip: req.ip,
     userAgent: req.get('User-Agent'),
@@ -27,14 +26,13 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
     });
 
      
-    // @ts-ignore
+     
     return originalEnd.call(this, chunk, encoding, cb);
   } as typeof res.end;
 
   next();
 };
-
-// Sanitize request body to remove sensitive information
+ 
 const sanitizeBody = (body: any): any => {
   if (!body || typeof body !== 'object') {
     return body;
