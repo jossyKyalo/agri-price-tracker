@@ -3,7 +3,7 @@ import { query } from '../database/connection';
 import { logger } from '../utils/logger';
 import type { ChatMessage } from '../types/index';
 
-// Initialize Gemini AI
+ 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -12,11 +12,9 @@ export const generateChatResponse = async (
   conversationHistory: ChatMessage[],
   context?: any
 ): Promise<string> => {
-  try {
-    // Get current price data for context
+  try { 
     const priceData = await getCurrentPriceContext();
-
-    // Build system prompt with agricultural focus
+ 
     const systemPrompt = `
 You are AgriBot — an intelligent digital farming assistant designed for Kenyan farmers. 
 You specialize in providing *accurate, friendly, and locally relevant* agricultural pricing information, 
@@ -100,7 +98,7 @@ Now, as AgriBot, respond helpfully using the Kenyan context and available data.
   } catch (error: any) {
     logger.error('Failed to generate Gemini AI response:', error);
 
-    // Fallback response
+    
     return generateFallbackResponse(userMessage);
   }
 };
