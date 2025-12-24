@@ -10,7 +10,7 @@ export const createAdminRequest = async (req: Request, res: Response, next: Next
   try {
     const { full_name, email, phone, region, organization, reason }: CreateAdminRequest = req.body;
 
-    // Check if request already exists
+    
     const existingRequest = await query(
       'SELECT id FROM admin_requests WHERE email = $1 AND status = $2',
       [email, 'pending']
@@ -20,7 +20,7 @@ export const createAdminRequest = async (req: Request, res: Response, next: Next
       throw new ApiError('Admin request already exists for this email', 409);
     }
 
-    // Create admin request
+     
     const result = await query(
       `INSERT INTO admin_requests (full_name, email, phone, region, organization, reason)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -133,13 +133,11 @@ export const reviewAdminRequest = async (req: Request, res: Response, next: Next
       }
 
       const adminRequest = requestResult.rows[0];
-
-      // If approved, create admin user
+ 
       if (status === 'approved') {
         const tempPassword = Math.random().toString(36).slice(-8);
         const passwordHash = await bcrypt.hash(tempPassword, 12);
-
-        // Check if user already exists
+ 
         const userCheck = await client.query('SELECT * FROM users WHERE email = $1', [adminRequest.email]);
         
         if (userCheck.rows.length > 0) { 
@@ -161,8 +159,7 @@ export const reviewAdminRequest = async (req: Request, res: Response, next: Next
             ]
             );
         }
-
-        // Email Credentials to the NEW Admin
+ 
         const approvedText = `Congratulations! Your request has been approved.\n\nLogin Email: ${adminRequest.email}\nTemporary Password: ${tempPassword}\n\nPlease change your password after logging in.`;
         
         await sendEmail({
