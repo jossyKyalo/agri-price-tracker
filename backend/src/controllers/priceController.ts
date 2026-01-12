@@ -153,9 +153,7 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
     }: CreatePriceEntry = req.body;
 
     const enteredBy = req.user?.id;
-    let resolvedMarketId = market_id;
-
-    // If market_id not provided but market name is
+    let resolvedMarketId = market_id; 
     if (!resolvedMarketId && market) {
       const existingMarket = await query(
         `SELECT id FROM markets WHERE LOWER(name) = LOWER($1) AND region_id = $2 LIMIT 1`,

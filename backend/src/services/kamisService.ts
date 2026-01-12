@@ -2,12 +2,16 @@ import { query, transaction } from '../database/connection';
 import { logger } from '../utils/logger';
 import { parse as csvParseSync } from 'csv-parse/sync';
 import * as XLSX from 'xlsx';
+import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 import util from 'util';
 
 const execPromise = util.promisify(exec);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
  
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 const DATA_DIR = path.join(PROJECT_ROOT, 'data/raw');
