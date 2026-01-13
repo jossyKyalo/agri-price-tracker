@@ -5,23 +5,22 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// Database configuration
+ 
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'agri_price_tracker',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD ,
-  max: 10, // Maximum number of clients in the pool
-  idleTimeoutMillis: 10000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 10000, // Return an error after 2 seconds if connection could not be established
+  max: 10,  
+  idleTimeoutMillis: 10000,  
+  connectionTimeoutMillis: 10000,  
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 };
 
-// Create connection pool
+ 
 export const pool = new Pool(dbConfig);
-
-// Database connection function
+ 
 export const connectDatabase = async (): Promise<void> => {
   try {
     const client = await pool.connect();
@@ -33,8 +32,7 @@ export const connectDatabase = async (): Promise<void> => {
     throw error;
   }
 };
-
-// Query helper function
+ 
 export const query = async (text: string, params?: any[]): Promise<pg.QueryResult> => {
   const start = Date.now();
   try {
@@ -47,8 +45,7 @@ export const query = async (text: string, params?: any[]): Promise<pg.QueryResul
     throw error;
   }
 };
-
-// Transaction helper
+ 
 export const transaction = async <T>(
   callback: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> => {
@@ -65,8 +62,7 @@ export const transaction = async <T>(
     client.release();
   }
 };
-
-// Graceful shutdown
+ 
 export const closeDatabase = async (): Promise<void> => {
   try {
     await pool.end();
@@ -75,8 +71,7 @@ export const closeDatabase = async (): Promise<void> => {
     logger.error('Error closing database connection:', error);
   }
 };
-
-// Handle pool errors
+ 
 pool.on('error', (err) => {
   logger.error('Unexpected error on idle client', err);
 });
