@@ -7,9 +7,17 @@ import time
 import random
 from datetime import datetime, timedelta
 import sys
+import warnings
+import io
+ 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+ 
+warnings.filterwarnings("ignore", message="Parsing dates in %Y-%m-%d format")
+
  
 BASE_URL = "https://kamis.kilimo.go.ke/site/market" 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "../../data/raw")
 MASTER_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")
 LATEST_FILE = os.path.join(OUTPUT_DIR, "kamis_latest.csv")
@@ -29,14 +37,14 @@ HEADERS = {
 
 def scrape_market_data():
     new_data = []
-    
-    print(f"🚀 Starting scrape for {len(PRODUCT_IDS)} products...")
-    print(f"📅 Fetching data from: {CUTOFF_DATE.strftime('%Y-%m-%d')} to TODAY")
+     
+    print(f"[INFO] Starting scrape for {len(PRODUCT_IDS)} products...")
+    print(f"[INFO] Fetching data from: {CUTOFF_DATE.strftime('%Y-%m-%d')} to TODAY")
      
     try:
         requests.get(BASE_URL, headers=HEADERS, timeout=10)
     except requests.exceptions.ConnectionError:
-        print("\nCRITICAL: KAMIS site unreachable.")
+        print("\n[ERROR] CRITICAL: KAMIS site unreachable.")
         os.makedirs(OUTPUT_DIR, exist_ok=True) 
         with open(LATEST_FILE, 'w') as f:
             f.write("Commodity,Classification,Grade,Sex,Market,Wholesale,Retail,Supply Volume,County,Date\n")
@@ -65,7 +73,7 @@ def scrape_market_data():
             
             date_col = next((col for col in df.columns if 'date' in col.lower()), None)
             
-            if date_col:
+            if date_col: 
                 df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True) 
                 df = df[df[date_col] >= CUTOFF_DATE]
                 
@@ -74,21 +82,21 @@ def scrape_market_data():
                     df["CropName"] = product_name 
                     df[date_col] = df[date_col].dt.strftime('%Y-%m-%d')
                     new_data.append(df)
-                    print(f"✅ {product_name}: {len(df)} rows")
+                    print(f"[OK] {product_name}: {len(df)} rows")
             
         except Exception as e:
             continue
 
-    print("\n\n🔄 Saving Data...")
+    print("\n\n[INFO] Saving Data...")
  
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     if new_data:
         new_df = pd.concat(new_data, ignore_index=True) 
         new_df.to_csv(LATEST_FILE, index=False)
-        print(f"🎉 Success! Scraped {len(new_df)} rows to {LATEST_FILE}")
+        print(f"[SUCCESS] Scraped {len(new_df)} rows to {LATEST_FILE}")
     else:
-        print("⚠️ No new data found in range.") 
+        print("[WARN] No new data found in range.") 
         with open(LATEST_FILE, 'w') as f:
              f.write("Commodity,Classification,Grade,Sex,Market,Wholesale,Retail,Supply Volume,County,Date\n")
 

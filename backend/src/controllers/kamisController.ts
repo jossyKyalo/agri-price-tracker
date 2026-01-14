@@ -4,6 +4,7 @@ import { ApiError } from '../utils/apiError';
 import { logger } from '../utils/logger';
 import { query } from '../database/connection'; 
 import fs from 'fs';
+import { restartScheduler } from '../services/scheduler.service'; 
  
 export const triggerKamisSync = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -92,6 +93,53 @@ export const getKamisLogs = async (req: Request, res: Response, next: NextFuncti
         total,
         pages
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSyncConfig = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const result = await query(
+      "SELECT value FROM system_settings WHERE key = $1", 
+      ['kamis_config']
+    );
+    
+    const config = result.rows.length > 0 ? result.rows[0].value : {};
+
+    res.json({
+      success: true,
+      data: config
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSyncConfig = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const configData = req.body;  
+    const userId = req.user?.id;
+ 
+    const result = await query(
+      `INSERT INTO system_settings (key, value, updated_by, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (key) 
+       DO UPDATE SET value = $2, updated_by = $3, updated_at = NOW()
+       RETURNING value`,
+      ['kamis_config', JSON.stringify(configData), userId]
+    );
+
+    logger.info(`KAMIS sync config updated by ${req.user?.email}`);
+    
+     
+    await restartScheduler();
+
+    res.json({
+      success: true,
+      message: 'Configuration saved and scheduler updated',
+      data: result.rows[0].value
     });
   } catch (error) {
     next(error);

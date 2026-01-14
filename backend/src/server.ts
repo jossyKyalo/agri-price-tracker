@@ -11,16 +11,17 @@ import { rateLimiter } from './middleware/rateLimiter';
 import { requestLogger } from './middleware/requestLogger';
 import { connectDatabase } from './database/connection';
 import { startCronJobs } from './services/cronService';
+import { initScheduler } from './services/scheduler.service';
  
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import cropRoutes from './routes/crops';
 import priceRoutes from './routes/prices';
 import adminRoutes from './routes/admin';
-import smsRoutes from './routes/sms.js';
+import smsRoutes from './routes/sms';
 import chatbotRoutes from './routes/chatbot';
 import kamisRoutes from './routes/kamis';
-import mlRoutes from './routes/ml.js';
+import mlRoutes from './routes/ml';
 import analyticsRoutes from './routes/analytics';
 import regionRoutes from './routes/region';
 import alertsRoutes from './routes/alerts';
@@ -112,7 +113,8 @@ const startServer = async () => {
     logger.info('Database connected successfully');
  
     startCronJobs();
-    logger.info('Cron jobs started');
+    initScheduler();
+    logger.info('Cron jobs and schedulers started');
 
      
     server.listen(PORT, () => {
