@@ -2,21 +2,22 @@ import { query, transaction } from '../database/connection';
 import { logger } from '../utils/logger';
 import { parse as csvParseSync } from 'csv-parse/sync';
 import * as XLSX from 'xlsx';
-import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 import util from 'util';
+import { fileURLToPath } from 'url';
+
 
 const execPromise = util.promisify(exec);
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
  
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 const DATA_DIR = path.join(PROJECT_ROOT, 'data/raw');
 const LATEST_FILE = path.join(DATA_DIR, 'kamis_latest.csv');
-const SCRAPER_SCRIPT = path.join(PROJECT_ROOT, 'src/scripts/kamis_scraper_optimized.py'); 
+const SCRAPER_SCRIPT = path.join(PROJECT_ROOT, 'src/ml-model-service/data/scraping/kamis_scraper.py'); 
  
 const categorizeCrop = (commodityName: string): string => {
   const lowerName = (commodityName || '').toLowerCase();
@@ -48,6 +49,7 @@ const determineUnit = (category: string, commodityName: string): string => {
   if (lowerName.match(/timber|post|pole|pineapple|watermelon|coconut|pumpkin|butternut|cabbage/)) return 'piece';
   return 'kg';
 };
+
  
 
 export const syncKamisData = async (): Promise<any> => {
@@ -55,12 +57,12 @@ export const syncKamisData = async (): Promise<any> => {
 
   try {
     logger.info('🔄 Starting KAMIS data synchronization...');
-    logger.info(`   Script Path: ${SCRAPER_SCRIPT}`);
+    
  
     try {
         const { stdout, stderr } = await execPromise(`python "${SCRAPER_SCRIPT}"`);
-        logger.info(`Scraper stdout: ${stdout}`);
-        if (stderr && !stderr.includes("UserWarning")) {
+        logger.info(`Scraper stdout: ${stdout}`); 
+        if (stderr && !stderr.includes("UserWarning") && !stderr.includes("DeprecationWarning")) {
              logger.warn(`Scraper stderr: ${stderr}`);
         }
     } catch (err: any) {
@@ -70,10 +72,12 @@ export const syncKamisData = async (): Promise<any> => {
     if (!fs.existsSync(LATEST_FILE)) {
         throw new Error('Scraper finished but no output file found at ' + LATEST_FILE);
     }
- 
+
+  
     const fileBuffer = fs.readFileSync(LATEST_FILE);
     const result = await processKamisFile(fileBuffer, 'kamis_latest.csv');
- 
+
+    
     await updateSyncLog(syncId, result.total_rows, result.inserted, 0, 'completed');
     logger.info(`KAMIS sync completed: ${result.inserted} inserted.`);
     
@@ -89,43 +93,44 @@ export const syncKamisData = async (): Promise<any> => {
   }
 };
  
+
 export async function processKamisFile(buffer: Buffer, filename: string) {
   const ext = (path.extname(filename) || '').toLowerCase();
   let rows: any[] = [];
- 
+
   try {
     if (ext === '.xlsx' || ext === '.xls') {
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       if (!sheetName) {
-        throw new Error('No sheets found in workbook');
+        throw new Error('No sheets found in Excel file');
       }
       const sheet = workbook.Sheets[sheetName];
       if (!sheet) {
-        throw new Error('Sheet is undefined');
+        throw new Error('Sheet data is undefined');
       }
       rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
     } else {
       const text = buffer.toString('utf8');
-      const cleanText = text.replace(/^\uFEFF/, '');  
+      const cleanText = text.replace(/^\uFEFF/, ''); 
       rows = csvParseSync(cleanText, { columns: true, skip_empty_lines: true, trim: true });
     }
   } catch (err) {
     throw new Error('Failed to parse file: ' + String(err));
   }
- 
+
   return await transaction(async (client) => {
     let insertedCount = 0;
     let skippedCount = 0;
     let errorCount = 0;
 
     for (const rawRow of rows) {
-      try { 
+      try {
         const row: any = {};
         for (const k of Object.keys(rawRow)) {
           row[k.toLowerCase().trim()] = rawRow[k];
         }
- 
+
         const cropName = (row.crop || row.crop_name || row['commodity'] || row['crop name'] || row['productname'] || '').toString().trim();
         const regionName = (row.region || row.region_name || row['county'] || row['district'] || '').toString().trim();
         const marketName = (row.market || row.market_name || row['market name'] || '').toString().trim();
@@ -140,7 +145,8 @@ export async function processKamisFile(buffer: Buffer, filename: string) {
           skippedCount++;
           continue;
         }
- 
+
+        
         let cropId;
         const cropRes = await client.query('SELECT id FROM crops WHERE LOWER(name) = LOWER($1)', [cropName]);
         if (cropRes.rows.length > 0) {
@@ -154,7 +160,8 @@ export async function processKamisFile(buffer: Buffer, filename: string) {
           );
           cropId = newCrop.rows[0].id;
         }
- 
+
+         
         let regionId;
         const regionRes = await client.query('SELECT id FROM regions WHERE LOWER(name) = LOWER($1)', [regionName]);
         if (regionRes.rows.length > 0) {
@@ -179,7 +186,8 @@ export async function processKamisFile(buffer: Buffer, filename: string) {
                 );
                 marketId = newMarket.rows[0].id;
             }
-        } 
+        }
+ 
         const dupCheck = await client.query(
             `SELECT id FROM price_entries WHERE crop_id=$1 AND region_id=$2 AND market_id IS NOT DISTINCT FROM $3 AND DATE(entry_date)=DATE($4)`,
             [cropId, regionId, marketId, entryDate]
@@ -215,7 +223,7 @@ export async function processKamisFile(buffer: Buffer, filename: string) {
 const startSyncLog = async (): Promise<string> => { 
     await query(`CREATE TABLE IF NOT EXISTS kamis_sync_logs (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        started_at TIMESTAMP DEFAULT NOW(),
+        sync_date TIMESTAMP DEFAULT NOW(),
         completed_at TIMESTAMP,
         records_processed INT DEFAULT 0,
         records_inserted INT DEFAULT 0,
@@ -223,9 +231,9 @@ const startSyncLog = async (): Promise<string> => {
         status VARCHAR(50),
         error_message TEXT
     )`);
-
+ 
     const result = await query(
-      'INSERT INTO kamis_sync_logs (status) VALUES ($1) RETURNING id',
+      'INSERT INTO kamis_sync_logs (status, sync_date) VALUES ($1, NOW()) RETURNING id',
       ['running']
     );
     return result.rows[0].id;
@@ -242,12 +250,12 @@ const updateSyncLog = async (id: string, processed: number, inserted: number, up
 };
 
 export const getKamisSyncStatus = async (): Promise<any> => {
-    try {
-        const result = await query('SELECT * FROM kamis_sync_logs ORDER BY started_at DESC LIMIT 1');
+    try { 
+        const result = await query('SELECT * FROM kamis_sync_logs ORDER BY sync_date DESC LIMIT 1');
         if (result.rows.length === 0) return { last_sync: null, records_synced: 0, is_active: false };
         const row = result.rows[0];
         return {
-            last_sync: row.started_at,
+            last_sync: row.sync_date,
             records_synced: (row.records_inserted || 0) + (row.records_updated || 0),
             is_active: row.status === 'running'
         };
