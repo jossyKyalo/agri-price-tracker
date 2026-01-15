@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, timeout } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 export interface AdminRequest {
   id: string;
@@ -38,11 +40,25 @@ export interface AdminStats {
   todaySms: number;
 }
 
+export interface SyncConfig {
+  autoSyncEnabled: boolean;
+  frequency: 'daily' | 'weekly' | 'manual';
+  syncTime: string;
+  retryAttempts: number;
+  notifyOnFailure: boolean;
+  targetCrops: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  constructor(private apiService: ApiService) {}
+  private apiUrl = environment.apiUrl;
+
+  constructor(
+    private apiService: ApiService,
+    private http: HttpClient
+  ) { }
 
   createAdminRequest(requestData: CreateAdminRequest): Observable<AdminRequest> {
     return this.apiService.post<AdminRequest>('/admin/request', requestData).pipe(
@@ -50,7 +66,7 @@ export class AdminService {
     );
   }
 
-  getAdminRequests(page: number = 1, limit: number = 10, status?: string): Observable<{requests: AdminRequest[], pagination: any}> {
+  getAdminRequests(page: number = 1, limit: number = 10, status?: string): Observable<{ requests: AdminRequest[], pagination: any }> {
     const params: any = { page, limit };
     if (status) {
       params.status = status;
@@ -89,12 +105,22 @@ export class AdminService {
   }
 
   syncKamisData(): Observable<any> {
-    return this.apiService.post<any>('/kamis/sync', {}).pipe(
+    const token = localStorage.getItem('authToken') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('admin_token') ||
+      '';
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<any>(`${this.apiUrl}/kamis/sync`, {}, { headers }).pipe(
+      timeout(6000000),
       map(response => response.data || {})
     );
   }
 
-  getKamisLogs(page: number = 1, limit: number = 20): Observable<{logs: any[], pagination: any}> {
+  getKamisLogs(page: number = 1, limit: number = 20): Observable<{ logs: any[], pagination: any }> {
     return this.apiService.get<any[]>('/kamis/logs', { page, limit }).pipe(
       map(response => ({
         logs: response.data || [],
@@ -104,9 +130,17 @@ export class AdminService {
   }
 
   uploadKamisFile(formData: FormData): Observable<any> {
-     return this.apiService.post<any>('/kamis/upload', formData).pipe(
+    return this.apiService.post<any>('/kamis/upload', formData).pipe(
       map(response => response.data || {})
     );
+  }
+
+  getSyncConfig(): Observable<SyncConfig> {
+    return this.apiService.get<SyncConfig>('/kamis/config').pipe(map(r => r.data!));
+  }
+
+  updateSyncConfig(config: SyncConfig): Observable<any> {
+    return this.apiService.put<any>('/kamis/config', config).pipe(map(r => r.data));
   }
 
   getSystemAlerts(): Observable<SystemAlert[]> {
