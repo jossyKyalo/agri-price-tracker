@@ -284,3 +284,27 @@ export interface ApiError extends Error {
   statusCode: number;
   isOperational: boolean;
 }
+
+export interface SendSmsWithReplyRequest {
+  recipients: string[];
+  message: string;
+  sms_type?: string;
+  template_id?: number;
+  template_variables?: Record<string, string>;
+  reply_webhook_url?: string;
+  webhook_data?: string;
+  sender?: string;
+}
+
+export interface TestSmsReplyRequest {
+  test_phone: string;
+}
+
+export interface SmsReply {
+  id: number;
+  external_id: string;
+  from_number: string;
+  reply_text: string;
+  processed_action: string;
+  created_at: string;
+}
