@@ -2,8 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import { query, transaction } from '../database/connection';
 import { ApiError } from '../utils/apiError';
 import { logger } from '../utils/logger';
-import { sendSmsMessage, sendBulkSms } from '../services/smsService';
-import type { SendSmsRequest, SmsTemplate, SmsLog, SmsSubscription, ApiResponse } from '../types/index';
+import { 
+  sendSmsMessage, 
+  sendBulkSms, 
+  processSmsWebhook,
+  testReplySystem,
+  formatPhoneNumber
+} from '../services/smsService';
+import type { 
+  SendSmsRequest, 
+  SmsTemplate, 
+  SmsLog, 
+  SmsSubscription, 
+  ApiResponse,
+  SendSmsWithReplyRequest 
+} from '../types/index';
+
+ 
 
 export const sendSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -51,6 +66,223 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
   }
 };
 
+// NEW: Send SMS with reply/webhook support
+export const sendSmsWithReply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const {
+      recipients,
+      message,
+      sms_type = 'general',
+      template_id,
+      template_variables,
+      reply_webhook_url,
+      webhook_data,
+      sender
+    }: SendSmsWithReplyRequest = req.body;
+
+    const sentBy = req.user!.id;
+    let finalMessage = message;
+
+    // If template is used, process variables
+    if (template_id && template_variables) {
+      const templateResult = await query('SELECT template FROM sms_templates WHERE id = $1', [template_id]);
+      if (templateResult.rows.length > 0) {
+        finalMessage = templateResult.rows[0].template;
+        // Replace variables in template
+        Object.entries(template_variables).forEach(([key, value]) => {
+          finalMessage = finalMessage.replace(new RegExp(`{${key}}`, 'g'), value);
+        });
+      }
+    }
+
+    const smsResults = [];
+    
+    // Send SMS to each recipient with webhook support
+    for (const recipient of recipients) {
+      const options: any = {
+        smsType: sms_type,
+        sentBy
+      };
+      if (reply_webhook_url) options.replyWebhookUrl = reply_webhook_url;
+      if (webhook_data) options.webhookData = webhook_data;
+      if (sender) options.sender = sender;
+      
+      const result = await sendSmsMessage(recipient, finalMessage, options);
+      smsResults.push(result);
+
+      // Small delay between messages
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    logger.info(`SMS with reply enabled sent to ${recipients.length} recipients by ${req.user!.email}`);
+
+    const response: ApiResponse = {
+      success: true,
+      message: `SMS sent to ${smsResults.length} recipients with reply capability`,
+      data: {
+        sent: smsResults.filter(r => r.status === 'sent').length,
+        failed: smsResults.filter(r => r.status === 'failed').length,
+        results: smsResults,
+        has_reply_support: true
+      }
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// NEW: Handle SMS webhook from Textbelt
+export const handleSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    // Get raw body for signature verification
+    const rawBody = (req as any).rawBody || JSON.stringify(req.body);
+    const headers = req.headers;
+    
+    // Process the webhook
+    const result = await processSmsWebhook(req.body, headers, rawBody);
+    
+    if (result.processed) {
+      logger.info(`SMS webhook processed successfully: ${result.action}`);
+      
+      // Return success response to Textbelt
+      res.status(200).json({
+        success: true,
+        message: 'Webhook processed successfully'
+      });
+    } else {
+      logger.warn(`SMS webhook failed: ${result.message}`);
+      res.status(400).json({
+        success: false,
+        error: result.message
+      });
+    }
+  } catch (error) {
+    logger.error('Error processing SMS webhook:', error);
+    // Still return 200 to Textbelt to avoid retries
+    res.status(200).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};
+
+// NEW: Get SMS replies
+export const getSmsReplies = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { 
+      page = 1, 
+      limit = 20, 
+      phone, 
+      date_from, 
+      date_to,
+      action 
+    } = req.query;
+    
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const conditions: string[] = ['reply_received = true'];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (phone) {
+      conditions.push(`recipient = $${paramIndex++}`);
+      params.push(formatPhoneNumber(phone as string));
+    }
+    if (date_from) {
+      conditions.push(`reply_timestamp >= $${paramIndex++}`);
+      params.push(date_from);
+    }
+    if (date_to) {
+      conditions.push(`reply_timestamp <= $${paramIndex++}`);
+      params.push(date_to);
+    }
+    if (action) {
+      // You might need to store the action in a separate table or column
+      // For now, we'll search in reply_text
+      conditions.push(`reply_text ILIKE $${paramIndex++}`);
+      params.push(`%${action}%`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    params.push(limit, offset);
+
+    const result = await query(
+      `SELECT 
+         id,
+         recipient,
+         message,
+         reply_text,
+         reply_timestamp,
+         external_id,
+         sms_type,
+         created_at
+       FROM sms_logs
+       ${whereClause}
+       ORDER BY reply_timestamp DESC
+       LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+      params
+    );
+
+    const countResult = await query(
+      `SELECT COUNT(*) FROM sms_logs ${whereClause}`,
+      params.slice(0, -2)
+    );
+
+    const total = parseInt(countResult.rows[0].count);
+    const pages = Math.ceil(total / Number(limit));
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'SMS replies retrieved successfully',
+      data: result.rows.map(row => ({
+        id: row.id,
+        phone: row.recipient,
+        original_message: row.message,
+        reply_text: row.reply_text,
+        reply_timestamp: row.reply_timestamp,
+        external_id: row.external_id,
+        sms_type: row.sms_type,
+        received_at: row.reply_timestamp
+      })),
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages
+      }
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// NEW: Test SMS reply system
+export const testSmsReplySystem = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { test_phone } = req.body;
+
+    if (!test_phone) {
+      throw new ApiError('Test phone number is required', 400);
+    }
+
+    const result = await testReplySystem(test_phone);
+
+    const response: ApiResponse = {
+      success: result.success,
+      message: result.message,
+      data: result.details
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+ 
 export const getSmsLogs = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { page = 1, limit = 20, status, sms_type, date_from, date_to } = req.query;

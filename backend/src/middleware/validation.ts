@@ -119,11 +119,22 @@ export const schemas = {
 
   // SMS schemas
   sendSms: Joi.object({
-    recipients: Joi.array().items(Joi.string().pattern(/^\+?[1-9]\d{1,14}$/)).min(1).required(),
-    message: Joi.string().min(1).max(160).required(),
-    sms_type: Joi.string().valid('alert', 'update', 'prediction', 'weather', 'general').required(),
+    recipients: Joi.array().items(Joi.string().pattern(/^\+?[1-9]\d{1,14}$/)).min(1).max(100).required(),
+    message: Joi.string().min(1).max(1600).required(),  // Increased to 1600 chars
+    sms_type: Joi.string().valid('alert', 'update', 'prediction', 'weather', 'general', 'subscription', 'unsubscription', 'price_request', 'test', 'info', 'error').required(),
     template_id: Joi.string().uuid().optional(),
     template_variables: Joi.object().optional()
+  }),
+
+  sendSmsWithReply: Joi.object({
+    recipients: Joi.array().items(Joi.string().pattern(/^\+?[1-9]\d{1,14}$/)).min(1).max(100).required(),
+    message: Joi.string().min(1).max(1600).required(),
+    sms_type: Joi.string().valid('alert', 'update', 'prediction', 'weather', 'general', 'subscription', 'unsubscription', 'price_request', 'test', 'info', 'error').optional().default('general'),
+    template_id: Joi.string().uuid().optional(),
+    template_variables: Joi.object().optional(),
+    reply_webhook_url: Joi.string().uri().optional(),
+    webhook_data: Joi.string().max(100).optional(),
+    sender: Joi.string().max(20).optional()
   }),
 
   createSmsTemplate: Joi.object({
@@ -135,9 +146,9 @@ export const schemas = {
 
   updateSmsTemplate: Joi.object({
     name: Joi.string().min(2).max(100).optional(),
-    template: Joi.string().min(1).max(160).optional(),
+    template: Joi.string().min(1).max(1600).optional(),
     variables: Joi.array().items(Joi.string()).optional(),
-    sms_type: Joi.string().valid('alert', 'update', 'prediction', 'weather', 'general').optional(),
+    sms_type: Joi.string().valid('alert', 'update', 'prediction', 'weather', 'general', 'subscription', 'unsubscription', 'price_request', 'test', 'info', 'error').optional(),
     is_active: Joi.boolean().optional()
   }),
 
@@ -146,6 +157,17 @@ export const schemas = {
     crops: Joi.array().items(Joi.string().uuid()).optional(),
     regions: Joi.array().items(Joi.string().uuid()).optional(),
     alert_types: Joi.array().items(Joi.string()).optional()
+  }),
+
+   testSmsReply: Joi.object({
+    test_phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).required()
+  }),
+
+  smsWebhook: Joi.object({
+    textId: Joi.string().required(),
+    fromNumber: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).required(),
+    text: Joi.string().optional().allow(''),
+    data: Joi.string().optional()
   }),
 
   // Chat schemas

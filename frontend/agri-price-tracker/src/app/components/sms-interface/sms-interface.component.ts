@@ -189,6 +189,17 @@ export class SmsInterfaceComponent implements OnInit {
     return cleaned;
   }
 
+  private sanitizeSmsType(rawType: string): string {
+    const type = rawType.toLowerCase();
+    if (type === 'price-alert') return 'alert';
+    if (type === 'daily-update') return 'update';
+
+    const validTypes = ['alert', 'update', 'prediction', 'weather', 'general'];
+    if (validTypes.includes(type)) return type;
+
+    return 'general';
+  }
+
   sendSms() {
     if (!this.smsData.type || !this.smsData.message) {
       this.errorMessage = 'Please fill in message and type fields';
@@ -236,7 +247,7 @@ export class SmsInterfaceComponent implements OnInit {
     const smsRequest: SendSmsRequest = {
       recipients: recipientList,
       message: this.smsData.message,
-      sms_type: this.smsData.type as any
+      sms_type: this.sanitizeSmsType(this.smsData.type) as any
     };
 
     this.smsService.sendSms(smsRequest).subscribe({
@@ -297,6 +308,9 @@ export class SmsInterfaceComponent implements OnInit {
     const template = this.smsTemplates.find(t => t.id === this.selectedTemplate);
     if (template) {
       this.smsData.message = template.template;
+      if (template.sms_type) {
+        this.smsData.type = this.sanitizeSmsType(template.sms_type);
+      }
     }
   }
 
