@@ -5,17 +5,21 @@ import { logger } from '../utils/logger';
 import { ApiError } from '../utils/apiError';
 
 export interface SmsLog {
-  id?: number;
+  id?: string;  // UUID
   recipient: string;
   message: string;
   sms_type: string;
-  status: 'sent' | 'failed';
+  status: 'sent' | 'failed' | 'pending';
   external_id?: string | undefined;
   sent_by?: string | undefined;
   error_message?: string | undefined;
   reply_received?: boolean;
   reply_text?: string;
   reply_timestamp?: Date;
+  cost?: number;
+  sent_at?: Date;
+  delivered_at?: Date;
+  created_at?: Date;
 }
 
 export interface SendSmsOptions {
@@ -27,28 +31,26 @@ export interface SendSmsOptions {
   getdlr?: boolean; // Request delivery report
 }
 
-// Fixed: Single SmsReply interface definition
 export interface SmsReply {
-  textId: string;          // messageid from TextSMS
-  fromNumber: string;      // mobile (254... format)
+  textId: string;          // messageid from TextBee
+  fromNumber: string;      // sender number
   text: string;            // message content
   data?: string;           // optional additional data
   timestamp: number;       // unix timestamp
-  // Note: No signature field for TextSMS
   status?: string;         // delivery status if applicable
   networkid?: string;      // network provider ID
 }
 
-export interface TextSmsResponse {
+export interface TextBeeResponse {
   success: boolean | undefined;
   code?: string | undefined;
   message?: string | undefined;
   data?: {
-    message_id?: string | undefined;
-    recipient?: string | undefined;
-    cost?: number | undefined;
-    balance?: number | undefined;
-    message_ids?: string[] | undefined;
+    _id?: string | undefined;
+    message?: string | undefined;
+    recipients?: string[] | undefined;
+    status?: string | undefined;
+    createdAt?: string | undefined;
   } | undefined;
   error?: string | undefined;
 }
@@ -60,50 +62,21 @@ export interface ConnectionTestResult {
   details?: any;
 }
 
-export interface QuotaResult {
-  balance: number;
-  hasBalance: boolean;
-  details?: any;
-}
-
-export interface TestResult {
-  success: boolean;
-  message: string;
-  details?: any;
-}
-
-// Update the TextSmsApiResponse interface in smsService.ts:
-export interface TextSmsApiResponse {
-  success?: boolean;
-  code?: string;
-  message?: string;
+export interface TextBeeApiResponse {
   data?: {
-    messageid?: string;
-    mobile?: string;
-    cost?: number;
-    messageids?: string[];
-  };
-  messages?: Array<{
-    code?: string;
+    _id?: string;
     message?: string;
-    messageid?: string;
-  }>;
-  // Add this for bulk response format:
-  responses?: Array<{
-    clientsmsid?: string | null;
-    messageid?: string;
-    mobile?: string;
-    networkid?: number;
-    "response-code"?: number;
-    "response-description"?: string;
-  }>;
+    recipients?: string[];
+    status?: string;
+    createdAt?: string;
+  };
+  error?: string;
+  message?: string;
 }
 
-const TEXTSMS_API_KEY = process.env.TEXTSMS_API_KEY;
-const TEXTSMS_PARTNER_ID = process.env.TEXTSMS_PARTNER_ID;
-const TEXTSMS_API_URL = 'https://sms.textsms.co.ke/api/services';
-const TEXTSMS_SHORTCODE = process.env.TEXTSMS_SHORTCODE || 'TextSMS';
-const TEXTSMS_PASS_TYPE = process.env.TEXTSMS_PASS_TYPE || 'plain';
+const TEXTBEE_API_KEY = process.env.TEXTBEE_API_KEY;
+const TEXTBEE_DEVICE_ID = process.env.TEXTBEE_DEVICE_ID;
+const TEXTBEE_API_URL = process.env.TEXTBEE_API_URL || 'https://api.textbee.dev/api/v1';
 
 const APP_BASE_URL = process.env.APP_BASE_URL || '';
 const SMS_RATE_LIMIT_DELAY = parseInt(process.env.SMS_RATE_LIMIT_DELAY || '500', 10);
@@ -112,7 +85,7 @@ const SMS_RATE_LIMIT_DELAY = parseInt(process.env.SMS_RATE_LIMIT_DELAY || '500',
 const MAX_WEBHOOK_DATA_LENGTH = 100;
 const DEFAULT_SMS_TYPE = 'general';
 
-logger.info(`📱 SMS Service initialized with TextSMS API`);
+logger.info(`📱 SMS Service initialized with TextBee API`);
 
 /* ------------------------------------------------------------------ */
 /* Phone Number Utilities */
@@ -138,272 +111,257 @@ export const formatPhoneNumber = (phone: string): string => {
     throw new ApiError(`Invalid Kenyan phone number format: ${phone}`, 400);
   }
 
-  return num; // TextSMS expects WITHOUT + prefix
+  return '+' + num; // TextBee expects + prefix
 };
 
 export const validatePhoneNumber = (phone: string): boolean => {
   try {
     const formatted = formatPhoneNumber(phone);
-    return /^254\d{9}$/.test(formatted);
+    return /^\+254\d{9}$/.test(formatted);
   } catch {
     return false;
   }
 };
 
 /* ------------------------------------------------------------------ */
-/* TextSMS API Client */
+/* TextBee API Client */
 /* ------------------------------------------------------------------ */
 
-class TextSmsClient {
+class TextBeeClient {
   private apiKey: string;
-  private partnerId: string;
+  private deviceId: string;
   private baseUrl: string;
-  private shortcode: string;
-  private passType: string;
 
   constructor() {
-    this.apiKey = TEXTSMS_API_KEY || '';
-    this.partnerId = TEXTSMS_PARTNER_ID || '';
-    this.baseUrl = TEXTSMS_API_URL;
-    this.shortcode = TEXTSMS_SHORTCODE;
-    this.passType = TEXTSMS_PASS_TYPE;
+    this.apiKey = TEXTBEE_API_KEY || '';
+    this.deviceId = TEXTBEE_DEVICE_ID || '';
+    this.baseUrl = TEXTBEE_API_URL;
 
-    if (!this.apiKey || !this.partnerId) {
-      throw new ApiError('TextSMS API_KEY or PARTNER_ID not configured', 500);
+    if (!this.apiKey || !this.deviceId) {
+      throw new ApiError('TextBee API_KEY or DEVICE_ID not configured', 500);
     }
 
-    logger.debug('TextSMS Client initialized', {
+    logger.debug('TextBee Client initialized', {
       apiKeyPrefix: this.apiKey.substring(0, 10) + '...',
-      partnerId: this.partnerId
+      deviceId: this.deviceId
     });
   }
 
-async sendSms(phone: string, message: string, options?: {
-  scheduleTime?: string | undefined;
-  getdlr?: boolean | undefined;
-  clientSmsId?: number | undefined;
-}): Promise<TextSmsResponse> {
-  try {
-    const formattedPhone = formatPhoneNumber(phone);
-
-    const payload: any = {
-      apikey: this.apiKey,
-      partnerID: this.partnerId,
-      message: message,
-      shortcode: this.shortcode,
-      mobile: formattedPhone,
-      pass_type: this.passType
-    };
-
-    // Add optional parameters
-    if (options?.scheduleTime !== undefined) {
-      payload.timeToSend = options.scheduleTime;
-    }
-    if (options?.getdlr !== undefined) {
-      payload.getdlr = options.getdlr;
-    }
-    if (options?.clientSmsId !== undefined) {
-      payload.clientsmsid = options.clientSmsId;
-    }
-
-    logger.debug('📤 TextSMS send request', { payload });
-
-    const response = await axios.post<TextSmsApiResponse>(
-      `${this.baseUrl}/sendsms/`,
-      payload,
-      {
-        headers: { 
-          'Content-Type': 'application/json', 
-          Accept: 'application/json' 
-        },
-        timeout: 30000
-      }
-    );
-
-    logger.debug('📡 TextSMS Response:', response.data);
-
-    // Parse TextSMS response format
-    const apiResponse = response.data;
-    
-    // Handle different response formats
-    let success: boolean | undefined = false;
-    let messageId: string | undefined;
-    let cost: number | undefined;
-    
-    if (apiResponse.responses && apiResponse.responses.length > 0) {
-      // Bulk response format used for single SMS too
-      const resp = apiResponse.responses[0];
-      success = resp && (resp["response-code"] === 200 || resp["response-description"]?.toLowerCase() === 'success');
-      messageId = resp?.messageid;
-    } else if (apiResponse.code === '1000' || apiResponse.success === true) {
-      success = true;
-      messageId = apiResponse.data?.messageid;
-      cost = apiResponse.data?.cost;
-    }
-    
-    const responseData: TextSmsResponse['data'] = {
-      message_id: messageId,
-      recipient: formattedPhone,
-      cost: cost,
-      balance: undefined,
-      message_ids: messageId ? [messageId] : undefined
-    };
-    
-    return {
-      success,
-      code: success ? '1000' : apiResponse.code || '1006', // 1006 = Invalid credentials
-      message: success ? 'SMS sent successfully' : apiResponse.message || 'SMS failed',
-      data: responseData,
-      error: !success ? apiResponse.message || 'SMS failed' : undefined
-    };
-  } catch (error: any) {
-    logger.error('TextSMS API Error:', error.message, { 
-      response: error.response?.data,
-      status: error.response?.status 
-    });
-    
-    if (error.response?.data) {
-      const errorData = error.response.data;
-      return {
-        success: false,
-        code: errorData.code,
-        message: errorData.message,
-        error: errorData.message || error.message
-      };
-    }
-    
-    throw error;
-  }
-}
-
-async sendBulkSms(
-  phones: string[], 
-  message: string, 
-  options?: {
+  async sendSms(phone: string, message: string, options?: {
     scheduleTime?: string | undefined;
     getdlr?: boolean | undefined;
-  }
-): Promise<TextSmsResponse> {
-  try {
-    const smslist = phones.map(phone => ({
-      partnerID: this.partnerId,
-      apikey: this.apiKey,
-      mobile: formatPhoneNumber(phone),
-      message: message,
-      shortcode: this.shortcode,
-      pass_type: this.passType,
-      ...(options?.scheduleTime !== undefined && { timeToSend: options.scheduleTime }),
-      ...(options?.getdlr !== undefined && { getdlr: options.getdlr })
-    }));
-
-    const payload = {
-      count: phones.length,
-      smslist
-    };
-
-    logger.debug('📤 TextSMS bulk send request', { 
-      count: phones.length,
-      firstPhone: phones[0],
-      messageLength: message.length
-    });
-
-    const response = await axios.post<TextSmsApiResponse>(
-      `${this.baseUrl}/sendbulk/`,
-      payload,
-      {
-        headers: { 
-          'Content-Type': 'application/json', 
-          Accept: 'application/json' 
-        },
-        timeout: 30000
-      }
-    );
-
-    logger.debug('📡 TextSMS Bulk Response:', response.data);
-
-    const apiResponse = response.data;
-    
-    // Handle bulk response format
-    let success = false;
-    let messageIds: string[] = [];
-    
-    if (apiResponse.responses && apiResponse.responses.length > 0) {
-      // Check if all responses are successful
-      success = apiResponse.responses.every(resp => 
-        resp["response-code"] === 200 || resp["response-description"]?.toLowerCase() === 'success'
-      );
-      
-      // Collect all message IDs
-      messageIds = apiResponse.responses
-        .map(resp => resp.messageid)
-        .filter((id): id is string => !!id);
-    } else if (apiResponse.code === '1000' || apiResponse.success === true) {
-      // Fallback to the original success check
-      success = true;
-    }
-    
-    const responseData: TextSmsResponse['data'] = {
-      message_id: messageIds[0], // Use first message ID as main ID
-      recipient: phones[0], // Use first recipient
-      cost: undefined, // Not available in bulk response
-      balance: undefined,
-      message_ids: messageIds
-    };
-    
-    return {
-      success,
-      code: success ? '1000' : apiResponse.code || '1004', // 1004 = Bulk credits low
-      message: success ? 'Bulk SMS sent successfully' : apiResponse.message || 'Bulk SMS failed',
-      data: responseData,
-      error: !success ? apiResponse.message || 'Bulk SMS failed' : undefined
-    };
-  } catch (error: any) {
-    logger.error('TextSMS Bulk API Error:', error.message, { 
-      response: error.response?.data 
-    });
-    
-    if (error.response?.data) {
-      const errorData = error.response.data;
-      return {
-        success: false,
-        code: errorData.code,
-        message: errorData.message,
-        error: errorData.message || error.message
-      };
-    }
-    
-    throw error;
-  }
-}
-
-  async getBalance(): Promise<{ balance: number; success: boolean }> {
+    clientSmsId?: number | undefined;
+  }): Promise<TextBeeResponse> {
     try {
-      const payload = {
-        apikey: this.apiKey,
-        partnerID: this.partnerId
+      const formattedPhone = formatPhoneNumber(phone);
+
+      const payload: any = {
+        recipients: [formattedPhone],
+        message: message
       };
 
-      const response = await axios.post<TextSmsApiResponse>(
-        `${this.baseUrl}/getbalance/`,
+      // Note: TextBee API might not support scheduleTime in the same way
+      if (options?.scheduleTime) {
+        logger.warn('Scheduling not implemented for TextBee yet');
+      }
+
+      logger.debug('📤 TextBee send request', { 
+        deviceId: this.deviceId,
+        payload: { 
+          recipients: [formattedPhone],
+          messageLength: message.length 
+        }
+      });
+
+      const response = await axios.post<TextBeeApiResponse>(
+        `${this.baseUrl}/gateway/devices/${this.deviceId}/send-sms`,
         payload,
         {
           headers: { 
-            'Content-Type': 'application/json', 
-            Accept: 'application/json' 
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey
           },
-          timeout: 10000
+          timeout: 30000
         }
       );
 
-      const balance = parseFloat(response.data.message || '0');
-      return {
-        balance,
-        success: !isNaN(balance)
+      logger.debug('📡 TextBee Response:', response.data);
+
+      const apiResponse = response.data;
+      
+      let success = false;
+      let externalId: string | undefined;
+      
+      if (apiResponse.data?._id) {
+        success = true;
+        externalId = apiResponse.data._id;
+      }
+
+      const responseData: TextBeeResponse['data'] = {
+        _id: externalId,
+        message: message,
+        recipients: [formattedPhone],
+        status: apiResponse.data?.status || 'PENDING',
+        createdAt: apiResponse.data?.createdAt
       };
-    } catch (error) {
-      logger.error('Failed to get TextSMS balance:', error);
-      return { balance: 0, success: false };
+      
+      return {
+        success,
+        code: success ? '200' : '500',
+        message: success ? 'SMS sent successfully' : apiResponse.message || 'SMS failed',
+        data: responseData,
+        error: !success ? apiResponse.error || apiResponse.message || 'SMS failed' : undefined
+      };
+    } catch (error: any) {
+      logger.error('TextBee API Error:', error.message, { 
+        response: error.response?.data,
+        status: error.response?.status 
+      });
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        return {
+          success: false,
+          code: error.response.status.toString(),
+          message: errorData.message || errorData.error || 'API Error',
+          error: errorData.message || errorData.error || error.message
+        };
+      }
+      
+      throw error;
     }
+  }
+
+  async sendBulkSms(
+    phones: string[], 
+    message: string, 
+    options?: {
+      scheduleTime?: string | undefined;
+      getdlr?: boolean | undefined;
+    }
+  ): Promise<TextBeeResponse> {
+    try {
+      const formattedPhones = phones.map(phone => formatPhoneNumber(phone));
+
+      const payload: any = {
+        recipients: formattedPhones,
+        message: message
+      };
+
+      logger.debug('📤 TextBee bulk send request', { 
+        deviceId: this.deviceId,
+        count: phones.length,
+        firstPhone: formattedPhones[0],
+        messageLength: message.length
+      });
+
+      const response = await axios.post<TextBeeApiResponse>(
+        `${this.baseUrl}/gateway/devices/${this.deviceId}/send-sms`,
+        payload,
+        {
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey
+          },
+          timeout: 30000
+        }
+      );
+
+      logger.debug('📡 TextBee Bulk Response:', response.data);
+
+      const apiResponse = response.data;
+      
+      let success = false;
+      let externalId: string | undefined;
+      
+      if (apiResponse.data?._id) {
+        success = true;
+        externalId = apiResponse.data._id;
+      }
+
+      const responseData: TextBeeResponse['data'] = {
+        _id: externalId,
+        message: message,
+        recipients: formattedPhones,
+        status: apiResponse.data?.status || 'PENDING',
+        createdAt: apiResponse.data?.createdAt
+      };
+      
+      return {
+        success,
+        code: success ? '200' : '500',
+        message: success ? 'Bulk SMS sent successfully' : apiResponse.message || 'Bulk SMS failed',
+        data: responseData,
+        error: !success ? apiResponse.error || apiResponse.message || 'Bulk SMS failed' : undefined
+      };
+    } catch (error: any) {
+      logger.error('TextBee Bulk API Error:', error.message, { 
+        response: error.response?.data 
+      });
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        return {
+          success: false,
+          code: error.response.status.toString(),
+          message: errorData.message || errorData.error || 'API Error',
+          error: errorData.message || errorData.error || error.message
+        };
+      }
+      
+      throw error;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Core SMS Functions */
+/* ------------------------------------------------------------------ */
+
+async function saveSmsLog(
+  recipient: string,
+  message: string,
+  smsType: string,
+  status: 'sent' | 'failed' | 'pending',
+  externalId?: string,
+  sentBy?: string,
+  errorMsg?: string
+): Promise<SmsLog> {
+  try {
+    const result = await pool.query(
+      `INSERT INTO sms_logs (
+        recipient, 
+        message, 
+        sms_type, 
+        status, 
+        external_id, 
+        sent_by, 
+        error_message,
+        sent_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
+      RETURNING *`,
+      [
+        recipient, 
+        message, 
+        smsType, 
+        status, 
+        externalId || null, 
+        sentBy || null, 
+        errorMsg || null
+      ]
+    );
+    return result.rows[0];
+  } catch (err) {
+    logger.error('Failed to save SMS log', err);
+    return { 
+      recipient, 
+      message, 
+      sms_type: smsType, 
+      status, 
+      external_id: externalId, 
+      sent_by: sentBy, 
+      error_message: errorMsg 
+    };
   }
 }
 
@@ -428,7 +386,7 @@ export const sendSmsMessage = async (
       throw new ApiError('SMS message cannot be empty', 400);
     }
 
-    const smsClient = new TextSmsClient();
+    const smsClient = new TextBeeClient();
 
     const response = await smsClient.sendSms(
       formattedRecipient, 
@@ -436,16 +394,15 @@ export const sendSmsMessage = async (
       { 
         scheduleTime: scheduleTime,
         getdlr: getdlr,
-        clientSmsId: Date.now() // Use timestamp as client SMS ID
+        clientSmsId: Date.now()
       }
     );
     
-    // FIXED: Check success based on response code OR success flag
-    const success = response.success === true || response.code === '1000';
-    externalId = response.data?.message_id || `textsms_${Date.now()}`;
+    const success = response.success === true;
+    externalId = response.data?._id || `textbee_${Date.now()}`;
 
     if (success) {
-      logger.info(`✅ SMS sent via TextSMS`, { 
+      logger.info(`✅ SMS sent via TextBee`, { 
         recipient: formattedRecipient, 
         messageId: externalId,
         scheduleTime,
@@ -460,8 +417,8 @@ export const sendSmsMessage = async (
         sentBy
       );
     } else {
-      errorMsg = response.error || response.message || `TextSMS error: ${response.code}`;
-      logger.error('❌ SMS Failed via TextSMS', { 
+      errorMsg = response.error || response.message || `TextBee error: ${response.code}`;
+      logger.error('❌ SMS Failed via TextBee', { 
         recipient: formattedRecipient, 
         error: errorMsg,
         code: response.code,
@@ -517,7 +474,7 @@ export const sendBulkSms = async (
   // For small batches, use single API call
   if (validRecipients.length <= 100) {
     try {
-      const smsClient = new TextSmsClient();
+      const smsClient = new TextBeeClient();
       const response = await smsClient.sendBulkSms(
         validRecipients, 
         message.trim(),
@@ -527,33 +484,29 @@ export const sendBulkSms = async (
         }
       );
 
-      // FIXED: Check success based on response
-      const success = response.success === true || response.code === '1000';
-      
-      // Extract message IDs from response
-      const messageIds = response.data?.message_ids || [];
+      const success = response.success === true;
+      const externalId = response.data?._id || `textbee_bulk_${Date.now()}`;
       
       validRecipients.forEach((recipient, index) => {
-        const messageId = messageIds[index] || response.data?.message_id || `textsms_bulk_${Date.now()}_${index}`;
         results.push({
           recipient: formatPhoneNumber(recipient),
           message,
           sms_type: smsType,
           status: success ? 'sent' : 'failed',
-          external_id: messageId,
+          external_id: externalId,
           sent_by: sentBy,
           error_message: !success ? response.message : undefined
         });
       });
 
       if (success) {
-        logger.info(`✅ Bulk SMS sent via TextSMS`, { 
+        logger.info(`✅ Bulk SMS sent via TextBee`, { 
           count: validRecipients.length,
           type: smsType,
           responseCode: response.code
         });
       } else {
-        logger.error('❌ Bulk SMS failed via TextSMS', { 
+        logger.error('❌ Bulk SMS failed via TextBee', { 
           error: response.message,
           code: response.code,
           response
@@ -599,245 +552,422 @@ export const sendBulkSms = async (
 
   return results;
 };
- 
-async function saveSmsLog(
-  recipient: string,
-  message: string,
-  smsType: string,
-  status: 'sent' | 'failed',
-  externalId?: string,
-  sentBy?: string,
-  errorMsg?: string
-): Promise<SmsLog> {
+
+/* ------------------------------------------------------------------ */
+/* Webhook Signature Verification */
+/* ------------------------------------------------------------------ */
+
+export const verifyWebhookSignature = (
+  payload: string,
+  signature: string,
+  timestamp: string
+): boolean => {
   try {
-    const result = await pool.query(
-      `INSERT INTO sms_logs (recipient, message, sms_type, status, external_id, sent_by, error_message)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [recipient, message, smsType, status, externalId || null, sentBy || null, errorMsg || null]
+    const secret = process.env.TEXTBEE_WEBHOOK_SECRET;
+    
+    if (!secret) {
+      logger.warn('TEXTBEE_WEBHOOK_SECRET not configured, skipping signature verification');
+      return true; // Allow if no secret configured
+    }
+
+    if (!signature || !timestamp) {
+      logger.warn('Missing signature or timestamp headers');
+      return false;
+    }
+
+    // Check if timestamp is within allowed timeframe (5 minutes)
+    const eventTime = parseInt(timestamp, 10);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeDifference = Math.abs(currentTime - eventTime);
+    
+    if (timeDifference > 300) { // 5 minutes
+      logger.warn('Webhook timestamp too old', {
+        eventTime,
+        currentTime,
+        difference: timeDifference
+      });
+      return false;
+    }
+
+    // Create the signed payload string
+    const signedPayload = `${timestamp}.${payload}`;
+    
+    // Calculate HMAC SHA256
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(signedPayload)
+      .digest('hex');
+
+    // Use constant-time comparison to prevent timing attacks
+    const signatureMatches = crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
     );
-    return result.rows[0];
-  } catch (err) {
-    logger.error('Failed to save SMS log', err);
-    return { 
-      recipient, 
-      message, 
-      sms_type: smsType, 
-      status, 
-      external_id: externalId, 
-      sent_by: sentBy, 
-      error_message: errorMsg 
-    };
+
+    logger.debug('Signature verification', {
+      signatureMatches,
+      signatureLength: signature?.length,
+      expectedLength: expectedSignature?.length,
+      timeDifference
+    });
+
+    return signatureMatches;
+  } catch (error) {
+    logger.error('Error verifying webhook signature:', error);
+    return false;
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/* Webhook Processing */
+/* ------------------------------------------------------------------ */
+
+async function updateDeliveryStatus(
+  externalId: string, 
+  status: string, 
+  mobile: string
+): Promise<void> {
+  try {
+    const statusColumn = status === 'DELIVERED' ? 'delivered_at' : 'sent_at';
+    const statusValue = status === 'DELIVERED' || status === 'SENT' 
+      ? 'CURRENT_TIMESTAMP' 
+      : 'NULL';
+    
+    const result = await query(
+      `UPDATE sms_logs 
+       SET status = $1,
+           ${statusColumn} = ${statusValue},
+           updated_at = CURRENT_TIMESTAMP
+       WHERE external_id = $2 
+       OR (recipient = $3 AND external_id IS NULL)
+       RETURNING id`,
+      [status.toLowerCase(), externalId, mobile]
+    );
+
+    if (result.rowCount === 0) {
+      logger.warn('No matching SMS log found for delivery update', {
+        externalId,
+        mobile,
+        status
+      });
+    } else {
+      logger.info('✅ Delivery status updated', {
+        rowsUpdated: result.rowCount,
+        externalId,
+        status
+      });
+    }
+  } catch (error) {
+    logger.error('Failed to update delivery status:', error);
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* TextSMS Monitoring */
-/* ------------------------------------------------------------------ */
-
-export const testTextSmsConnection = async (): Promise<ConnectionTestResult> => {
+async function saveIncomingMessage(
+  smsId: string,
+  sender: string,
+  message: string,
+  receivedAt: string
+): Promise<void> {
   try {
-    const smsClient = new TextSmsClient();
-    const balanceResult = await smsClient.getBalance();
-    
-    return { 
-      isActive: balanceResult.success, 
-      balance: balanceResult.balance,
-      status: balanceResult.success ? 'active' : 'inactive', 
-      details: `Balance: ${balanceResult.balance} | API Connected: ${balanceResult.success}`
-    };
-  } catch (error: any) {
-    return { 
-      isActive: false, 
-      status: 'inactive', 
-      details: error.message 
-    };
-  }
-};
-
-export const getTextSmsBalance = async (): Promise<number> => {
-  try {
-    const smsClient = new TextSmsClient();
-    const result = await smsClient.getBalance();
-    return result.balance;
-  } catch (error) {
-    logger.error('Failed to get TextSMS balance:', error);
-    return 0;
-  }
-};
-
-export const testReplySystem = async (reply: SmsReply) => {
-  try {
-    const phone = formatPhoneNumber(reply.fromNumber);
-    const message = reply.text.trim();
-    const externalId = reply.textId;
-    const replyTime = new Date(reply.timestamp);
-
-    logger.info('📨 Processing test reply for TextSMS', {
-      externalId,
-      phone,
-      messageLength: message.length
-    });
-
-    // First, try to find by external_id (TextSMS messageid)
-    let result = await pool.query(
-      `
-      UPDATE sms_logs
-      SET reply_received = true,
-          reply_text = $1,
-          reply_timestamp = $2,
-          delivery_status = $3,
-          delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-          updated_at = CURRENT_TIMESTAMP
-      WHERE external_id = $4
-      RETURNING *
-      `,
-      [message, replyTime, reply.status || 'delivered', externalId]
+    // First check if there's an existing SMS log to update
+    const existingLog = await query(
+      `SELECT id FROM sms_logs 
+       WHERE external_id = $1 OR recipient = $2
+       ORDER BY sent_at DESC LIMIT 1`,
+      [smsId, sender]
     );
 
-    // If not found by external_id, try by phone number
-    if (result.rowCount === 0) {
-      result = await pool.query(
-        `
-        UPDATE sms_logs
-        SET reply_received = true,
-            reply_text = $1,
-            reply_timestamp = $2,
-            delivery_status = $3,
-            delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-            updated_at = CURRENT_TIMESTAMP
-        WHERE recipient = $4
-        ORDER BY created_at DESC
-        LIMIT 1
-        RETURNING *
-        `,
-        [message, replyTime, reply.status || 'delivered', phone]
+    if (existingLog.rows.length > 0) {
+      // Update existing log with reply
+      await query(
+        `UPDATE sms_logs 
+         SET reply_received = true,
+             reply_text = $1,
+             reply_timestamp = $2,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $3`,
+        [message, new Date(receivedAt), existingLog.rows[0].id]
+      );
+    } else {
+      // Create a new log entry for incoming-only messages
+      await query(
+        `INSERT INTO sms_logs (
+          recipient,
+          message,
+          sms_type,
+          status,
+          external_id,
+          reply_received,
+          reply_text,
+          reply_timestamp
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          sender,
+          message,
+          'incoming',
+          'received',
+          smsId,
+          true,
+          message,
+          new Date(receivedAt)
+        ]
       );
     }
-
-    if (result.rowCount === 0) {
-      logger.warn('No matching SMS log found for test reply', { externalId, phone });
-      
-      // Create a new log entry if none found (for testing purposes)
-      const newLog = await saveSmsLog(
-        phone,
-        `[Test Reply] Original message unknown`,
-        'test',
-        'sent',
-        externalId,
-        'test_system',
-        undefined
-      );
-      
-      // Update the new log with reply - FIXED: Use newLog.id safely
-      if (newLog.id) {
-        await pool.query(
-          `
-          UPDATE sms_logs
-          SET reply_received = true,
-              reply_text = $1,
-              reply_timestamp = $2,
-              delivery_status = $3,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = $4
-          `,
-          [message, replyTime, reply.status || 'delivered', newLog.id]
-        );
-      }
-      
-      logger.info('✅ Created new test SMS log for reply', { externalId, phone });
-      return { success: true, data: newLog, createdNew: true };
-    }
-
-    logger.info('✅ Test reply processed successfully', { 
-      externalId, 
-      phone, 
-      text: message,
-      rowsUpdated: result.rowCount 
-    });
-    
-    return { success: true, data: result.rows[0], createdNew: false };
-
-  } catch (error: any) {
-    logger.error('❌ Failed to process test reply', {
-      error: error.message,
-      stack: error.stack
-    });
-    return { success: false, error: error.message };
+  } catch (error) {
+    logger.error('Failed to save incoming message:', error);
   }
-};
+}
 
-// Also add a helper function to simulate TextSMS webhook for testing
-export const simulateTextSmsWebhook = async (
-  messageId: string,
-  mobile: string,
+async function handleIncomingMessage(
+  smsId: string,
+  sender: string,
   message: string,
-  status: string = 'delivered'
-): Promise<{ processed: boolean; action?: string; message?: string }> => {
-  const simulatedWebhook = {
-    messageid: messageId,
-    mobile: mobile,
-    message: message,
-    status: status,
-    networkid: 'TestNetwork',
-    timestamp: Date.now()
-  };
-  
-  return await processTextSmsWebhook(simulatedWebhook);
-};
-
-/* ------------------------------------------------------------------ */
-/* TextSMS Webhook Processing (No signature validation needed) */
-/* ------------------------------------------------------------------ */
-
-export const processTextSmsWebhook = async (
-  body: any
-): Promise<{ processed: boolean; action?: string; message?: string }> => {
+  receivedAt: string
+): Promise<{ processed: boolean; action?: string; message?: string }> {
   try {
-    // TextSMS webhook format (based on their documentation)
-    // Adjust based on actual webhook payload from TextSMS
-    const { 
-      messageid,      // TextSMS message ID
-      mobile,         // Recipient number (254...)
-      message,        // Message content
-      status,         // Delivery status
-      networkid,      // Network provider ID
-      timestamp       // Timestamp
-    } = body;
-
-    if (!messageid || !mobile) {
-      logger.warn('Invalid TextSMS webhook payload', body);
-      return { 
-        processed: false, 
-        message: 'Invalid payload: missing messageid or mobile' 
-      };
-    }
-
-    logger.info(`TextSMS webhook received`, {
-      messageid,
-      mobile,
-      status,
-      networkid,
-      timestamp
+    logger.info(`📨 Incoming SMS from ${sender}`, {
+      smsId,
+      messageLength: message?.length,
+      receivedAt
     });
 
-    // Update SMS log with delivery status
-    if (status) {
-      await updateDeliveryStatus(messageid, status, mobile);
-    }
+    // Store the incoming message in database
+    await saveIncomingMessage(smsId, sender, message, receivedAt);
 
-    // If it's a reply message (contains text)
+    // Process the reply if it's a text message
     if (message && typeof message === 'string' && message.trim()) {
-      return await processReplyMessage(mobile, message.trim(), messageid);
+      return await processReplyMessage(sender, message.trim(), smsId);
     }
 
     return {
       processed: true,
-      action: 'delivery_update',
-      message: `Delivery status updated: ${status}`
+      action: 'message_received',
+      message: 'Message received and stored'
     };
+    
+  } catch (error: any) {
+    logger.error('Failed to handle incoming message:', error);
+    return {
+      processed: false,
+      message: `Error processing incoming message: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageSent(
+  smsId: string,
+  body: any
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  try {
+    const { recipients, sentAt } = body;
+    
+    logger.info(`✈️ Message sent update`, {
+      smsId,
+      recipients,
+      sentAt
+    });
+
+    // Update with specific sent_at time if provided
+    if (sentAt) {
+      await query(
+        `UPDATE sms_logs 
+         SET status = 'sent',
+             sent_at = $1,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE external_id = $2 OR recipient = $3`,
+        [new Date(sentAt), smsId, recipients?.[0]]
+      );
+    } else {
+      await updateDeliveryStatus(smsId, 'SENT', recipients?.[0]);
+    }
+
+    return {
+      processed: true,
+      action: 'message_sent',
+      message: `Message marked as sent: ${smsId}`
+    };
+  } catch (error: any) {
+    logger.error('Failed to handle message sent:', error);
+    return {
+      processed: false,
+      message: `Error updating sent status: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageDelivered(
+  smsId: string,
+  body: any
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  try {
+    const { recipients, deliveredAt } = body;
+    
+    logger.info(`✅ Message delivered`, {
+      smsId,
+      recipients,
+      deliveredAt
+    });
+
+    // Update with specific delivered_at time if provided
+    if (deliveredAt) {
+      await query(
+        `UPDATE sms_logs 
+         SET status = 'delivered',
+             delivered_at = $1,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE external_id = $2 OR recipient = $3`,
+        [new Date(deliveredAt), smsId, recipients?.[0]]
+      );
+    } else {
+      await updateDeliveryStatus(smsId, 'DELIVERED', recipients?.[0]);
+    }
+
+    return {
+      processed: true,
+      action: 'message_delivered',
+      message: `Message marked as delivered: ${smsId}`
+    };
+  } catch (error: any) {
+    logger.error('Failed to handle message delivered:', error);
+    return {
+      processed: false,
+      message: `Error updating delivered status: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageFailed(
+  smsId: string,
+  body: any
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  try {
+    const { recipients, failedAt, error: errorMessage } = body;
+    
+    logger.error(`❌ Message failed`, {
+      smsId,
+      recipients,
+      failedAt,
+      errorMessage
+    });
+
+    await updateDeliveryStatus(smsId, 'FAILED', recipients?.[0]);
+
+    if (errorMessage) {
+      await query(
+        `UPDATE sms_logs 
+         SET error_message = $1,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE external_id = $2 OR recipient = $3`,
+        [errorMessage, smsId, recipients?.[0]]
+      );
+    }
+
+    return {
+      processed: true,
+      action: 'message_failed',
+      message: `Message marked as failed: ${smsId}`
+    };
+  } catch (error: any) {
+    logger.error('Failed to handle message failed:', error);
+    return {
+      processed: false,
+      message: `Error updating failed status: ${error.message}`
+    };
+  }
+}
+
+export const processTextSmsWebhook = async (
+  body: any,
+  headers?: any,
+  rawBody?: string
+): Promise<{ processed: boolean; action?: string; message?: string }> => {
+  try {
+    // Get signature from headers
+    const signature = headers?.['x-textbee-signature'] || 
+                     headers?.['x-signature'] || 
+                     headers?.['signature'];
+    const timestamp = headers?.['x-textbee-timestamp'] || 
+                     headers?.['x-timestamp'] || 
+                     headers?.['timestamp'];
+
+    // Verify signature if rawBody is provided
+    if (rawBody && signature && timestamp) {
+      const isValid = verifyWebhookSignature(rawBody, signature, timestamp);
+      if (!isValid) {
+        logger.error('Invalid webhook signature', {
+          signature: signature?.substring(0, 20) + '...',
+          timestamp,
+          bodyKeys: Object.keys(body)
+        });
+        return {
+          processed: false,
+          action: 'signature_invalid',
+          message: 'Invalid webhook signature'
+        };
+      }
+    } else if (process.env.TEXTBEE_WEBHOOK_SECRET) {
+      logger.warn('Missing signature or timestamp headers, but secret is configured');
+    }
+
+    // Parse the webhook payload
+    const {
+      smsId,
+      sender,
+      message,
+      receivedAt,
+      deviceId,
+      webhookSubscriptionId,
+      webhookEvent
+    } = body;
+
+    // Validate required fields
+    if (!webhookEvent) {
+      logger.warn('Missing webhookEvent in payload', body);
+      return {
+        processed: false,
+        message: 'Missing webhookEvent in payload'
+      };
+    }
+
+    logger.info(`📩 TextBee webhook received`, {
+      event: webhookEvent,
+      smsId,
+      sender,
+      deviceId,
+      webhookSubscriptionId
+    });
+
+    // Handle different event types
+    switch (webhookEvent) {
+      case 'MESSAGE_RECEIVED':
+        return await handleIncomingMessage(smsId, sender, message, receivedAt);
+        
+      case 'MESSAGE_SENT':
+        return await handleMessageSent(smsId, body);
+        
+      case 'MESSAGE_DELIVERED':
+        return await handleMessageDelivered(smsId, body);
+        
+      case 'MESSAGE_FAILED':
+        return await handleMessageFailed(smsId, body);
+        
+      default:
+        logger.warn(`Unknown webhook event: ${webhookEvent}`, body);
+        return {
+          processed: true, // Still return true to prevent retries
+          action: 'unknown_event',
+          message: `Unknown event type: ${webhookEvent}`
+        };
+    }
 
   } catch (error: any) {
-    logger.error('Failed to process TextSMS webhook', error);
+    logger.error('❌ Failed to process TextBee webhook', {
+      error: error.message,
+      stack: error.stack,
+      body: JSON.stringify(body).substring(0, 500)
+    });
+    
     return {
       processed: false,
       message: `Error: ${error.message}`
@@ -845,16 +975,15 @@ export const processTextSmsWebhook = async (
   }
 };
 
-// Added: Original processSmsWebhook function for backward compatibility
+// For backward compatibility
 export const processSmsWebhook = async (
   body: any,
   headers: any,
   rawBody: string
 ): Promise<{ processed: boolean; action?: string; message?: string }> => {
   try {
-    // This function now delegates to processTextSmsWebhook
-    // We ignore headers and rawBody since TextSMS doesn't use signature validation
-    return await processTextSmsWebhook(body);
+    // Delegate to the main webhook processor
+    return await processTextSmsWebhook(body, headers, rawBody);
   } catch (error: any) {
     logger.error('Failed to process SMS webhook', error);
     return {
@@ -864,24 +993,9 @@ export const processSmsWebhook = async (
   }
 };
 
-async function updateDeliveryStatus(
-  externalId: string, 
-  status: string, 
-  mobile: string
-): Promise<void> {
-  try {
-    await query(
-      `UPDATE sms_logs 
-       SET delivery_status = $1,
-           delivery_updated_at = CURRENT_TIMESTAMP,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE external_id = $2 OR recipient = $3`,
-      [status, externalId, mobile]
-    );
-  } catch (error) {
-    logger.error('Failed to update delivery status:', error);
-  }
-}
+/* ------------------------------------------------------------------ */
+/* Reply Message Processing */
+/* ------------------------------------------------------------------ */
 
 async function processReplyMessage(
   phone: string,
@@ -892,14 +1006,11 @@ async function processReplyMessage(
     const userText = message.trim();
     const upperText = userText.toUpperCase();
     
-    logger.info(`TextSMS reply received`, {
+    logger.info(`📨 Reply received`, {
       messageId,
       phone,
       text: userText
     });
-
-    // Update SMS log with reply
-    await updateSmsLogWithReply(messageId, userText, phone);
 
     // Process based on message content
     let action = 'processed';
@@ -925,7 +1036,7 @@ async function processReplyMessage(
         break;
     }
 
-    logger.info(`✅ TextSMS reply processed`, {
+    logger.info(`✅ Reply processed`, {
       action,
       phone,
       messageId
@@ -946,28 +1057,171 @@ async function processReplyMessage(
   }
 }
 
-async function updateSmsLogWithReply(
-  externalId: string, 
-  replyText: string,
-  phone: string
-): Promise<void> {
+/* ------------------------------------------------------------------ */
+/* Test Reply System */
+/* ------------------------------------------------------------------ */
+
+export const testReplySystem = async (reply: SmsReply) => {
   try {
-    await query(
-      `UPDATE sms_logs 
-       SET reply_received = true, 
-           reply_text = $1, 
-           reply_timestamp = CURRENT_TIMESTAMP,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE external_id = $2 OR recipient = $3`,
-      [replyText, externalId, phone]
+    const phone = formatPhoneNumber(reply.fromNumber);
+    const message = reply.text.trim();
+    const externalId = reply.textId;
+    const replyTime = new Date(reply.timestamp * 1000); // Convert from Unix timestamp
+
+    logger.info('🔧 Processing test reply for TextBee', {
+      externalId,
+      phone,
+      message,
+      replyTime: replyTime.toISOString()
+    });
+
+    // First, try to find by external_id (TextBee message ID)
+    let result = await pool.query(
+      `
+      UPDATE sms_logs
+      SET reply_received = true,
+          reply_text = $1,
+          reply_timestamp = $2,
+          status = COALESCE($3, status),
+          delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE external_id = $4
+      RETURNING *
+      `,
+      [message, replyTime, reply.status || 'delivered', externalId]
     );
-  } catch (error) {
-    logger.error('Failed to update SMS log with reply:', error);
+
+    // If not found by external_id, try by phone number
+    if (result.rowCount === 0) {
+      result = await pool.query(
+        `
+        UPDATE sms_logs
+        SET reply_received = true,
+            reply_text = $1,
+            reply_timestamp = $2,
+            status = COALESCE($3, status),
+            delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE recipient = $4
+        ORDER BY sent_at DESC
+        LIMIT 1
+        RETURNING *
+        `,
+        [message, replyTime, reply.status || 'delivered', phone]
+      );
+    }
+
+    if (result.rowCount === 0) {
+      logger.warn('No matching SMS log found for test reply', { 
+        externalId, 
+        phone,
+        message 
+      });
+      
+      // Create a new log entry if none found (for testing purposes)
+      const newLog = await saveSmsLog(
+        phone,
+        `[Test Reply] Original message not found`,
+        'test',
+        'sent',
+        externalId,
+        'test_system',
+        undefined
+      );
+      
+      // Update the new log with reply
+      if (newLog.id) {
+        await pool.query(
+          `
+          UPDATE sms_logs
+          SET reply_received = true,
+              reply_text = $1,
+              reply_timestamp = $2,
+              status = COALESCE($3, status),
+              delivered_at = CURRENT_TIMESTAMP,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = $4
+          `,
+          [message, replyTime, reply.status || 'delivered', newLog.id]
+        );
+        
+        // Fetch the updated log
+        result = await pool.query(
+          `SELECT * FROM sms_logs WHERE id = $1`,
+          [newLog.id]
+        );
+      }
+      
+      logger.info('✅ Created new test SMS log for reply', { 
+        externalId, 
+        phone,
+        logId: newLog.id 
+      });
+      return { 
+        success: true, 
+        data: result.rows[0] || newLog, 
+        createdNew: true 
+      };
+    }
+
+    logger.info('✅ Test reply processed successfully', { 
+      externalId, 
+      phone, 
+      text: message,
+      rowsUpdated: result.rowCount,
+      logId: result.rows[0]?.id
+    });
+    
+    return { 
+      success: true, 
+      data: result.rows[0], 
+      createdNew: false 
+    };
+
+  } catch (error: any) {
+    logger.error('❌ Failed to process test reply', {
+      error: error.message,
+      stack: error.stack,
+      reply
+    });
+    return { 
+      success: false, 
+      error: error.message 
+    };
   }
-}
+};
+
+// Helper function to simulate TextBee webhook for testing
+export const simulateTextBeeWebhook = async (
+  smsId: string,
+  sender: string,
+  message: string,
+  status: string = 'delivered',
+  eventType: string = 'MESSAGE_RECEIVED'
+): Promise<{ processed: boolean; action?: string; message?: string }> => {
+  const simulatedWebhook = {
+    smsId,
+    sender,
+    message,
+    receivedAt: new Date().toISOString(),
+    deviceId: TEXTBEE_DEVICE_ID || 'test_device',
+    webhookSubscriptionId: 'test_subscription',
+    webhookEvent: eventType,
+    ...(eventType === 'MESSAGE_FAILED' && { error: 'Simulated failure' })
+  };
+  
+  logger.info('🔧 Simulating TextBee webhook', {
+    smsId,
+    sender,
+    eventType,
+    messageLength: message.length
+  });
+  
+  return await processTextSmsWebhook(simulatedWebhook);
+};
 
 /* ------------------------------------------------------------------ */
-/* Subscription and Helper Functions (Keep as is, but update SMS sending) */
+/* Subscription and Helper Functions */
 /* ------------------------------------------------------------------ */
 
 async function handleUnsubscribe(phone: string): Promise<string> {
@@ -981,7 +1235,7 @@ async function handleUnsubscribe(phone: string): Promise<string> {
     [formattedPhone]
   );
   
-  // Send confirmation via TextSMS
+  // Send confirmation via TextBee
   await sendSmsMessage(
     phone,
     'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe anytime.',
@@ -1003,7 +1257,7 @@ async function handleSubscribe(phone: string): Promise<string> {
     [formattedPhone]
   );
   
-  // Send welcome message via TextSMS
+  // Send welcome message via TextBee
   await sendSmsMessage(
     phone,
     'Welcome to AgriPrice! You are now subscribed to daily price alerts.\n\nCommands:\n• Reply with location (e.g., NAIROBI) for prices\n• Reply STOP to unsubscribe\n• Reply HELP for more info',
@@ -1132,7 +1386,7 @@ export const subscribeUser = async (
       [formattedPhone, cropIds]
     );
 
-    // Send welcome message via TextSMS
+    // Send welcome message via TextBee
     await sendSmsMessage(
       formattedPhone,
       `Welcome to AgriPrice! You are now tracking ${cropIds.length || 'all'} crops.\n\nYou will receive daily price updates.\n\nCommands:\n• Reply with location for prices\n• Reply STOP to unsubscribe\n• Reply HELP for info`,
@@ -1232,7 +1486,7 @@ export const sendPriceAlert = async (
     if (subscribers.length > 0) {
       await sendBulkSms(subscribers, message, 'price_alert', sentBy);
       
-      logger.info(`✅ Price alert sent via TextSMS`, {
+      logger.info(`✅ Price alert sent via TextBee`, {
         crop: cropName,
         subscribers: subscribers.length,
         region
@@ -1294,7 +1548,7 @@ export const sendDailyPriceUpdate = async (sentBy?: string): Promise<void> => {
     if (subscribers.length > 0) {
       await sendBulkSms(subscribers, message, 'daily_update', sentBy);
       
-      logger.info(`✅ Daily update sent via TextSMS to ${subscribers.length} subscribers`);
+      logger.info(`✅ Daily update sent via TextBee to ${subscribers.length} subscribers`);
     } else {
       logger.info('No active subscribers for daily update');
     }
@@ -1317,12 +1571,12 @@ export default {
   
   // Webhook functions
   processTextSmsWebhook,
-  processSmsWebhook, // Original function for backward compatibility
+  processSmsWebhook,
+  verifyWebhookSignature,
   
   // Test functions
   testReplySystem,
-  testTextSmsConnection,
-  simulateTextSmsWebhook,
+  simulateTextBeeWebhook,
   
   // Subscription management
   subscribeUser,
@@ -1331,8 +1585,5 @@ export default {
   
   // Alerts
   sendPriceAlert,
-  sendDailyPriceUpdate,
-  
-  // TextSMS specific
-  getTextSmsBalance
+  sendDailyPriceUpdate
 };
