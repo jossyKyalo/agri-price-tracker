@@ -47,10 +47,13 @@ export interface TextBeeResponse {
   message?: string | undefined;
   data?: {
     _id?: string | undefined;
+    smsBatchId?: string | undefined;
     message?: string | undefined;
     recipients?: string[] | undefined;
     status?: string | undefined;
     createdAt?: string | undefined;
+    success?: boolean | undefined;
+    recipientCount?: number | undefined;
   } | undefined;
   error?: string | undefined;
 }
@@ -63,9 +66,13 @@ export interface ConnectionTestResult {
 }
 
 export interface TextBeeApiResponse {
+  success?: boolean;
   data?: {
-    _id?: string;
+    success?: boolean;
     message?: string;
+    recipientCount?: number;
+    smsBatchId?: string;
+    _id?: string;
     recipients?: string[];
     status?: string;
     createdAt?: string;
@@ -189,26 +196,29 @@ class TextBeeClient {
 
       const apiResponse = response.data;
       
-      let success = false;
-      let externalId: string | undefined;
+      // Check for success flag (could be at root level or in data)
+      let success = apiResponse.success === true || 
+                    apiResponse.data?.success === true;
       
-      if (apiResponse.data?._id) {
-        success = true;
-        externalId = apiResponse.data._id;
-      }
+      let externalId: string | undefined = apiResponse.data?.smsBatchId || 
+                                          apiResponse.data?._id;
 
       const responseData: TextBeeResponse['data'] = {
         _id: externalId,
+        smsBatchId: apiResponse.data?.smsBatchId,
         message: message,
         recipients: [formattedPhone],
         status: apiResponse.data?.status || 'PENDING',
-        createdAt: apiResponse.data?.createdAt
+        createdAt: apiResponse.data?.createdAt || new Date().toISOString(),
+        success: success,
+        recipientCount: 1
       };
       
       return {
         success,
         code: success ? '200' : '500',
-        message: success ? 'SMS sent successfully' : apiResponse.message || 'SMS failed',
+        message: success ? (apiResponse.data?.message || apiResponse.message || 'SMS queued successfully') : 
+                         (apiResponse.message || 'SMS failed'),
         data: responseData,
         error: !success ? apiResponse.error || apiResponse.message || 'SMS failed' : undefined
       };
@@ -271,26 +281,30 @@ class TextBeeClient {
 
       const apiResponse = response.data;
       
-      let success = false;
-      let externalId: string | undefined;
+      // Check for success flag (could be at root level or in data)
+      let success = apiResponse.success === true || 
+                    apiResponse.data?.success === true ||
+                    !!apiResponse.data?.smsBatchId;
       
-      if (apiResponse.data?._id) {
-        success = true;
-        externalId = apiResponse.data._id;
-      }
+      let externalId: string | undefined = apiResponse.data?.smsBatchId || 
+                                          apiResponse.data?._id;
 
       const responseData: TextBeeResponse['data'] = {
         _id: externalId,
+        smsBatchId: apiResponse.data?.smsBatchId,
         message: message,
         recipients: formattedPhones,
-        status: apiResponse.data?.status || 'PENDING',
-        createdAt: apiResponse.data?.createdAt
+        status: 'PENDING', // TextBee returns PENDING when queued
+        createdAt: new Date().toISOString(),
+        success: success,
+        recipientCount: phones.length
       };
       
       return {
         success,
         code: success ? '200' : '500',
-        message: success ? 'Bulk SMS sent successfully' : apiResponse.message || 'Bulk SMS failed',
+        message: success ? (apiResponse.data?.message || 'Bulk SMS queued successfully') : 
+                         (apiResponse.message || 'Bulk SMS failed'),
         data: responseData,
         error: !success ? apiResponse.error || apiResponse.message || 'Bulk SMS failed' : undefined
       };
@@ -398,15 +412,20 @@ export const sendSmsMessage = async (
       }
     );
     
-    const success = response.success === true;
-    externalId = response.data?._id || `textbee_${Date.now()}`;
+    // Check for success - TextBee returns success when SMS is queued
+    const success = response.success === true || 
+                   response.code === '200' || 
+                   !!response.data?._id;
+    
+    externalId = response.data?._id || response.data?.smsBatchId || `textbee_${Date.now()}`;
 
     if (success) {
-      logger.info(`✅ SMS sent via TextBee`, { 
+      logger.info(`✅ SMS queued via TextBee`, { 
         recipient: formattedRecipient, 
         messageId: externalId,
         scheduleTime,
-        responseCode: response.code
+        responseCode: response.code,
+        responseMessage: response.message
       });
       return await saveSmsLog(
         formattedRecipient, 
@@ -422,7 +441,7 @@ export const sendSmsMessage = async (
         recipient: formattedRecipient, 
         error: errorMsg,
         code: response.code,
-        response
+        responseMessage: response.message
       });
       return await saveSmsLog(
         formattedRecipient, 
@@ -484,8 +503,13 @@ export const sendBulkSms = async (
         }
       );
 
-      const success = response.success === true;
-      const externalId = response.data?._id || `textbee_bulk_${Date.now()}`;
+      // Check for success - TextBee returns success when SMS is queued
+      const success = response.success === true || 
+                     response.code === '200' || 
+                     !!response.data?._id ||
+                     !!response.data?.smsBatchId;
+      
+      const externalId = response.data?._id || response.data?.smsBatchId || `textbee_bulk_${Date.now()}`;
       
       validRecipients.forEach((recipient, index) => {
         results.push({
@@ -500,16 +524,18 @@ export const sendBulkSms = async (
       });
 
       if (success) {
-        logger.info(`✅ Bulk SMS sent via TextBee`, { 
+        logger.info(`✅ Bulk SMS queued via TextBee`, { 
           count: validRecipients.length,
           type: smsType,
-          responseCode: response.code
+          responseCode: response.code,
+          batchId: externalId,
+          responseMessage: response.message
         });
       } else {
         logger.error('❌ Bulk SMS failed via TextBee', { 
           error: response.message,
           code: response.code,
-          response
+          responseMessage: response.message
         });
       }
 
