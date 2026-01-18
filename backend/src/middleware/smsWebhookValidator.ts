@@ -1,54 +1,50 @@
-// middleware/smsWebhookValidator.ts
+
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { ApiError } from '../utils/apiError';
-import { schemas } from './validation';
 
-/**
- * Special validation for SMS webhooks that uses raw body
- * This bypasses normal validation to handle Textbelt signature verification
- */
-export const validateSmsWebhook = (req: Request, res: Response, next: NextFunction): void => {
-  try {
-    // Validate required headers for paid tier
-    const signature = req.headers['x-textbelt-signature'];
-    const timestamp = req.headers['x-textbelt-timestamp'];
-    
-    // If using paid Textbelt tier, validate signature headers
-    if (process.env.TEXTBELT_API_KEY && process.env.TEXTBELT_API_KEY !== 'textbelt') {
-      if (!signature || !timestamp) {
-        throw new ApiError('Missing Textbelt signature headers', 400);
-      }
-      
-      // Validate timestamp format
-      const timestampNum = parseInt(timestamp as string, 10);
-      if (isNaN(timestampNum)) {
-        throw new ApiError('Invalid timestamp format', 400);
-      }
+const smsLeopardWebhookSchema = Joi.object({
+    message_id: Joi.string().optional(),
+    to: Joi.string().required(),
+    status: Joi.string()
+        .valid('DELIVERED', 'FAILED', 'PENDING', 'SENT')
+        .required(),
+    error: Joi.string().optional(),
+    cost: Joi.number().optional(),
+    timestamp: Joi.string().optional(),
+}).unknown(true);
+
+export const validateSmsWebhook = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    try {
+        // Ensure JSON body exists
+        if (!req.body || Object.keys(req.body).length === 0) {
+            throw new ApiError('Empty webhook payload', 400);
+        }
+
+        const { error } = smsLeopardWebhookSchema.validate(req.body, {
+            abortEarly: false,
+        });
+
+        if (error) {
+            const message = error.details.map(d => d.message).join(', ');
+            throw new ApiError(`SMSLeopard webhook validation error: ${message}`, 400);
+        }
+
+        next();
+    } catch (err) {
+        next(err);
     }
-
-    // Validate request body against schema
-    const { error } = schemas.smsWebhook.validate(req.body, { abortEarly: false });
-
-    if (error) {
-      const errorMessage = error.details
-        .map(detail => detail.message)
-        .join(', ');
-
-      throw new ApiError(`Webhook validation error: ${errorMessage}`, 400);
-    }
-
-    next();
-  } catch (error) {
-    next(error);
-  }
 };
 
-/**
- * Alternative: Skip validation entirely for webhooks (since Textbelt controls the payload)
- * This is useful if you want to accept webhooks even if validation fails
- */
-export const acceptSmsWebhook = (req: Request, res: Response, next: NextFunction): void => {
-  // Always accept webhook, validation happens in service layer
-  next();
+
+export const acceptSmsWebhook = (
+    _req: Request,
+    _res: Response,
+    next: NextFunction
+): void => {
+    next();
 };

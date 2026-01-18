@@ -6,8 +6,10 @@ import {
   sendSmsMessage, 
   sendBulkSms, 
   processSmsWebhook,
+  processTextSmsWebhook, 
   testReplySystem,
-  formatPhoneNumber
+  formatPhoneNumber,
+  simulateTextSmsWebhook 
 } from '../services/smsService';
 import type { 
   SendSmsRequest, 
@@ -45,10 +47,10 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
       }
     }
 
-    // Send SMS
+    // Send SMS using TextSMS
     const smsResults = await sendBulkSms(recipients, finalMessage, sms_type, sentBy);
 
-    logger.info(`SMS sent to ${recipients.length} recipients by ${req.user!.email}`);
+    logger.info(`SMS sent via TextSMS to ${recipients.length} recipients by ${req.user!.email}`);
 
     const response: ApiResponse = {
       success: true,
@@ -77,8 +79,10 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
       template_variables,
       reply_webhook_url,
       webhook_data,
-      sender
-    }: SendSmsWithReplyRequest = req.body;
+      sender,
+      schedule_time, // Added for TextSMS scheduling
+      getdlr = false // Added for delivery reports
+    }: SendSmsWithReplyRequest & { schedule_time?: string; getdlr?: boolean } = req.body;
 
     const sentBy = req.user!.id;
     let finalMessage = message;
@@ -101,16 +105,18 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
     for (const recipient of recipients) {
       const options: any = {
         smsType: sms_type,
-        sentBy
+        sentBy,
+        scheduleTime: schedule_time,
+        getdlr: getdlr
       };
-      if (reply_webhook_url) options.replyWebhookUrl = reply_webhook_url;
-      if (webhook_data) options.webhookData = webhook_data;
-      if (sender) options.sender = sender;
+      
+      // TextSMS doesn't support custom reply webhook URLs per message
+      // You'll need to use your main webhook endpoint configured with TextSMS
       
       const result = await sendSmsMessage(recipient, finalMessage, options);
       smsResults.push(result);
 
-      // Small delay between messages
+      // Small delay between messages to avoid rate limiting
       await new Promise(r => setTimeout(r, 200));
     }
 
@@ -123,7 +129,8 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
         sent: smsResults.filter(r => r.status === 'sent').length,
         failed: smsResults.filter(r => r.status === 'failed').length,
         results: smsResults,
-        has_reply_support: true
+        has_reply_support: true,
+        provider: 'TextSMS'
       }
     };
 
@@ -133,34 +140,63 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
   }
 };
 
-// NEW: Handle SMS webhook from Textbelt
+// UPDATED: Handle SMS webhook from TextSMS (no signature validation needed)
 export const handleSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Get raw body for signature verification
-    const rawBody = (req as any).rawBody || JSON.stringify(req.body);
-    const headers = req.headers;
-    
-    // Process the webhook
-    const result = await processSmsWebhook(req.body, headers, rawBody);
+    // For TextSMS, we don't need signature validation or raw body
+    // Simply process the body directly
+    const result = await processTextSmsWebhook(req.body);
     
     if (result.processed) {
-      logger.info(`SMS webhook processed successfully: ${result.action}`);
+      logger.info(`TextSMS webhook processed successfully: ${result.action}`);
       
-      // Return success response to Textbelt
+      // Return success response to TextSMS
       res.status(200).json({
         success: true,
         message: 'Webhook processed successfully'
       });
     } else {
-      logger.warn(`SMS webhook failed: ${result.message}`);
+      logger.warn(`TextSMS webhook failed: ${result.message}`);
       res.status(400).json({
         success: false,
         error: result.message
       });
     }
   } catch (error) {
-    logger.error('Error processing SMS webhook:', error);
-    // Still return 200 to Textbelt to avoid retries
+    logger.error('Error processing TextSMS webhook:', error);
+    // Still return 200 to TextSMS to avoid retries
+    res.status(200).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};
+
+// UPDATED: Also keep the old endpoint for backward compatibility
+export const handleTextSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    // For TextSMS, we don't need signature validation or raw body
+    // Simply process the body directly
+    const result = await processTextSmsWebhook(req.body);
+    
+    if (result.processed) {
+      logger.info(`TextSMS webhook processed successfully: ${result.action}`);
+      
+      // Return success response to TextSMS
+      res.status(200).json({
+        success: true,
+        message: 'Webhook processed successfully'
+      });
+    } else {
+      logger.warn(`TextSMS webhook failed: ${result.message}`);
+      res.status(400).json({
+        success: false,
+        error: result.message
+      });
+    }
+  } catch (error) {
+    logger.error('Error processing TextSMS webhook:', error);
+    // Still return 200 to TextSMS to avoid retries
     res.status(200).json({
       success: false,
       error: 'Internal server error'
@@ -217,6 +253,7 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
          reply_timestamp,
          external_id,
          sms_type,
+         delivery_status,
          created_at
        FROM sms_logs
        ${whereClause}
@@ -244,6 +281,7 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
         reply_timestamp: row.reply_timestamp,
         external_id: row.external_id,
         sms_type: row.sms_type,
+        delivery_status: row.delivery_status,
         received_at: row.reply_timestamp
       })),
       pagination: {
@@ -260,21 +298,109 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// NEW: Test SMS reply system
+// UPDATED: Test SMS reply system for TextSMS
 export const testSmsReplySystem = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { test_phone } = req.body;
+    const { 
+      test_phone, 
+      test_message = "Test reply message",
+      test_message_id = `test_${Date.now()}`,
+      test_status = "delivered"
+    } = req.body;
 
     if (!test_phone) {
       throw new ApiError('Test phone number is required', 400);
     }
 
-    const result = await testReplySystem(test_phone);
+    // Create a test reply object matching the SmsReply interface
+    const testReply = {
+      textId: test_message_id,
+      fromNumber: test_phone,
+      text: test_message,
+      status: test_status,
+      timestamp: Date.now()
+    };
+
+    // Option 1: Test using the testReplySystem function
+    const result = await testReplySystem(testReply);
+
+    // Option 2: Alternatively, simulate a webhook
+    // const webhookResult = await simulateTextSmsWebhook(
+    //   test_message_id,
+    //   test_phone,
+    //   test_message,
+    //   test_status
+    // );
 
     const response: ApiResponse = {
       success: result.success,
-      message: result.message,
-      data: result.details
+      message: result.success ? 'Test reply system is working' : 'Test reply system failed',
+      data: {
+        ...result,
+        test_details: {
+          phone: test_phone,
+          message_id: test_message_id,
+          message: test_message,
+          status: test_status
+        }
+      }
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// NEW: Test TextSMS connection
+export const testTextSmsConnection = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { testTextSmsConnection, getTextSmsBalance } = require('../services/smsService');
+    
+    const connectionResult = await testTextSmsConnection();
+    const balance = await getTextSmsBalance();
+
+    const response: ApiResponse = {
+      success: connectionResult.isActive,
+      message: connectionResult.isActive ? 'TextSMS connection is active' : 'TextSMS connection failed',
+      data: {
+        isActive: connectionResult.isActive,
+        balance: balance,
+        status: connectionResult.status,
+        details: connectionResult.details
+      }
+    };
+
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// NEW: Send test SMS
+export const sendTestSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { phone, message = "Test SMS from AgriPrice system" } = req.body;
+
+    if (!phone) {
+      throw new ApiError('Test phone number is required', 400);
+    }
+
+    const result = await sendSmsMessage(phone, message, {
+      smsType: 'test',
+      sentBy: req.user?.id || 'test_user'
+    });
+
+    const response: ApiResponse = {
+      success: result.status === 'sent',
+      message: result.status === 'sent' ? 'Test SMS sent successfully' : 'Failed to send test SMS',
+      data: {
+        recipient: result.recipient,
+        message: result.message,
+        status: result.status,
+        external_id: result.external_id,
+        error_message: result.error_message
+      }
     };
 
     res.json(response);
@@ -378,21 +504,12 @@ export const getSmsTemplates = async (req: Request, res: Response, next: NextFun
   try {
     const { sms_type, is_active = true } = req.query;
 
-    const conditions: string[] = ['is_active = $1'];
-    const params: any[] = [is_active];
-    let paramIndex = 2;
-
-    if (sms_type) {
-      conditions.push(`sms_type = $${paramIndex++}`);
-      params.push(sms_type);
-    }
-
     const result = await query(
       `SELECT st.*, u.full_name as created_by_name
-   FROM sms_templates st
-   JOIN users u ON st.created_by = u.id
-   WHERE st.is_active = $1
-   ORDER BY st.created_at DESC`,
+       FROM sms_templates st
+       JOIN users u ON st.created_by = u.id
+       WHERE st.is_active = $1
+       ORDER BY st.created_at DESC`,
       [true]
     );
 
