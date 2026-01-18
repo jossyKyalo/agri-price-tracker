@@ -8,8 +8,7 @@ import {
   processSmsWebhook,
   processTextSmsWebhook, 
   testReplySystem,
-  formatPhoneNumber,
-  simulateTextSmsWebhook 
+  formatPhoneNumber
 } from '../services/smsService';
 import type { 
   SendSmsRequest, 
@@ -80,19 +79,17 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
       reply_webhook_url,
       webhook_data,
       sender,
-      schedule_time, // Added for TextSMS scheduling
-      getdlr = false // Added for delivery reports
+      schedule_time,  
+      getdlr = false 
     }: SendSmsWithReplyRequest & { schedule_time?: string; getdlr?: boolean } = req.body;
 
     const sentBy = req.user!.id;
     let finalMessage = message;
-
-    // If template is used, process variables
+ 
     if (template_id && template_variables) {
       const templateResult = await query('SELECT template FROM sms_templates WHERE id = $1', [template_id]);
       if (templateResult.rows.length > 0) {
-        finalMessage = templateResult.rows[0].template;
-        // Replace variables in template
+        finalMessage = templateResult.rows[0].template; 
         Object.entries(template_variables).forEach(([key, value]) => {
           finalMessage = finalMessage.replace(new RegExp(`{${key}}`, 'g'), value);
         });
@@ -100,8 +97,7 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
     }
 
     const smsResults = [];
-    
-    // Send SMS to each recipient with webhook support
+     
     for (const recipient of recipients) {
       const options: any = {
         smsType: sms_type,
@@ -109,14 +105,10 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
         scheduleTime: schedule_time,
         getdlr: getdlr
       };
-      
-      // TextSMS doesn't support custom reply webhook URLs per message
-      // You'll need to use your main webhook endpoint configured with TextSMS
+       
       
       const result = await sendSmsMessage(recipient, finalMessage, options);
-      smsResults.push(result);
-
-      // Small delay between messages to avoid rate limiting
+      smsResults.push(result); 
       await new Promise(r => setTimeout(r, 200));
     }
 
@@ -139,18 +131,14 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
-
-// UPDATED: Handle SMS webhook from TextSMS (no signature validation needed)
+ 
 export const handleSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    // For TextSMS, we don't need signature validation or raw body
-    // Simply process the body directly
+  try { 
     const result = await processTextSmsWebhook(req.body);
     
     if (result.processed) {
       logger.info(`TextSMS webhook processed successfully: ${result.action}`);
-      
-      // Return success response to TextSMS
+       
       res.status(200).json({
         success: true,
         message: 'Webhook processed successfully'
@@ -163,26 +151,21 @@ export const handleSmsWebhook = async (req: Request, res: Response, next: NextFu
       });
     }
   } catch (error) {
-    logger.error('Error processing TextSMS webhook:', error);
-    // Still return 200 to TextSMS to avoid retries
+    logger.error('Error processing TextSMS webhook:', error); 
     res.status(200).json({
       success: false,
       error: 'Internal server error'
     });
   }
-};
+}; 
 
-// UPDATED: Also keep the old endpoint for backward compatibility
 export const handleTextSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    // For TextSMS, we don't need signature validation or raw body
-    // Simply process the body directly
+  try { 
     const result = await processTextSmsWebhook(req.body);
     
     if (result.processed) {
       logger.info(`TextSMS webhook processed successfully: ${result.action}`);
-      
-      // Return success response to TextSMS
+       
       res.status(200).json({
         success: true,
         message: 'Webhook processed successfully'
@@ -195,16 +178,14 @@ export const handleTextSmsWebhook = async (req: Request, res: Response, next: Ne
       });
     }
   } catch (error) {
-    logger.error('Error processing TextSMS webhook:', error);
-    // Still return 200 to TextSMS to avoid retries
+    logger.error('Error processing TextSMS webhook:', error); 
     res.status(200).json({
       success: false,
       error: 'Internal server error'
     });
   }
 };
-
-// NEW: Get SMS replies
+ 
 export const getSmsReplies = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { 
@@ -234,9 +215,7 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
       conditions.push(`reply_timestamp <= $${paramIndex++}`);
       params.push(date_to);
     }
-    if (action) {
-      // You might need to store the action in a separate table or column
-      // For now, we'll search in reply_text
+    if (action) { 
       conditions.push(`reply_text ILIKE $${paramIndex++}`);
       params.push(`%${action}%`);
     }
@@ -297,8 +276,7 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
-
-// UPDATED: Test SMS reply system for TextSMS
+ 
 export const testSmsReplySystem = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { 
@@ -310,9 +288,8 @@ export const testSmsReplySystem = async (req: Request, res: Response, next: Next
 
     if (!test_phone) {
       throw new ApiError('Test phone number is required', 400);
-    }
+    } 
 
-    // Create a test reply object matching the SmsReply interface
     const testReply = {
       textId: test_message_id,
       fromNumber: test_phone,
@@ -320,17 +297,9 @@ export const testSmsReplySystem = async (req: Request, res: Response, next: Next
       status: test_status,
       timestamp: Date.now()
     };
-
-    // Option 1: Test using the testReplySystem function
+ 
     const result = await testReplySystem(testReply);
-
-    // Option 2: Alternatively, simulate a webhook
-    // const webhookResult = await simulateTextSmsWebhook(
-    //   test_message_id,
-    //   test_phone,
-    //   test_message,
-    //   test_status
-    // );
+ 
 
     const response: ApiResponse = {
       success: result.success,
@@ -351,8 +320,7 @@ export const testSmsReplySystem = async (req: Request, res: Response, next: Next
     next(error);
   }
 };
-
-// NEW: Test TextSMS connection
+ 
 export const testTextSmsConnection = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { testTextSmsConnection, getTextSmsBalance } = require('../services/smsService');
@@ -376,8 +344,7 @@ export const testTextSmsConnection = async (req: Request, res: Response, next: N
     next(error);
   }
 };
-
-// NEW: Send test SMS
+ 
 export const sendTestSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { phone, message = "Test SMS from AgriPrice system" } = req.body;
