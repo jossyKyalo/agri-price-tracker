@@ -120,6 +120,11 @@ export class PublicPortalComponent implements OnInit {
   ngOnInit(): void {
     this.checkAuth();
     this.loadData();
+  } 
+ 
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    this.filterCrops();  
   }
 
   openHistoryModal(crop: DisplayCrop) {
@@ -360,6 +365,18 @@ export class PublicPortalComponent implements OnInit {
 
       return matchesSearch && matchesCategory && matchesRegion && matchesSource;
     });
+
+    if (this.activeTab === 'predictions') { 
+      this.filteredCrops.sort((a, b) => {
+        const getChange = (c: DisplayCrop) => {
+          if (!c.currentPrice || c.prediction == null) return -1;  
+          return Math.abs((c.prediction - c.currentPrice) / c.currentPrice);
+        };
+        return getChange(b) - getChange(a);  
+      });
+    } else { 
+      this.filteredCrops.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
 
     this.currentPage = 1;
   }

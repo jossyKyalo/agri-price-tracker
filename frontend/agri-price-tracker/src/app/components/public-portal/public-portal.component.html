@@ -94,19 +94,19 @@
     </div>
 
     <div class="portal-tabs">
-      <button class="tab-btn" [class.active]="activeTab === 'prices'" (click)="activeTab = 'prices'">
+      <button class="tab-btn" [class.active]="activeTab === 'prices'" (click)="setActiveTab('prices')">
         <i class="fas fa-chart-bar"></i>
         Current Prices
       </button>
-      <button class="tab-btn" [class.active]="activeTab === 'predictions'" (click)="activeTab = 'predictions'">
+      <button class="tab-btn" [class.active]="activeTab === 'predictions'" (click)="setActiveTab('predictions')">
         <i class="fas fa-brain"></i>
         AI Predictions
       </button>
-      <button class="tab-btn" [class.active]="activeTab === 'input'" (click)="activeTab = 'input'">
+      <button class="tab-btn" [class.active]="activeTab === 'input'" (click)="setActiveTab('input')">
         <i class="fas fa-plus-circle"></i>
         Input Prices
       </button>
-      <button class="tab-btn" [class.active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
+      <button class="tab-btn" [class.active]="activeTab === 'sms'" (click)="setActiveTab('sms')">
         <i class="fas fa-sms"></i>
         SMS Alerts
       </button>
