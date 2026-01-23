@@ -1,4 +1,8 @@
 Commodity,Classification,Grade,Sex,Market,Wholesale,Retail,Supply Volume,County,Date,ProductID,CropName
+Dry Maize,White Maize,-,-,Katito,55.56/Kg,69.31/Kg,7500.0,Kisumu,2026-01-22,1,Product-1
+Dry Maize,Yellow Maize,-,-,Gikomba,77.78/Kg,100.00/Kg,,Nairobi,2026-01-22,1,Product-1
+Dry Maize,White Maize,-,-,Gikomba,50.00/Kg,65.00/Kg,,Nairobi,2026-01-22,1,Product-1
+Dry Maize,White Maize,-,-,Kitale Municipality Market,40.00/Kg,44.44/Kg,500.0,Trans-Nzoia,2026-01-22,1,Product-1
 Dry Maize,White Maize,-,-,Sabatia,42.22/Kg,50.00/Kg,13500.0,Kakamega,2026-01-21,1,Product-1
 Dry Maize,White Maize,-,-,Mwingi Town,46.67/Kg,55.00/Kg,36000.0,Kitui,2026-01-21,1,Product-1
 Dry Maize,White Maize,-,-,Kakamega Town,38.89/Kg,50.00/Kg,30000.0,Kakamega,2026-01-21,1,Product-1
@@ -95,9 +99,9 @@ Dry Maize,White Maize,-,-,Ngurubani Market,44.44/Kg,50.00/Kg,3200.0,Kirinyaga,20
 Dry Maize,White Maize,-,-,Taveta Retail Market,35.00/Kg,45.00/Kg,2000.0,Taita-Taveta,2025-12-27,1,Product-1
 Dry Maize,White Maize,-,-,Gakoromone,51.11/Kg,51.11/Kg,50000.0,Meru,2025-12-26,1,Product-1
 Dry Maize,White Maize,-,-,Kakamega Town,33.33/Kg,50.00/Kg,20000.0,Kakamega,2025-12-26,1,Product-1
-Dry Maize,White Maize,-,-,Mwingi Town,46.67/Kg,55.00/Kg,30000.0,Kitui,2025-12-24,1,Product-1
-Dry Maize,White Maize,-,-,Maua,50.00/Kg,60.00/Kg,6300.0,Meru,2025-12-24,1,Product-1
-Dry Maize,White Maize,-,-,Kangeta,40.00/Kg,50.00/Kg,1000.0,Meru,2025-12-24,1,Product-1
+Red Sorghum,-,-,-,Katito,80.00/Kg,93.46/Kg,3500.0,Kisumu,2026-01-22,2,Product-2
+Red Sorghum,-,-,-,Gikomba,72.22/Kg,100.00/Kg,,Nairobi,2026-01-22,2,Product-2
+Red Sorghum,-,-,-,Kitale Municipality Market,61.11/Kg,68.89/Kg,300.0,Trans-Nzoia,2026-01-22,2,Product-2
 Red Sorghum,-,-,-,Sabatia,62.22/Kg,68.18/Kg,630.0,Kakamega,2026-01-21,2,Product-2
 Red Sorghum,-,-,-,Kangeta,70.08/Kg,80.00/Kg,600.0,Meru,2026-01-21,2,Product-2
 Red Sorghum,-,-,-,Ngurubani Market,81.11/Kg,100.00/Kg,850.0,Kirinyaga,2026-01-20,2,Product-2
@@ -139,8 +143,8 @@ Red Sorghum,-,-,-,Maua,80.00/Kg,90.00/Kg,1700.0,Meru,2025-12-30,2,Product-2
 Red Sorghum,-,-,-,Kangeta,70.00/Kg,80.00/Kg,500.0,Meru,2025-12-29,2,Product-2
 Red Sorghum,-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,2,Product-2
 Red Sorghum,-,-,-,Ngurubani Market,80.00/Kg,100.00/Kg,850.0,Kirinyaga,2025-12-27,2,Product-2
-Red Sorghum,-,-,-,Maua,60.00/Kg,70.00/Kg,1500.0,Meru,2025-12-24,2,Product-2
-Red Sorghum,-,-,-,Kangeta,70.00/Kg,80.00/Kg,500.0,Meru,2025-12-24,2,Product-2
+Wheat,-,-,-,Gikomba,64.44/Kg,100.00/Kg,,Nairobi,2026-01-22,3,Product-3
+Wheat,-,-,-,Kitale Municipality Market,61.11/Kg,66.67/Kg,500.0,Trans-Nzoia,2026-01-22,3,Product-3
 Wheat,-,-,-,Bondeni,85.00/Kg,115.00/Kg,400.0,Trans-Nzoia,2026-01-20,3,Product-3
 Wheat,-,-,-,Maua,86.67/Kg,100.00/Kg,1350.0,Meru,2026-01-20,3,Product-3
 Wheat,-,-,-,Kitale Municipality Market,90.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-20,3,Product-3
@@ -153,7 +157,13 @@ Wheat,-,-,-,Maua,86.67/Kg,100.00/Kg,1500.0,Meru,2026-01-06,3,Product-3
 Wheat,-,-,-,Kutus,85.00/Kg,200.00/Kg,,Kirinyaga,2026-01-05,3,Product-3
 Wheat,-,-,-,Maua,86.67/Kg,100.00/Kg,1080.0,Meru,2025-12-30,3,Product-3
 Wheat,-,-,-,Kibuye,-,85.00/Kg,,Kisumu,2025-12-28,3,Product-3
-Wheat,-,-,-,Maua,77.78/Kg,100.00/Kg,1350.0,Meru,2025-12-24,3,Product-3
+Rice,Pishori,-,-,Katito,175.00/Kg,178.57/Kg,6500.0,Kisumu,2026-01-22,4,Product-4
+Rice,IRR,-,-,Katito,125.00/Kg,158.37/Kg,8500.0,Kisumu,2026-01-22,4,Product-4
+Rice,Sindano,-,-,Gikomba,160.00/Kg,160.00/Kg,,Nairobi,2026-01-22,4,Product-4
+Rice,Pishori,-,-,Gikomba,160.00/Kg,180.00/Kg,,Nairobi,2026-01-22,4,Product-4
+Rice,Sindano,-,-,Kitale Municipality Market,120.00/Kg,152.00/Kg,300.0,Trans-Nzoia,2026-01-22,4,Product-4
+Rice,Pishori,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,400.0,Trans-Nzoia,2026-01-22,4,Product-4
+Rice,IRR,-,-,Kitale Municipality Market,80.00/Kg,112.00/Kg,500.0,Trans-Nzoia,2026-01-22,4,Product-4
 Rice,Sindano,-,-,Mwingi Town,152.00/Kg,170.00/Kg,5000.0,Kitui,2026-01-21,4,Product-4
 Rice,Pishori,-,-,Mwingi Town,190.00/Kg,220.00/Kg,3000.0,Kitui,2026-01-21,4,Product-4
 Rice,Pishori,-,-,Ngurubani Market,150.00/Kg,170.00/Kg,152000.0,Kirinyaga,2026-01-20,4,Product-4
@@ -213,9 +223,10 @@ Rice,Pishori,-,-,Kerugoya,150.00/Kg,180.00/Kg,2400.0,Kirinyaga,2025-12-29,4,Prod
 Rice,Pishori,-,-,Kibuye,-,175.00/Kg,,Kisumu,2025-12-28,4,Product-4
 Rice,IRR,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,4,Product-4
 Rice,Pishori,-,-,Ngurubani Market,140.00/Kg,160.00/Kg,136500.0,Kirinyaga,2025-12-27,4,Product-4
-Rice,Sindano,-,-,Mwingi Town,152.00/Kg,180.00/Kg,2000.0,Kitui,2025-12-24,4,Product-4
-Rice,Pishori,-,-,Maua,160.00/Kg,200.00/Kg,6000.0,Meru,2025-12-24,4,Product-4
-Rice,Sindano,-,-,Maua,140.00/Kg,160.00/Kg,3000.0,Meru,2025-12-24,4,Product-4
+Green Grams,Local-Special,-,-,Katito,173.33/Kg,180.95/Kg,3800.0,Kisumu,2026-01-22,10,Product-10
+Green Grams,Makueni,-,-,Gikomba,100.00/Kg,200.00/Kg,,Nairobi,2026-01-22,10,Product-10
+Green Grams,Makueni,-,-,Kitale Municipality Market,175.00/Kg,200.00/Kg,300.0,Trans-Nzoia,2026-01-22,10,Product-10
+Green Grams,Hybrid/ polished,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,400.0,Trans-Nzoia,2026-01-22,10,Product-10
 Green Grams,Hybrid/ polished,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,10,Product-10
 Green Grams,Local-Special,-,-,Sabatia,111.11/Kg,121.74/Kg,900.0,Kakamega,2026-01-21,10,Product-10
 Green Grams,Local-Special,-,-,Kangeta,130.00/Kg,140.00/Kg,400.0,Meru,2026-01-21,10,Product-10
@@ -294,13 +305,10 @@ Green Grams,Hybrid/ polished,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,10,Produc
 Green Grams,Hybrid/ polished,-,-,Ngurubani Market,100.00/Kg,155.00/Kg,3500.0,Kirinyaga,2025-12-27,10,Product-10
 Green Grams,Makueni,-,-,Makutano Kirinyaga,170.00/Kg,200.00/Kg,1050.0,Kirinyaga,2025-12-27,10,Product-10
 Green Grams,Hybrid/ polished,-,-,Makutano Kirinyaga,150.00/Kg,45.00/Kg,2500.0,Kirinyaga,2025-12-27,10,Product-10
-Green Grams,Makueni,-,-,Makutano Kirinyaga,150.00/Kg,175.00/Kg,2350.0,Kirinyaga,2025-12-24,10,Product-10
-Green Grams,Hybrid/ polished,-,-,Makutano Kirinyaga,170.00/Kg,200.00/Kg,2100.0,Kirinyaga,2025-12-24,10,Product-10
-Green Grams,Hybrid/ polished,-,-,Maua,133.33/Kg,140.00/Kg,7200.0,Meru,2025-12-24,10,Product-10
-Green Grams,Makueni,-,-,Kerugoya,120.00/Kg,160.00/Kg,1650.0,Kirinyaga,2025-12-24,10,Product-10
-Green Grams,Local-Special,-,-,Kerugoya,120.00/Kg,150.00/Kg,1600.0,Kirinyaga,2025-12-24,10,Product-10
-Green Grams,Hybrid/ polished,-,-,Kerugoya,130.00/Kg,165.00/Kg,1450.0,Kirinyaga,2025-12-24,10,Product-10
-Green Grams,Local-Special,-,-,Kangeta,130.00/Kg,140.00/Kg,300.0,Meru,2025-12-24,10,Product-10
+Ground Nuts,Large Brown,-,-,Katito,200.00/Kg,246.64/Kg,4500.0,Kisumu,2026-01-22,12,Product-12
+Ground Nuts,Large Brown,-,-,Gikomba,166.67/Kg,275.00/Kg,,Nairobi,2026-01-22,12,Product-12
+Ground Nuts,Small Red,-,-,Kitale Municipality Market,250.00/Kg,275.00/Kg,400.0,Trans-Nzoia,2026-01-22,12,Product-12
+Ground Nuts,Large Brown,-,-,Kitale Municipality Market,275.00/Kg,300.00/Kg,500.0,Trans-Nzoia,2026-01-22,12,Product-12
 Ground Nuts,Large Brown,-,-,Mukuyu Market,-,350.00/Kg,,Muranga,2026-01-21,12,Product-12
 Ground Nuts,Small Red,-,-,Sabatia,244.44/Kg,285.71/Kg,540.0,Kakamega,2026-01-21,12,Product-12
 Ground Nuts,Large Brown,-,-,Kawangware,220.00/Kg,240.00/Kg,,Nairobi,2026-01-21,12,Product-12
@@ -341,7 +349,8 @@ Ground Nuts,Large Brown,-,-,Ahero,325.00/Kg,350.00/Kg,4800.0,Kisumu,2026-01-06,1
 Ground Nuts,Large Brown,-,-,Kerugoya,250.00/Kg,350.00/Kg,850.0,Kirinyaga,2025-12-29,12,Product-12
 Ground Nuts,Small Red,-,-,Kibuye,-,310.00/Kg,,Kisumu,2025-12-28,12,Product-12
 Ground Nuts,Large Brown,-,-,Kibuye,-,270.00/Kg,,Kisumu,2025-12-28,12,Product-12
-Ground Nuts,Large Brown,-,-,Kerugoya,250.00/Kg,340.00/Kg,850.0,Kirinyaga,2025-12-24,12,Product-12
+Beans Red Haricot (Wairimu),-,-,-,Gikomba,88.89/Kg,150.00/Kg,,Nairobi,2026-01-22,29,Product-29
+Beans Red Haricot (Wairimu),-,-,-,Kitale Municipality Market,100.00/Kg,130.00/Kg,200.0,Trans-Nzoia,2026-01-22,29,Product-29
 Beans Red Haricot (Wairimu),-,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,29,Product-29
 Beans Red Haricot (Wairimu),-,-,-,Gikomba,88.89/Kg,150.00/Kg,,Nairobi,2026-01-21,29,Product-29
 Beans Red Haricot (Wairimu),-,-,-,Kawangware,80.00/Kg,90.00/Kg,,Nairobi,2026-01-21,29,Product-29
@@ -381,7 +390,8 @@ Beans Red Haricot (Wairimu),-,-,-,Kerugoya,120.00/Kg,150.00/Kg,2750.0,Kirinyaga,
 Beans Red Haricot (Wairimu),-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,29,Product-29
 Beans Red Haricot (Wairimu),-,-,-,Ngurubani Market,102.22/Kg,160.00/Kg,6500.0,Kirinyaga,2025-12-27,29,Product-29
 Beans Red Haricot (Wairimu),-,-,-,Makutano Kirinyaga,100.00/Kg,120.00/Kg,1300.0,Kirinyaga,2025-12-27,29,Product-29
-Beans Red Haricot (Wairimu),-,-,-,Kerugoya,120.00/Kg,150.00/Kg,2750.0,Kirinyaga,2025-12-24,29,Product-29
+Beans (Yellow-Green),-,-,-,Gikomba,111.11/Kg,200.00/Kg,,Nairobi,2026-01-22,30,Product-30
+Beans (Yellow-Green),-,-,-,Kitale Municipality Market,100.00/Kg,122.22/Kg,300.0,Trans-Nzoia,2026-01-22,30,Product-30
 Beans (Yellow-Green),-,-,-,Mukuyu Market,-,175.00/Kg,,Muranga,2026-01-21,30,Product-30
 Beans (Yellow-Green),-,-,-,Mwingi Town,127.78/Kg,150.00/Kg,12000.0,Kitui,2026-01-21,30,Product-30
 Beans (Yellow-Green),-,-,-,Sabatia,168.89/Kg,173.91/Kg,180.0,Kakamega,2026-01-21,30,Product-30
@@ -450,9 +460,8 @@ Beans (Yellow-Green),-,-,-,Kibuye,-,250.00/Kg,,Kisumu,2025-12-28,30,Product-30
 Beans (Yellow-Green),-,-,-,Ngurubani Market,127.78/Kg,200.00/Kg,5200.0,Kirinyaga,2025-12-27,30,Product-30
 Beans (Yellow-Green),-,-,-,Taveta Retail Market,120.00/Kg,130.00/Kg,230.0,Taita-Taveta,2025-12-27,30,Product-30
 Beans (Yellow-Green),-,-,-,Makutano Kirinyaga,100.00/Kg,125.00/Kg,950.0,Kirinyaga,2025-12-27,30,Product-30
-Beans (Yellow-Green),-,-,-,Maua,144.44/Kg,150.00/Kg,1800.0,Meru,2025-12-24,30,Product-30
-Beans (Yellow-Green),-,-,-,Kerugoya,145.00/Kg,200.00/Kg,1700.0,Kirinyaga,2025-12-24,30,Product-30
-Beans (Yellow-Green),-,-,-,Kangeta,140.00/Kg,150.00/Kg,200.0,Meru,2025-12-24,30,Product-30
+Dolichos lablab (Njahi),-,-,-,Gikomba,88.89/Kg,150.00/Kg,,Nairobi,2026-01-22,50,Product-50
+Dolichos lablab (Njahi),-,-,-,Kitale Municipality Market,83.33/Kg,100.00/Kg,400.0,Trans-Nzoia,2026-01-22,50,Product-50
 Dolichos lablab (Njahi),-,-,-,Mukuyu Market,-,110.00/Kg,,Muranga,2026-01-21,50,Product-50
 Dolichos lablab (Njahi),-,-,-,Mwingi Town,80.00/Kg,100.00/Kg,5000.0,Kitui,2026-01-21,50,Product-50
 Dolichos lablab (Njahi),-,-,-,Kangeta,90.00/Kg,100.00/Kg,1200.0,Meru,2026-01-21,50,Product-50
@@ -502,10 +511,7 @@ Dolichos lablab (Njahi),-,-,-,Kibuye,-,225.00/Kg,,Kisumu,2025-12-28,50,Product-5
 Dolichos lablab (Njahi),-,-,-,Ngurubani Market,72.22/Kg,90.00/Kg,2500.0,Kirinyaga,2025-12-27,50,Product-50
 Dolichos lablab (Njahi),-,-,-,Makutano Kirinyaga,90.00/Kg,100.00/Kg,2300.0,Kirinyaga,2025-12-27,50,Product-50
 Dolichos lablab (Njahi),-,-,-,Gakoromone,84.44/Kg,86.67/Kg,16000.0,Meru,2025-12-26,50,Product-50
-Dolichos lablab (Njahi),-,-,-,Makutano Kirinyaga,90.00/Kg,100.00/Kg,1900.0,Kirinyaga,2025-12-24,50,Product-50
-Dolichos lablab (Njahi),-,-,-,Maua,8.89/Kg,100.00/Kg,8100.0,Meru,2025-12-24,50,Product-50
-Dolichos lablab (Njahi),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,1650.0,Kirinyaga,2025-12-24,50,Product-50
-Dolichos lablab (Njahi),-,-,-,Kangeta,90.00/Kg,100.00/Kg,1200.0,Meru,2025-12-24,50,Product-50
+Pearl Rush Millet,-,-,-,Gikomba,124.00/Kg,170.00/Kg,,Nairobi,2026-01-22,51,Product-51
 Pearl Rush Millet,-,-,-,Kangeta,100.00/Kg,110.00/Kg,650.0,Meru,2026-01-21,51,Product-51
 Pearl Rush Millet,-,-,-,Kangeta,100.00/Kg,110.00/Kg,650.0,Meru,2026-01-21,51,Product-51
 Pearl Rush Millet,-,-,-,Kagio,170.00/Kg,220.00/Kg,,Kirinyaga,2026-01-20,51,Product-51
@@ -527,8 +533,9 @@ Pearl Rush Millet,-,-,-,Kagio,140.00/Kg,170.00/Kg,,Kirinyaga,2025-12-30,51,Produ
 Pearl Rush Millet,-,-,-,Nkubu,100.00/Kg,120.00/Kg,810.0,Meru,2025-12-30,51,Product-51
 Pearl Rush Millet,-,-,-,Maua,100.00/Kg,110.00/Kg,2400.0,Meru,2025-12-30,51,Product-51
 Pearl Rush Millet,-,-,-,Kangeta,90.00/Kg,100.00/Kg,500.0,Meru,2025-12-29,51,Product-51
-Pearl Rush Millet,-,-,-,Maua,80.00/Kg,90.00/Kg,3000.0,Meru,2025-12-24,51,Product-51
-Pearl Rush Millet,-,-,-,Kangeta,90.00/Kg,100.00/Kg,500.0,Meru,2025-12-24,51,Product-51
+Finger Millet,-,-,-,Katito,150.00/Kg,164.32/Kg,2500.0,Kisumu,2026-01-22,54,Product-54
+Finger Millet,-,-,-,Gikomba,83.33/Kg,140.00/Kg,,Nairobi,2026-01-22,54,Product-54
+Finger Millet,-,-,-,Kitale Municipality Market,105.56/Kg,111.11/Kg,400.0,Trans-Nzoia,2026-01-22,54,Product-54
 Finger Millet,-,-,-,Sabatia,111.11/Kg,121.74/Kg,540.0,Kakamega,2026-01-21,54,Product-54
 Finger Millet,-,-,-,Bondeni,125.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-20,54,Product-54
 Finger Millet,-,-,-,Kagio,140.00/Kg,160.00/Kg,,Kirinyaga,2026-01-20,54,Product-54
@@ -562,7 +569,6 @@ Finger Millet,-,-,-,Kapkwen,150.00/Kg,175.00/Kg,3000.0,Bomet,2026-01-06,54,Produ
 Finger Millet,-,-,-,Nkubu,122.22/Kg,130.00/Kg,540.0,Meru,2025-12-30,54,Product-54
 Finger Millet,-,-,-,Maua,130.00/Kg,140.00/Kg,2000.0,Meru,2025-12-30,54,Product-54
 Finger Millet,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,54,Product-54
-Finger Millet,-,-,-,Maua,130.00/Kg,140.00/Kg,2100.0,Meru,2025-12-24,54,Product-54
 White Sorghum,-,-,-,Maua,80.00/kg,90.00/kg,1900.0,Meru,2026-01-20,56,Product-56
 White Sorghum,-,-,-,Ahero,75.00/kg,80.00/kg,600.0,Kisumu,2026-01-20,56,Product-56
 White Sorghum,-,-,-,Nkubu,66.67/kg,80.00/kg,630.0,Meru,2026-01-20,56,Product-56
@@ -579,7 +585,7 @@ White Sorghum,-,-,-,Maua,80.00/kg,90.00/kg,1800.0,Meru,2026-01-06,56,Product-56
 White Sorghum,-,-,-,Kutus,100.00/kg,125.00/kg,,Kirinyaga,2026-01-05,56,Product-56
 White Sorghum,-,-,-,Nkubu,66.67/kg,80.00/kg,540.0,Meru,2025-12-30,56,Product-56
 White Sorghum,-,-,-,Maua,80.00/kg,90.00/kg,800.0,Meru,2025-12-30,56,Product-56
-White Sorghum,-,-,-,Maua,60.00/kg,70.00/kg,800.0,Meru,2025-12-24,56,Product-56
+Red Irish potato,-,-,-,Kitale Municipality Market,40.00/Kg,45.33/Kg,3000.0,Trans-Nzoia,2026-01-22,57,Product-57
 Red Irish potato,-,-,-,Mulot,55.56/Kg,80.00/Kg,800.0,Bomet,2026-01-21,57,Product-57
 Red Irish potato,-,-,-,Kitale Municipality Market,42.67/Kg,45.33/Kg,2000.0,Trans-Nzoia,2026-01-21,57,Product-57
 Red Irish potato,-,-,-,Bondeni,60.00/Kg,70.00/Kg,2000.0,Trans-Nzoia,2026-01-20,57,Product-57
@@ -594,6 +600,11 @@ Red Irish potato,-,-,-,Kabati - Muranga,-,100.00/Kg,,Muranga,2025-12-30,57,Produ
 Red Irish potato,-,-,-,Mogogosiek Market,40.00/Kg,60.00/Kg,6000.0,Bomet,2025-12-30,57,Product-57
 Red Irish potato,-,-,-,Maua,45.00/Kg,80.00/Kg,1000.0,Meru,2025-12-30,57,Product-57
 Red Irish potato,-,-,-,Wundanyi,-,60.00/Kg,300.0,Taita-Taveta,2025-12-30,57,Product-57
+Cabbages,-,-,-,Kutus,30.00/Kg,40.00/Kg,,Kirinyaga,2026-01-22,58,Product-58
+Cabbages,-,-,-,Kinango,25.00/Kg,40.00/Kg,1600.0,Kwale,2026-01-22,58,Product-58
+Cabbages,-,-,-,Kagio,20.00/Kg,30.00/Kg,28000.0,Kirinyaga,2026-01-22,58,Product-58
+Cabbages,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,3100.0,Kirinyaga,2026-01-22,58,Product-58
+Cabbages,-,-,-,Kitale Municipality Market,26.67/Kg,40.00/Kg,4000.0,Trans-Nzoia,2026-01-22,58,Product-58
 Cabbages,-,-,-,Sabatia,34.78/Kg,43.48/Kg,4462.0,Kakamega,2026-01-21,58,Product-58
 Cabbages,-,-,-,Kangeta,25.00/Kg,30.00/Kg,2800.0,Meru,2026-01-21,58,Product-58
 Cabbages,-,-,-,Kakamega Town,16.67/Kg,26.67/Kg,3000.0,Kakamega,2026-01-21,58,Product-58
@@ -710,11 +721,8 @@ Cabbages,-,-,-,Lungalunga,60.00/Kg,80.00/Kg,10000.0,Kwale,2025-12-26,58,Product-
 Cabbages,-,-,-,Kakamega Town,16.67/Kg,41.67/Kg,3500.0,Kakamega,2025-12-26,58,Product-58
 Cabbages,-,-,-,Kakamega Town,16.67/Kg,46.67/Kg,6000.0,Kakamega,2025-12-25,58,Product-58
 Cabbages,-,-,-,Kinango,26.67/Kg,40.00/Kg,700.0,Kwale,2025-12-25,58,Product-58
-Cabbages,-,-,-,Mwingi Town,20.00/Kg,25.00/Kg,5000.0,Kitui,2025-12-24,58,Product-58
-Cabbages,-,-,-,Maua,120.00/Kg,150.00/Kg,3000.0,Meru,2025-12-24,58,Product-58
-Cabbages,-,-,-,Kerugoya,18.00/Kg,30.00/Kg,400.0,Kirinyaga,2025-12-24,58,Product-58
-Cabbages,-,-,-,Kagio,20.00/Kg,30.00/Kg,24000.0,Kirinyaga,2025-12-24,58,Product-58
-Cabbages,-,-,-,Kangeta,25.00/Kg,30.00/Kg,450.0,Meru,2025-12-24,58,Product-58
+Sweet potatoes,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,500.0,Trans-Nzoia,2026-01-22,59,Product-59
+Sweet potatoes,-,-,-,Makutano Kirinyaga,60.00/Kg,100.00/Kg,1200.0,Kirinyaga,2026-01-22,59,Product-59
 Sweet potatoes,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,59,Product-59
 Sweet potatoes,-,-,-,Sabatia,44.00/Kg,52.63/Kg,350.0,Kakamega,2026-01-21,59,Product-59
 Sweet potatoes,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-21,59,Product-59
@@ -763,7 +771,11 @@ Sweet potatoes,-,-,-,Kabati - Muranga,75.00/Kg,100.00/Kg,,Muranga,2025-12-27,59,
 Sweet potatoes,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,450.0,Kirinyaga,2025-12-27,59,Product-59
 Sweet potatoes,-,-,-,Taveta Retail Market,80.00/Kg,100.00/Kg,180.0,Taita-Taveta,2025-12-27,59,Product-59
 Sweet potatoes,-,-,-,Gakoromone,78.57/Kg,82.86/Kg,1000.0,Meru,2025-12-26,59,Product-59
-Sweet potatoes,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-24,59,Product-59
+Carrots,-,-,-,Kutus,45.00/Kg,50.00/Kg,,Kirinyaga,2026-01-22,60,Product-60
+Carrots,-,-,-,Kinango,70.00/Kg,150.00/Kg,400.0,Kwale,2026-01-22,60,Product-60
+Carrots,-,-,-,Kagio,50.00/Kg,70.00/Kg,2800.0,Kirinyaga,2026-01-22,60,Product-60
+Carrots,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,3100.0,Kirinyaga,2026-01-22,60,Product-60
+Carrots,-,-,-,Kitale Municipality Market,33.33/Kg,37.50/Kg,600.0,Trans-Nzoia,2026-01-22,60,Product-60
 Carrots,-,-,-,Mukuyu Market,35.00/Kg,50.00/Kg,,Muranga,2026-01-21,60,Product-60
 Carrots,-,-,-,Kangeta,30.00/Kg,40.00/Kg,1700.0,Meru,2026-01-21,60,Product-60
 Carrots,-,-,-,Kangeta,50.00/Kg,60.00/Kg,600.0,Meru,2026-01-21,60,Product-60
@@ -857,14 +869,11 @@ Carrots,-,-,-,Gakoromone,50.00/Kg,52.86/Kg,50000.0,Meru,2025-12-26,60,Product-60
 Carrots,-,-,-,Kakamega Town,3.00/Kg,50.00/Kg,5000.0,Kakamega,2025-12-25,60,Product-60
 Carrots,-,-,-,Kinango,80.00/Kg,120.00/Kg,400.0,Kwale,2025-12-25,60,Product-60
 Carrots,-,-,-,Diani Market,60.00/Kg,80.00/Kg,700.0,Kwale,2025-12-25,60,Product-60
-Carrots,-,-,-,Makutano Kirinyaga,40.00/Kg,50.00/Kg,4800.0,Kirinyaga,2025-12-24,60,Product-60
-Carrots,-,-,-,Mwingi Town,70.00/Kg,80.00/Kg,2000.0,Kitui,2025-12-24,60,Product-60
-Carrots,-,-,-,Maua,35.00/Kg,50.00/Kg,8000.0,Meru,2025-12-24,60,Product-60
-Carrots,-,-,-,Kerugoya,25.00/Kg,50.00/Kg,500.0,Kirinyaga,2025-12-24,60,Product-60
-Carrots,-,-,-,Kagio,30.00/Kg,50.00/Kg,4500.0,Kirinyaga,2025-12-24,60,Product-60
-Carrots,-,-,-,Diani Market,60.00/Kg,80.00/Kg,700.0,Kwale,2025-12-24,60,Product-60
-Carrots,-,-,-,Kangeta,50.00/Kg,60.00/Kg,2500.0,Meru,2025-12-24,60,Product-60
-Carrots,-,-,-,Kangeta,60.00/Kg,70.00/Kg,1100.0,Meru,2025-12-24,60,Product-60
+Tomatoes,-,-,-,Kutus,17.14/Kg,22.86/Kg,12000.0,Kirinyaga,2026-01-22,61,Product-61
+Tomatoes,-,-,-,Kinango,55.56/Kg,80.00/Kg,8000.0,Kwale,2026-01-22,61,Product-61
+Tomatoes,-,-,-,Kagio,17.14/Kg,24.00/Kg,28000.0,Kirinyaga,2026-01-22,61,Product-61
+Tomatoes,-,-,-,Diani Market,80.00/Kg,100.00/Kg,3500.0,Kwale,2026-01-22,61,Product-61
+Tomatoes,-,-,-,Kitale Municipality Market,52.94/Kg,58.82/Kg,10000.0,Trans-Nzoia,2026-01-22,61,Product-61
 Tomatoes,-,-,-,Diani Market,80.00/Kg,100.00/Kg,6000.0,Kwale,2026-01-21,61,Product-61
 Tomatoes,-,-,-,Mukuyu Market,-,40.00/Kg,,Muranga,2026-01-21,61,Product-61
 Tomatoes,-,-,-,Mwingi Town,33.33/Kg,60.00/Kg,6000.0,Kitui,2026-01-21,61,Product-61
@@ -992,13 +1001,11 @@ Tomatoes,-,-,-,Kakamega Town,30.00/Kg,50.00/Kg,10000.0,Kakamega,2025-12-26,61,Pr
 Tomatoes,-,-,-,Kakamega Town,30.00/Kg,50.00/Kg,9000.0,Kakamega,2025-12-25,61,Product-61
 Tomatoes,-,-,-,Kinango,51.11/Kg,80.00/Kg,4000.0,Kwale,2025-12-25,61,Product-61
 Tomatoes,-,-,-,Diani Market,100.00/Kg,120.00/Kg,6000.0,Kwale,2025-12-25,61,Product-61
-Tomatoes,-,-,-,Mwingi Town,50.00/Kg,70.00/Kg,7000.0,Kitui,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Maua,35.00/Kg,50.00/Kg,1800.0,Meru,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Kerugoya,20.00/Kg,50.00/Kg,2000.0,Kirinyaga,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Kagio,6.00/Kg,12.00/Kg,42000.0,Kirinyaga,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Diani Market,100.00/Kg,120.00/Kg,6000.0,Kwale,2025-12-24,61,Product-61
-Tomatoes,-,-,-,Kangeta,40.00/Kg,50.00/Kg,4200.0,Meru,2025-12-24,61,Product-61
+Beans Rosecoco,-,-,-,Ngurubani Market,100.00/Kg,140.00/Kg,2100.0,Kirinyaga,2026-01-23,64,Product-64
+Beans Rosecoco,-,-,-,Ndanai Market,144.44/Kg,175.00/Kg,9000.0,Bomet,2026-01-23,64,Product-64
+Beans Rosecoco,-,-,-,Kawangware,115.00/Kg,130.00/Kg,,Nairobi,2026-01-23,64,Product-64
+Beans Rosecoco,-,-,-,Mumias,-,195.45/Kg,,Kakamega,2026-01-23,64,Product-64
+Beans Rosecoco,-,-,-,Kitale Municipality Market,100.00/Kg,135.00/Kg,300.0,Trans-Nzoia,2026-01-22,64,Product-64
 Beans Rosecoco,-,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,64,Product-64
 Beans Rosecoco,-,-,-,Kawangware,115.00/Kg,130.00/Kg,,Nairobi,2026-01-21,64,Product-64
 Beans Rosecoco,-,-,-,Kakamega Town,160.00/Kg,190.00/Kg,6000.0,Kakamega,2026-01-21,64,Product-64
@@ -1042,7 +1049,12 @@ Beans Rosecoco,-,-,-,Nkubu,111.11/Kg,130.00/Kg,810.0,Meru,2025-12-30,64,Product-
 Beans Rosecoco,-,-,-,Kerugoya,130.00/Kg,175.00/Kg,2650.0,Kirinyaga,2025-12-29,64,Product-64
 Beans Rosecoco,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,64,Product-64
 Beans Rosecoco,-,-,-,Kakamega Town,150.00/Kg,190.00/Kg,2000.0,Kakamega,2025-12-25,64,Product-64
-Beans Rosecoco,-,-,-,Kerugoya,135.00/Kg,175.00/Kg,2600.0,Kirinyaga,2025-12-24,64,Product-64
+Beans (Mwitemania),-,-,-,Ngurubani Market,94.44/Kg,175.00/Kg,2200.0,Kirinyaga,2026-01-23,65,Product-65
+Beans (Mwitemania),-,-,-,Kawangware,80.00/Kg,105.00/Kg,,Nairobi,2026-01-23,65,Product-65
+Beans (Mwitemania),-,-,-,Mumias,-,145.45/Kg,,Kakamega,2026-01-23,65,Product-65
+Beans (Mwitemania),-,-,-,Kitale Municipality Market,110.00/Kg,150.00/Kg,500.0,Trans-Nzoia,2026-01-23,65,Product-65
+Beans (Mwitemania),-,-,-,Lungalunga,77.78/Kg,80.00/Kg,6000.0,Kwale,2026-01-23,65,Product-65
+Beans (Mwitemania),-,-,-,Kitale Municipality Market,100.00/Kg,116.67/Kg,500.0,Trans-Nzoia,2026-01-22,65,Product-65
 Beans (Mwitemania),-,-,-,Kangeta,110.00/Kg,120.00/Kg,800.0,Meru,2026-01-21,65,Product-65
 Beans (Mwitemania),-,-,-,Kawangware,80.00/Kg,105.00/Kg,,Nairobi,2026-01-21,65,Product-65
 Beans (Mwitemania),-,-,-,Kitale Municipality Market,100.00/Kg,122.22/Kg,400.0,Trans-Nzoia,2026-01-21,65,Product-65
@@ -1090,36 +1102,7 @@ Beans (Mwitemania),-,-,-,Ngurubani Market,91.11/Kg,130.00/Kg,3540.0,Kirinyaga,20
 Beans (Mwitemania),-,-,-,Taveta Retail Market,100.00/Kg,120.00/Kg,500.0,Taita-Taveta,2025-12-27,65,Product-65
 Beans (Mwitemania),-,-,-,Makutano Kirinyaga,100.00/Kg,120.00/Kg,2100.0,Kirinyaga,2025-12-27,65,Product-65
 Beans (Mwitemania),-,-,-,Gakoromone,108.89/Kg,111.11/Kg,12000.0,Meru,2025-12-26,65,Product-65
-Beans (Mwitemania),-,-,-,Maua,94.44/Kg,120.00/Kg,7200.0,Meru,2025-12-24,65,Product-65
-Beans (Mwitemania),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2300.0,Kirinyaga,2025-12-24,65,Product-65
-Beans (Mwitemania),-,-,-,Kangeta,110.00/Kg,120.00/Kg,600.0,Meru,2025-12-24,65,Product-65
-Beans (Mwezi Moja),-,-,-,Kitale Municipality Market,88.89/Kg,102.22/Kg,300.0,Trans-Nzoia,2026-01-21,66,Product-66
-Beans (Mwezi Moja),-,-,-,Bondeni,100.00/Kg,125.00/Kg,300.0,Trans-Nzoia,2026-01-20,66,Product-66
-Beans (Mwezi Moja),-,-,-,Ahero,140.00/Kg,150.00/Kg,3600.0,Kisumu,2026-01-20,66,Product-66
-Beans (Mwezi Moja),-,-,-,Nkubu,111.11/Kg,120.00/Kg,630.0,Meru,2026-01-20,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kitale Municipality Market,100.00/Kg,125.00/Kg,300.0,Trans-Nzoia,2026-01-20,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,150.00/Kg,2600.0,Kirinyaga,2026-01-19,66,Product-66
-Beans (Mwezi Moja),-,-,-,Muhoroni,120.00/Kg,128.00/Kg,3500.0,Kisumu,2026-01-18,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kisasi,100.00/Kg,120.00/Kg,,Kitui,2026-01-16,66,Product-66
-Beans (Mwezi Moja),-,-,-,Mumias,-,136.36/Kg,,Kakamega,2026-01-16,66,Product-66
-Beans (Mwezi Moja),-,-,-,Katito,166.67/Kg,124.16/Kg,6500.0,Kisumu,2026-01-15,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,150.00/Kg,2500.0,Kirinyaga,2026-01-15,66,Product-66
-Beans (Mwezi Moja),-,-,-,Ahero,150.00/Kg,165.00/Kg,4900.0,Kisumu,2026-01-13,66,Product-66
-Beans (Mwezi Moja),-,-,-,Holo,200.00/Kg,225.00/Kg,,Kisumu,2026-01-13,66,Product-66
-Beans (Mwezi Moja),-,-,-,Nkubu,111.11/Kg,120.00/Kg,450.0,Meru,2026-01-13,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kapkwen,150.00/Kg,175.00/Kg,3000.0,Bomet,2026-01-13,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2500.0,Kirinyaga,2026-01-12,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2026-01-11,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kisasi,100.00/Kg,120.00/Kg,,Kitui,2026-01-09,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2600.0,Kirinyaga,2026-01-08,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2600.0,Kirinyaga,2026-01-06,66,Product-66
-Beans (Mwezi Moja),-,-,-,Ahero,150.00/Kg,165.00/Kg,5300.0,Kisumu,2026-01-06,66,Product-66
-Beans (Mwezi Moja),-,-,-,Nkubu,111.11/Kg,120.00/Kg,450.0,Meru,2026-01-06,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kakamega Town,150.00/Kg,190.00/Kg,6000.0,Kakamega,2025-12-31,66,Product-66
-Beans (Mwezi Moja),-,-,-,Nkubu,111.11/Kg,120.00/Kg,540.0,Meru,2025-12-30,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2600.0,Kirinyaga,2025-12-29,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kibuye,-,175.00/Kg,,Kisumu,2025-12-28,66,Product-66
-Beans (Mwezi Moja),-,-,-,Kerugoya,120.00/Kg,160.00/Kg,2550.0,Kirinyaga,2025-12-24,66,Product-66
+Beans (Canadian wonder),-,-,-,Mumias,-,154.17/Kg,,Kakamega,2026-01-23,67,Product-67
 Beans (Canadian wonder),-,-,-,Kagio,97.78/Kg,140.00/Kg,,Kirinyaga,2026-01-20,67,Product-67
 Beans (Canadian wonder),-,-,-,Ahero,140.00/Kg,150.00/Kg,2000.0,Kisumu,2026-01-20,67,Product-67
 Beans (Canadian wonder),-,-,-,Muhoroni,120.00/Kg,128.00/Kg,2500.0,Kisumu,2026-01-18,67,Product-67
@@ -1132,6 +1115,7 @@ Beans (Canadian wonder),-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2026-01-11,67,Product-6
 Beans (Canadian wonder),-,-,-,Kisasi,100.00/Kg,120.00/Kg,,Kitui,2026-01-09,67,Product-67
 Beans (Canadian wonder),-,-,-,Ahero,150.00/Kg,165.00/Kg,4000.0,Kisumu,2026-01-06,67,Product-67
 Beans (Canadian wonder),-,-,-,Kibuye,-,160.00/Kg,,Kisumu,2025-12-28,67,Product-67
+Tilapia,Dried,-,-,Mumias,-,437.50/Kg,,Kakamega,2026-01-23,68,Product-68
 Tilapia,Fresh,-,-,Ahero,400.00/Kg,450.00/Kg,600.0,Kisumu,2026-01-20,68,Product-68
 Tilapia,Fried,-,-,Muhoroni,-,800.00/Kg,500.0,Kisumu,2026-01-18,68,Product-68
 Tilapia,Dried,-,-,Mumias,-,287.50/Kg,,Kakamega,2026-01-16,68,Product-68
@@ -1141,6 +1125,11 @@ Tilapia,Fresh,-,-,Kibuye,-,400.00/Kg,,Kisumu,2026-01-11,68,Product-68
 Tilapia,Smoked,-,-,Sabatia,1200.00/Kg,1720.00/Kg,50.0,Kakamega,2026-01-07,68,Product-68
 Tilapia,Fresh,-,-,Ahero,450.00/Kg,500.00/Kg,1200.0,Kisumu,2026-01-06,68,Product-68
 Tilapia,Fresh,-,-,Kibuye,-,450.00/Kg,,Kisumu,2025-12-28,68,Product-68
+Eggs,Exotic/Grade,-,-,Ngurubani Market,400.00/Tray(30),450.00/Tray(30),3200.0,Kirinyaga,2026-01-23,72,Product-72
+Eggs,Exotic/Grade,-,-,Ngurubani Market,390.00/Tray(30),600.00/Tray(30),3200.0,Kirinyaga,2026-01-23,72,Product-72
+Eggs,Indigenous /Kenyeji,-,-,Ndanai Market,510.00/Tray(30),600.00/Tray(30),8000.0,Bomet,2026-01-23,72,Product-72
+Eggs,Exotic/Grade,-,-,Katito,510.00/Tray(30),650.00/Tray(30),7500.0,Kisumu,2026-01-22,72,Product-72
+Eggs,Exotic/Grade,-,-,Makutano Kirinyaga,370.00/Tray(30),450.00/Tray(30),240.0,Kirinyaga,2026-01-22,72,Product-72
 Eggs,Exotic/Grade,-,-,Ngurubani Market,400.00/Tray(30),450.00/Tray(30),2200.0,Kirinyaga,2026-01-20,72,Product-72
 Eggs,Exotic/Grade,-,-,Kabati - Muranga,-,400.00/Tray(30),,Muranga,2026-01-20,72,Product-72
 Eggs,Indigenous /Kenyeji,-,-,Ahero,560.00/Tray(30),600.00/Tray(30),40.0,Kisumu,2026-01-20,72,Product-72
@@ -1174,7 +1163,9 @@ Eggs,Exotic/Grade,-,-,Kibuye,-,430.00/Tray(30),,Kisumu,2025-12-28,72,Product-72
 Eggs,Exotic/Grade,-,-,Kabati - Muranga,350.00/Tray(30),390.00/Tray(30),,Muranga,2025-12-27,72,Product-72
 Eggs,Exotic/Grade,-,-,Ngurubani Market,400.00/Tray(30),450.00/Tray(30),3200.0,Kirinyaga,2025-12-27,72,Product-72
 Eggs,Exotic/Grade,-,-,Kakamega Town,380.00/Tray(30),600.00/Tray(30),100.0,Kakamega,2025-12-26,72,Product-72
-Eggs,Exotic/Grade,-,-,Kagio,450.00/Tray(30),600.00/Tray(30),,Kirinyaga,2025-12-24,72,Product-72
+Meat Beef,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,2700.0,Kirinyaga,2026-01-23,73,Product-73
+Meat Beef,-,-,-,Katito,-,700.00/Kg,7500.0,Kisumu,2026-01-22,73,Product-73
+Meat Beef,-,-,-,Makutano Kirinyaga,550.00/Kg,700.00/Kg,1800.0,Kirinyaga,2026-01-22,73,Product-73
 Meat Beef,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,2150.0,Kirinyaga,2026-01-20,73,Product-73
 Meat Beef,-,-,-,Ngundune,600.00/Kg,700.00/Kg,3000.0,Meru,2026-01-20,73,Product-73
 Meat Beef,-,-,-,Ngurubani Market,150.00/Kg,170.00/Kg,145000.0,Kirinyaga,2026-01-16,73,Product-73
@@ -1191,9 +1182,11 @@ Meat Beef,-,-,-,Ngundune,600.00/Kg,700.00/Kg,1500.0,Meru,2026-01-06,73,Product-7
 Meat Beef,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,2700.0,Kirinyaga,2025-12-31,73,Product-73
 Meat Beef,-,-,-,Kibuye,-,1000.00/Kg,,Kisumu,2025-12-28,73,Product-73
 Meat Beef,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,2540.0,Kirinyaga,2025-12-27,73,Product-73
-Meat Beef,-,-,-,Kagio,500.00/Kg,650.00/Kg,,Kirinyaga,2025-12-24,73,Product-73
 Meat Mutton,-,-,-,Kagio,800.00/Kg,950.00/Kg,,Kirinyaga,2026-06-01,74,Product-74
 Meat Broiler,-,-,-,Kagio,500.00/Kg,600.00/Kg,,Kirinyaga,2026-06-01,76,Product-76
+Omena,Dried,-,-,Mumias,-,611.11/Kg,,Kakamega,2026-01-23,77,Product-77
+Omena,Dried,-,-,Mumias,-,611.11/Kg,,Kakamega,2026-01-23,77,Product-77
+Omena,Dried,-,-,Kinango,485.71/Kg,550.00/Kg,2100.0,Kwale,2026-01-22,77,Product-77
 Omena,Dried,-,-,Ahero,650.00/Kg,700.00/Kg,6000.0,Kisumu,2026-01-20,77,Product-77
 Omena,Dried,-,-,Mogogosiek Market,200.00/Kg,250.00/Kg,1000.0,Bomet,2026-01-20,77,Product-77
 Omena,Dried,-,-,Muhoroni,333.33/Kg,433.33/Kg,1000.0,Kisumu,2026-01-18,77,Product-77
@@ -1258,7 +1251,6 @@ Sardines,Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,200.0,Kwale,2025-12-31,101,Product-
 Sardines,Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,130.0,Kwale,2025-12-30,101,Product-101
 Sardines,Fresh,-,-,Vanga,200.00/Kg,280.00/Kg,600.0,Kwale,2025-12-29,101,Product-101
 Sardines,Fresh,-,-,Vanga,180.00/Kg,220.00/Kg,300.0,Kwale,2025-12-25,101,Product-101
-Sardines,Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,200.0,Kwale,2025-12-24,101,Product-101
 Lobster(Kamba Mawe),Live,-,-,Vanga,600.00/Kg,900.00/Kg,120.0,Kwale,2026-01-16,103,Product-103
 Prawns,Dried,-,-,Holo,12.50/Kg,25.00/Kg,,Kisumu,2026-01-13,104,Product-104
 Octopus (Pweza),Fresh,-,-,Vanga,450.00/Kg,550.00/Kg,600.0,Kwale,2026-01-19,110,Product-110
@@ -1279,16 +1271,26 @@ Cuttlefish,Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,60.0,Kwale,2026-01-19,111,Product
 Cuttlefish,Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,60.0,Kwale,2026-01-16,111,Product-111
 Cuttlefish,Fresh,-,-,Vanga,200.00/Kg,300.00/Kg,100.0,Kwale,2026-01-13,111,Product-111
 Cuttlefish,Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,130.0,Kwale,2026-01-11,111,Product-111
-Cuttlefish,Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,40.0,Kwale,2025-12-24,111,Product-111
 Squid(Ngisi),Fresh,-,-,Vanga,150.00/Kg,250.00/Kg,200.0,Kwale,2026-01-19,112,Product-112
 Squid(Ngisi),Fresh,-,-,Vanga,300.00/Kg,400.00/Kg,230.0,Kwale,2026-01-17,112,Product-112
 Squid(Ngisi),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,600.0,Kwale,2026-01-09,112,Product-112
 Squid(Ngisi),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,300.0,Kwale,2026-01-06,112,Product-112
 Squid(Ngisi),Fresh,-,-,Vanga,220.00/Kg,320.00/Kg,50.0,Kwale,2026-01-05,112,Product-112
-Squid(Ngisi),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,300.0,Kwale,2025-12-24,112,Product-112
 Fish Oil,-,-,-,Kibuye,-,250.00/Kg,,Kisumu,2026-11-01,114,Product-114
 Fish Maws,-,-,-,Kibuye,-,4000.00/Kg,,Kisumu,2026-11-01,115,Product-115
 Nile Perch Skins,-,-,-,Kibuye,-,110.00/Kg,,Kisumu,2026-11-01,117,Product-117
+Black nightshade (Managu/ Osuga),-,-,-,Ndanai Market,6.00/Kg,100.00/Kg,1500.0,Bomet,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Voi Retail,-,100.00/Kg,50.0,Taita-Taveta,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Mumias,-,160.00/Kg,,Kakamega,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Wundanyi,-,70.00/Kg,600.0,Taita-Taveta,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Voi Wholesale,70.00/Kg,-,800.0,Taita-Taveta,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Kitale Municipality Market,30.00/Kg,38.00/Kg,400.0,Trans-Nzoia,2026-01-23,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Kutus,40.00/Kg,50.00/Kg,,Kirinyaga,2026-01-22,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Katito,50.00/Kg,60.00/Kg,4500.0,Kisumu,2026-01-22,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Kinango,55.00/Kg,75.00/Kg,400.0,Kwale,2026-01-22,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Kagio,30.00/Kg,60.00/Kg,100.0,Kirinyaga,2026-01-22,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Kitale Municipality Market,30.00/Kg,35.00/Kg,500.0,Trans-Nzoia,2026-01-22,121,Product-121
+Black nightshade (Managu/ Osuga),-,-,-,Makutano Kirinyaga,28.00/Kg,40.00/Kg,680.0,Kirinyaga,2026-01-22,121,Product-121
 Black nightshade (Managu/ Osuga),-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,500.0,Trans-Nzoia,2026-01-21,121,Product-121
 Black nightshade (Managu/ Osuga),-,-,-,Mulot,120.00/Kg,200.00/Kg,350.0,Bomet,2026-01-21,121,Product-121
 Black nightshade (Managu/ Osuga),-,-,-,Ngurubani Market,30.00/Kg,35.00/Kg,520.0,Kirinyaga,2026-01-20,121,Product-121
@@ -1345,7 +1347,12 @@ Black nightshade (Managu/ Osuga),-,-,-,Ngurubani Market,30.00/Kg,40.00/Kg,520.0,
 Black nightshade (Managu/ Osuga),-,-,-,Makutano Kirinyaga,30.00/Kg,45.00/Kg,960.0,Kirinyaga,2025-12-27,121,Product-121
 Black nightshade (Managu/ Osuga),-,-,-,Kagio,35.00/Kg,60.00/Kg,150.0,Kirinyaga,2025-12-26,121,Product-121
 Black nightshade (Managu/ Osuga),-,-,-,Kinango,55.00/Kg,75.00/Kg,500.0,Kwale,2025-12-25,121,Product-121
-Black nightshade (Managu/ Osuga),-,-,-,Kagio,40.00/Kg,80.00/Kg,150.0,Kirinyaga,2025-12-24,121,Product-121
+Spider flower (Saga),-,-,-,Ndanai Market,70.00/Kg,100.00/Kg,4500.0,Bomet,2026-01-23,122,Product-122
+Spider flower (Saga),-,-,-,Voi Retail,-,100.00/Kg,10.0,Taita-Taveta,2026-01-23,122,Product-122
+Spider flower (Saga),-,-,-,Mumias,-,150.00/Kg,,Kakamega,2026-01-23,122,Product-122
+Spider flower (Saga),-,-,-,Kitale Municipality Market,32.00/Kg,38.00/Kg,300.0,Trans-Nzoia,2026-01-23,122,Product-122
+Spider flower (Saga),-,-,-,Katito,70.00/Kg,81.30/Kg,3500.0,Kisumu,2026-01-22,122,Product-122
+Spider flower (Saga),-,-,-,Kitale Municipality Market,30.00/Kg,35.00/Kg,400.0,Trans-Nzoia,2026-01-22,122,Product-122
 Spider flower (Saga),-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-21,122,Product-122
 Spider flower (Saga),-,-,-,Mulot,90.00/Kg,120.00/Kg,500.0,Bomet,2026-01-21,122,Product-122
 Spider flower (Saga),-,-,-,Bondeni,30.00/Kg,35.00/Kg,300.0,Trans-Nzoia,2026-01-20,122,Product-122
@@ -1368,57 +1375,11 @@ Spider flower (Saga),-,-,-,Ahero,80.00/Kg,100.00/Kg,1200.0,Kisumu,2026-01-06,122
 Spider flower (Saga),-,-,-,Mogogosiek Market,200.00/Kg,250.00/Kg,1200.0,Bomet,2026-01-06,122,Product-122
 Spider flower (Saga),-,-,-,Mogogosiek Market,200.00/Kg,250.00/Kg,1200.0,Bomet,2025-12-30,122,Product-122
 Spider flower (Saga),-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,122,Product-122
-Amaranthus (Terere),-,-,-,Kitale Municipality Market,30.00/Kg,40.00/Kg,300.0,Trans-Nzoia,2026-01-21,123,Product-123
-Amaranthus (Terere),-,-,-,Mulot,50.00/Kg,80.00/Kg,800.0,Bomet,2026-01-21,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,30.00/Kg,35.00/Kg,550.0,Kirinyaga,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,-,45.00/Kg,,Muranga,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Bondeni,10.00/Kg,18.00/Kg,300.0,Trans-Nzoia,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Ahero,70.00/Kg,80.00/Kg,150.0,Kisumu,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Voi Retail,-,80.00/Kg,20.0,Taita-Taveta,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Kitale Municipality Market,15.00/Kg,20.00/Kg,300.0,Trans-Nzoia,2026-01-20,123,Product-123
-Amaranthus (Terere),-,-,-,Kutus,30.00/Kg,40.00/Kg,,Kirinyaga,2026-01-19,123,Product-123
-Amaranthus (Terere),-,-,-,Kitale Municipality Market,25.00/Kg,30.00/Kg,400.0,Trans-Nzoia,2026-01-19,123,Product-123
-Amaranthus (Terere),-,-,-,Muhoroni,-,60.00/Kg,100.0,Kisumu,2026-01-18,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Embu,35.00/Kg,50.00/Kg,,Embu,2026-01-17,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,35.00/Kg,50.00/Kg,1100.0,Kirinyaga,2026-01-17,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,30.00/Kg,35.00/Kg,600.0,Kirinyaga,2026-01-16,123,Product-123
-Amaranthus (Terere),-,-,-,Kisasi,18.00/Kg,32.00/Kg,,Kitui,2026-01-16,123,Product-123
-Amaranthus (Terere),-,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-16,123,Product-123
-Amaranthus (Terere),-,-,-,Kinango,38.00/Kg,60.00/Kg,1200.0,Kwale,2026-01-15,123,Product-123
-Amaranthus (Terere),-,-,-,Mukuyu Market,-,70.00/Kg,,Muranga,2026-01-14,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,25.00/Kg,40.00/Kg,1800.0,Kirinyaga,2026-01-14,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,-,50.00/Kg,,Muranga,2026-01-14,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,25.00/Kg,30.00/Kg,520.0,Kirinyaga,2026-01-13,123,Product-123
-Amaranthus (Terere),-,-,-,Holo,-,80.00/Kg,,Kisumu,2026-01-13,123,Product-123
-Amaranthus (Terere),-,-,-,Kutus,30.00/Kg,40.00/Kg,130.0,Kirinyaga,2026-01-12,123,Product-123
-Amaranthus (Terere),-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2026-01-11,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,20.00/Kg,30.00/Kg,680.0,Kirinyaga,2026-01-10,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,20.00/Kg,30.00/Kg,450.0,Kirinyaga,2026-01-09,123,Product-123
-Amaranthus (Terere),-,-,-,Kagio,30.00/Kg,60.00/Kg,200.0,Kirinyaga,2026-01-09,123,Product-123
-Amaranthus (Terere),-,-,-,Kisasi,18.00/Kg,30.00/Kg,,Kitui,2026-01-09,123,Product-123
-Amaranthus (Terere),-,-,-,Kutus,20.00/Kg,30.00/Kg,150.0,Kirinyaga,2026-01-08,123,Product-123
-Amaranthus (Terere),-,-,-,Kinango,40.00/Kg,60.00/Kg,1600.0,Kwale,2026-01-08,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Embu,25.00/Kg,30.00/Kg,,Embu,2026-01-07,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2026-01-07,123,Product-123
-Amaranthus (Terere),-,-,-,Mwingi Town,20.00/Kg,40.00/Kg,1000.0,Kitui,2026-01-07,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,25.00/Kg,30.00/Kg,430.0,Kirinyaga,2026-01-07,123,Product-123
-Amaranthus (Terere),-,-,-,Kagio,25.00/Kg,50.00/Kg,200.0,Kirinyaga,2026-01-06,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,550.0,Kirinyaga,2026-01-06,123,Product-123
-Amaranthus (Terere),-,-,-,Kutus,25.00/Kg,30.00/Kg,150.0,Kirinyaga,2026-01-05,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,25.00/Kg,30.00/Kg,1400.0,Kirinyaga,2026-01-03,123,Product-123
-Amaranthus (Terere),-,-,-,Taveta Retail Market,40.00/Kg,70.00/Kg,120.0,Taita-Taveta,2026-01-03,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2026-01-03,123,Product-123
-Amaranthus (Terere),-,-,-,Kagio,25.00/Kg,50.00/Kg,200.0,Kirinyaga,2026-01-02,123,Product-123
-Amaranthus (Terere),-,-,-,Kinango,45.00/Kg,65.00/Kg,500.0,Kwale,2026-01-01,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,30.00/Kg,45.00/Kg,,Muranga,2025-12-30,123,Product-123
-Amaranthus (Terere),-,-,-,Wundanyi,-,50.00/Kg,500.0,Taita-Taveta,2025-12-30,123,Product-123
-Amaranthus (Terere),-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2025-12-28,123,Product-123
-Amaranthus (Terere),-,-,-,Kabati - Muranga,35.00/Kg,45.00/Kg,,Muranga,2025-12-27,123,Product-123
-Amaranthus (Terere),-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,650.0,Kirinyaga,2025-12-27,123,Product-123
-Amaranthus (Terere),-,-,-,Makutano Kirinyaga,20.00/Kg,30.00/Kg,1200.0,Kirinyaga,2025-12-27,123,Product-123
-Amaranthus (Terere),-,-,-,Kagio,30.00/Kg,60.00/Kg,150.0,Kirinyaga,2025-12-26,123,Product-123
-Amaranthus (Terere),-,-,-,Kinango,45.00/Kg,65.00/Kg,800.0,Kwale,2025-12-25,123,Product-123
-Amaranthus (Terere),-,-,-,Kagio,40.00/Kg,70.00/Kg,250.0,Kirinyaga,2025-12-24,123,Product-123
+Jute Plant (Murenda),-,-,-,Voi Retail,-,100.00/Kg,20.0,Taita-Taveta,2026-01-23,124,Product-124
+Jute Plant (Murenda),-,-,-,Mumias,-,200.00/Kg,,Kakamega,2026-01-23,124,Product-124
+Jute Plant (Murenda),-,-,-,Kitale Municipality Market,50.00/Kg,55.00/Kg,200.0,Trans-Nzoia,2026-01-23,124,Product-124
+Jute Plant (Murenda),-,-,-,Kitale Municipality Market,50.00/Kg,58.00/Kg,200.0,Trans-Nzoia,2026-01-22,124,Product-124
+Jute Plant (Murenda),-,-,-,Makutano Kirinyaga,25.00/Kg,45.00/Kg,750.0,Kirinyaga,2026-01-22,124,Product-124
 Jute Plant (Murenda),-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-21,124,Product-124
 Jute Plant (Murenda),-,-,-,Bondeni,50.00/Kg,55.00/Kg,200.0,Trans-Nzoia,2026-01-20,124,Product-124
 Jute Plant (Murenda),-,-,-,Voi Retail,-,100.00/Kg,20.0,Taita-Taveta,2026-01-20,124,Product-124
@@ -1437,6 +1398,10 @@ Jute Plant (Murenda),-,-,-,Makutano Kirinyaga,18.00/Kg,25.00/Kg,640.0,Kirinyaga,
 Jute Plant (Murenda),-,-,-,Makutano Kirinyaga,20.00/Kg,28.00/Kg,400.0,Kirinyaga,2026-01-03,124,Product-124
 Jute Plant (Murenda),-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2025-12-28,124,Product-124
 Jute Plant (Murenda),-,-,-,Makutano Kirinyaga,30.00/Kg,50.00/Kg,580.0,Kirinyaga,2025-12-27,124,Product-124
+Passion Fruits,-,-,-,Ngurubani Market,140.00/Kg,200.00/Kg,450.0,Kirinyaga,2026-01-23,125,Product-125
+Passion Fruits,-,-,-,Kitale Municipality Market,100.00/Kg,150.00/Kg,200.0,Trans-Nzoia,2026-01-23,125,Product-125
+Passion Fruits,-,-,-,Kutus,160.00/Kg,200.00/Kg,,Kirinyaga,2026-01-22,125,Product-125
+Passion Fruits,-,-,-,Kitale Municipality Market,100.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-22,125,Product-125
 Passion Fruits,-,-,-,Mukuyu Market,-,120.00/Kg,,Muranga,2026-01-21,125,Product-125
 Passion Fruits,-,-,-,Kitale Municipality Market,100.00/Kg,140.00/Kg,200.0,Trans-Nzoia,2026-01-21,125,Product-125
 Passion Fruits,-,-,-,Ngurubani Market,170.00/Kg,200.00/Kg,520.0,Kirinyaga,2026-01-20,125,Product-125
@@ -1464,7 +1429,15 @@ Passion Fruits,-,-,-,Kagio,100.00/Kg,180.00/Kg,300.0,Kirinyaga,2025-12-30,125,Pr
 Passion Fruits,-,-,-,Kerugoya,180.00/Kg,250.00/Kg,300.0,Kirinyaga,2025-12-29,125,Product-125
 Passion Fruits,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,125,Product-125
 Passion Fruits,-,-,-,Ngurubani Market,150.00/Kg,200.00/Kg,250.0,Kirinyaga,2025-12-27,125,Product-125
-Passion Fruits,-,-,-,Kerugoya,180.00/Kg,250.00/Kg,300.0,Kirinyaga,2025-12-24,125,Product-125
+Oranges,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,1500.0,Kirinyaga,2026-01-23,127,Product-127
+Oranges,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,1500.0,Kirinyaga,2026-01-23,127,Product-127
+Oranges,-,-,-,Mumias,-,100.00/Kg,,Kakamega,2026-01-23,127,Product-127
+Oranges,-,-,-,Voi Retail,-,10.00/Kg,80.0,Taita-Taveta,2026-01-23,127,Product-127
+Oranges,-,-,-,Wundanyi,-,60.00/Kg,300.0,Taita-Taveta,2026-01-23,127,Product-127
+Oranges,-,-,-,Kitale Municipality Market,50.00/Kg,80.00/Kg,4000.0,Trans-Nzoia,2026-01-23,127,Product-127
+Oranges,-,-,-,Kinango,45.00/Kg,65.00/Kg,1500.0,Kwale,2026-01-22,127,Product-127
+Oranges,-,-,-,Kagio,70.00/Kg,100.00/Kg,600.0,Kirinyaga,2026-01-22,127,Product-127
+Oranges,-,-,-,Kitale Municipality Market,30.00/Kg,35.00/Kg,10000.0,Trans-Nzoia,2026-01-22,127,Product-127
 Oranges,-,-,-,Mukuyu Market,-,50.00/Kg,,Muranga,2026-01-21,127,Product-127
 Oranges,-,-,-,Kitale Municipality Market,50.00/Kg,70.00/Kg,5000.0,Trans-Nzoia,2026-01-21,127,Product-127
 Oranges,-,-,-,Ngurubani Market,100.00/Kg,150.00/Kg,820.0,Kirinyaga,2026-01-20,127,Product-127
@@ -1525,10 +1498,10 @@ Oranges,-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,127,Product-127
 Oranges,-,-,-,Kabati - Muranga,70.00/Kg,100.00/Kg,,Muranga,2025-12-27,127,Product-127
 Oranges,-,-,-,Ngurubani Market,100.00/Kg,130.00/Kg,550.0,Kirinyaga,2025-12-27,127,Product-127
 Oranges,-,-,-,Kinango,30.00/Kg,50.00/Kg,1500.0,Kwale,2025-12-25,127,Product-127
-Oranges,-,-,-,Maua,40.00/Kg,60.00/Kg,1200.0,Meru,2025-12-24,127,Product-127
-Oranges,-,-,-,Kerugoya,70.00/Kg,120.00/Kg,350.0,Kirinyaga,2025-12-24,127,Product-127
-Oranges,-,-,-,Kagio,70.00/Kg,100.00/Kg,600.0,Kirinyaga,2025-12-24,127,Product-127
-Oranges,-,-,-,Kabati - Muranga,70.00/Kg,100.00/Kg,,Muranga,2025-12-24,127,Product-127
+Tree tomato,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,350.0,Kirinyaga,2026-01-23,128,Product-128
+Tree tomato,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,128,Product-128
+Tree tomato,-,-,-,Kutus,140.00/Kg,160.00/Kg,,Kirinyaga,2026-01-22,128,Product-128
+Tree tomato,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-22,128,Product-128
 Tree tomato,-,-,-,Mukuyu Market,-,120.00/Kg,,Muranga,2026-01-21,128,Product-128
 Tree tomato,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-21,128,Product-128
 Tree tomato,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,150.0,Kirinyaga,2026-01-20,128,Product-128
@@ -1561,15 +1534,22 @@ Tree tomato,-,-,-,Kabati - Muranga,70.00/Kg,100.00/Kg,,Muranga,2025-12-27,128,Pr
 Tree tomato,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,280.0,Kirinyaga,2025-12-27,128,Product-128
 Tree tomato,-,-,-,Makutano Kirinyaga,100.00/Kg,140.00/Kg,350.0,Kirinyaga,2025-12-27,128,Product-128
 Tree tomato,-,-,-,Kagio,80.00/Kg,120.00/Kg,400.0,Kirinyaga,2025-12-26,128,Product-128
-Tree tomato,-,-,-,Kerugoya,120.00/Kg,220.00/Kg,250.0,Kirinyaga,2025-12-24,128,Product-128
-Tree tomato,-,-,-,Kabati - Muranga,70.00/Kg,100.00/Kg,,Muranga,2025-12-24,128,Product-128
+Pepino melon,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,129,Product-129
+Pepino melon,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-22,129,Product-129
+Pepino melon,-,-,-,Makutano Kirinyaga,80.00/Kg,100.00/Kg,180.0,Kirinyaga,2026-01-22,129,Product-129
 Pepino melon,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-21,129,Product-129
 Pepino melon,-,-,-,Bondeni,70.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-20,129,Product-129
 Pepino melon,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-20,129,Product-129
 Pepino melon,-,-,-,Kagio,40.00/Kg,50.00/Kg,150.0,Kirinyaga,2026-01-06,129,Product-129
 Pepino melon,-,-,-,Kagio,25.00/Kg,40.00/Kg,200.0,Kirinyaga,2026-01-02,129,Product-129
 Pepino melon,-,-,-,Kagio,30.00/Kg,40.00/Kg,100.0,Kirinyaga,2025-12-26,129,Product-129
-Pepino melon,-,-,-,Kagio,40.00/Kg,60.00/Kg,100.0,Kirinyaga,2025-12-24,129,Product-129
+Thorn melon,-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,200.0,Kirinyaga,2026-01-23,130,Product-130
+Thorn melon,-,-,-,Gakoromone,25.00/Kg,30.00/Kg,100.0,Meru,2026-01-23,130,Product-130
+Thorn melon,-,-,-,Mumias,-,166.67/Kg,,Kakamega,2026-01-23,130,Product-130
+Thorn melon,-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-23,130,Product-130
+Thorn melon,-,-,-,Kutus,25.00/Kg,35.00/Kg,,Kirinyaga,2026-01-22,130,Product-130
+Thorn melon,-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,400.0,Trans-Nzoia,2026-01-22,130,Product-130
+Thorn melon,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,600.0,Kirinyaga,2026-01-22,130,Product-130
 Thorn melon,-,-,-,Mukuyu Market,-,80.00/Kg,,Muranga,2026-01-21,130,Product-130
 Thorn melon,-,-,-,Kitale Municipality Market,60.00/Kg,90.00/Kg,300.0,Trans-Nzoia,2026-01-21,130,Product-130
 Thorn melon,-,-,-,Ngurubani Market,80.00/Kg,100.00/Kg,1580.0,Kirinyaga,2026-01-20,130,Product-130
@@ -1612,10 +1592,8 @@ Thorn melon,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,280.0,Kirinyaga,2025-12-27
 Thorn melon,-,-,-,Makutano Kirinyaga,30.00/Kg,50.00/Kg,400.0,Kirinyaga,2025-12-27,130,Product-130
 Thorn melon,-,-,-,Kagio,15.00/Kg,25.00/Kg,1500.0,Kirinyaga,2025-12-26,130,Product-130
 Thorn melon,-,-,-,Gakoromone,20.00/Kg,25.00/Kg,200.0,Meru,2025-12-26,130,Product-130
-Thorn melon,-,-,-,Makutano Kirinyaga,30.00/Kg,40.00/Kg,950.0,Kirinyaga,2025-12-24,130,Product-130
-Thorn melon,-,-,-,Kerugoya,25.00/Kg,50.00/Kg,150.0,Kirinyaga,2025-12-24,130,Product-130
-Thorn melon,-,-,-,Kagio,20.00/Kg,30.00/Kg,600.0,Kirinyaga,2025-12-24,130,Product-130
-Thorn melon,-,-,-,Kabati - Muranga,45.00/Kg,60.00/Kg,,Muranga,2025-12-24,130,Product-130
+Yam,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-22,131,Product-131
+Yam,-,-,-,Makutano Kirinyaga,90.00/Kg,120.00/Kg,480.0,Kirinyaga,2026-01-22,131,Product-131
 Yam,-,-,-,Kabati - Muranga,-,100.00/Kg,,Muranga,2026-01-20,131,Product-131
 Yam,-,-,-,Bondeni,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-20,131,Product-131
 Yam,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2026-01-14,131,Product-131
@@ -1623,7 +1601,7 @@ Yam,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2026-01-03,131,Product-13
 Yam,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-30,131,Product-131
 Yam,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-27,131,Product-131
 Yam,-,-,-,Kagio,100.00/Kg,150.00/Kg,100.0,Kirinyaga,2025-12-26,131,Product-131
-Yam,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-24,131,Product-131
+Cow Milk(At collection point),-,-,-,Katito,60.00/Lt,75.00/Lt,1500.0,Kisumu,2026-01-22,133,Product-133
 Cow Milk(At collection point),-,-,-,Kabati - Muranga,45.00/Lt,70.00/Lt,,Muranga,2026-01-20,133,Product-133
 Cow Milk(At collection point),-,-,-,Ngundune,70.00/Lt,80.00/Lt,350.0,Meru,2026-01-20,133,Product-133
 Cow Milk(At collection point),-,-,-,Kabati - Muranga,45.00/Lt,70.00/Lt,,Muranga,2026-01-16,133,Product-133
@@ -1637,9 +1615,34 @@ Cow Milk(At collection point),-,-,-,Ngundune,70.00/Lt,80.00/Lt,250.0,Meru,2026-0
 Cow Milk(At collection point),-,-,-,Wundanyi,65.00/Lt,80.00/Lt,1000.0,Taita-Taveta,2025-12-30,133,Product-133
 Cow Milk(At collection point),-,-,-,Kibuye,-,70.00/Lt,,Kisumu,2025-12-28,133,Product-133
 Cow Milk(At collection point),-,-,-,Kabati - Muranga,45.00/Lt,70.00/Lt,,Muranga,2025-12-27,133,Product-133
-Cow Milk(At collection point),-,-,-,Kagio,45.00/Lt,60.00/Lt,,Kirinyaga,2025-12-24,133,Product-133
-Cow Milk(At collection point),-,-,-,Kabati - Muranga,45.00/Lt,70.00/Lt,,Muranga,2025-12-24,133,Product-133
-Cow Milk(At collection point),-,-,-,Kabati - Muranga,45.00/Lt,70.00/Lt,,Muranga,2025-12-24,133,Product-133
+Cattle,Mixed,Grade 3,Female,Malimili Livestock Market,23000.00/Head,-,31.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Mixed,Grade 3,Female,Malimili Livestock Market,35000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Mixed,Grade 3,Female,Malimili Livestock Market,53000.00/Head,-,25.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Mixed,Grade 3,Male,Malimili Livestock Market,20000.00/Head,-,27.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Mixed,Grade 3,Male,Malimili Livestock Market,30000.00/Head,-,19.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Mixed,Grade 3,Male,Malimili Livestock Market,46000.00/Head,-,25.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Female,Malimili Livestock Market,43000.00/Head,-,24.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Malimili Livestock Market,40000.00/Head,-,20.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 4,Female,Malimili Livestock Market,55000.00/Head,-,14.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Female,Malimili Livestock Market,60000.00/Head,-,18.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 4,Male,Malimili Livestock Market,50000.00/Head,-,7.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Ayrshire,Grade 3,Male,Khayega,57000.00/Head,-,16.0,Kakamega,2026-01-23,140,Product-140
+Cattle,Zebu,Grade 3,Female,Katito,22000.00/Head,-,930.0,Kisumu,2026-01-22,140,Product-140
+Cattle,Zebu,Grade 3,Male,Katito,15000.00/Head,-,1100.0,Kisumu,2026-01-22,140,Product-140
+Cattle,Zebu,Grade 3,Female,Katito,28000.00/Head,-,1200.0,Kisumu,2026-01-22,140,Product-140
+Cattle,Zebu,Grade 3,Male,Katito,34000.00/Head,-,860.0,Kisumu,2026-01-22,140,Product-140
+Cattle,Mixed,Grade 2,Female,Lubao Livestock Market,55000.00/Head,-,120.0,Kakamega,2026-01-22,140,Product-140
+Cattle,Mixed,Grade 2,Male,Lubao Livestock Market,60000.00/Head,-,100.0,Kakamega,2026-01-22,140,Product-140
 Cattle,Zebu,Grade 2,Female,Mwingi Town,20000.00/Head,-,80.0,Kitui,2026-01-21,140,Product-140
 Cattle,Zebu,Grade 2,Male,Mwingi Town,22000.00/Head,-,100.0,Kitui,2026-01-21,140,Product-140
 Cattle,Zebu,Grade 2,Female,Mwingi Town,40000.00/Head,-,120.0,Kitui,2026-01-21,140,Product-140
@@ -1846,10 +1849,7 @@ Cattle,Mixed,Grade 2,Female,Nambacha Market,65000.00/Head,-,200.0,Kakamega,2025-
 Cattle,Mixed,Grade 2,Male,Nambacha Market,70000.00/Head,-,200.0,Kakamega,2025-12-29,140,Product-140
 Cattle,Mixed,Grade 2,Female,Lubao Livestock Market,60000.00/Head,-,30.0,Kakamega,2025-12-25,140,Product-140
 Cattle,Mixed,Grade 2,Male,Lubao Livestock Market,75000.00/Head,-,50.0,Kakamega,2025-12-25,140,Product-140
-Cattle,Ayrshire,Grade 2,Male,Mwingi Town,40000.00/Head,-,50.0,Kitui,2025-12-24,140,Product-140
-Cattle,Zebu,Grade 2,Male,Mwingi Town,40000.00/Head,-,80.0,Kitui,2025-12-24,140,Product-140
-Cattle,Zebu,Grade 2,Female,Mwingi Town,40000.00/Head,-,50.0,Kitui,2025-12-24,140,Product-140
-Cattle,Zebu,Grade 2,Male,Mwingi Town,70000.00/Head,-,70.0,Kitui,2025-12-24,140,Product-140
+Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,420.0,Kirinyaga,2026-01-23,141,Product-141
 Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,380.0,Kirinyaga,2026-01-20,141,Product-141
 Pork,-,-,-,Kabati - Muranga,-,700.00/Kg,,Muranga,2026-01-20,141,Product-141
 Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,420.0,Kirinyaga,2026-01-16,141,Product-141
@@ -1863,8 +1863,16 @@ Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,400.0,Kirinyaga,2026-01-06,141,P
 Pork,-,-,-,Kagio,550.00/Kg,700.00/Kg,,Kirinyaga,2026-01-06,141,Product-141
 Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,420.0,Kirinyaga,2025-12-31,141,Product-141
 Pork,-,-,-,Ngurubani Market,500.00/Kg,700.00/Kg,410.0,Kirinyaga,2025-12-27,141,Product-141
-Pork,-,-,-,Kagio,550.00/Kg,700.00/Kg,,Kirinyaga,2025-12-24,141,Product-141
-Pork,-,-,-,Kabati - Muranga,600.00/Kg,700.00/Kg,,Muranga,2025-12-24,141,Product-141
+Avocado,Local,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,4200.0,Kirinyaga,2026-01-23,142,Product-142
+Avocado,Local,-,-,Mumias,-,71.43/Kg,,Kakamega,2026-01-23,142,Product-142
+Avocado,Fuerte,-,-,Voi Retail,-,30.00/Kg,40.0,Taita-Taveta,2026-01-23,142,Product-142
+Avocado,Fuerte,-,-,Voi Retail,-,30.00/Kg,40.0,Taita-Taveta,2026-01-23,142,Product-142
+Avocado,Local,-,-,Wundanyi,-,80.00/Kg,200.0,Taita-Taveta,2026-01-23,142,Product-142
+Avocado,Fuerte,-,-,Kitale Municipality Market,100.00/Kg,130.00/Kg,400.0,Trans-Nzoia,2026-01-23,142,Product-142
+Avocado,Local,-,-,Kutus,40.00/Kg,50.00/Kg,1500.0,Kirinyaga,2026-01-22,142,Product-142
+Avocado,Local,-,-,Kinango,55.00/Kg,100.00/Kg,600.0,Kwale,2026-01-22,142,Product-142
+Avocado,Local,-,-,Kitale Municipality Market,100.00/Kg,130.00/Kg,500.0,Trans-Nzoia,2026-01-22,142,Product-142
+Avocado,Local,-,-,Makutano Kirinyaga,60.00/Kg,80.00/Kg,1050.0,Kirinyaga,2026-01-22,142,Product-142
 Avocado,Fuerte,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,142,Product-142
 Avocado,Local,-,-,Kakamega Town,60.00/Kg,100.00/Kg,2000.0,Kakamega,2026-01-21,142,Product-142
 Avocado,Local,-,-,Kitale Municipality Market,100.00/Kg,130.00/Kg,300.0,Trans-Nzoia,2026-01-21,142,Product-142
@@ -1902,7 +1910,14 @@ Avocado,Hass,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,142,Product-142
 Avocado,Fuerte,-,-,Kabati - Muranga,60.00/Kg,120.00/Kg,,Muranga,2025-12-27,142,Product-142
 Avocado,Local,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,550.0,Kirinyaga,2025-12-27,142,Product-142
 Avocado,Local,-,-,Kakamega Town,50.00/Kg,100.00/Kg,2000.0,Kakamega,2025-12-26,142,Product-142
-Avocado,Hass,-,-,Kabati - Muranga,60.00/Kg,120.00/Kg,,Muranga,2025-12-24,142,Product-142
+Arrow Root,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,1200.0,Kirinyaga,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Mumias,-,71.43/Kg,,Kakamega,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Voi Retail,-,140.00/Kg,50.0,Taita-Taveta,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Wundanyi,-,150.00/Kg,208.0,Taita-Taveta,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Voi Wholesale,100.00/Kg,-,2500.0,Taita-Taveta,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,143,Product-143
+Arrow Root,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,500.0,Trans-Nzoia,2026-01-22,143,Product-143
+Arrow Root,-,-,-,Makutano Kirinyaga,90.00/Kg,130.00/Kg,1500.0,Kirinyaga,2026-01-22,143,Product-143
 Arrow Root,-,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,143,Product-143
 Arrow Root,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-21,143,Product-143
 Arrow Root,-,-,-,Ngurubani Market,70.00/Kg,110.00/Kg,820.0,Kirinyaga,2026-01-20,143,Product-143
@@ -1953,7 +1968,15 @@ Arrow Root,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,820.0,Kirinyaga,2025-12-27,
 Arrow Root,-,-,-,Taveta Retail Market,80.00/Kg,100.00/Kg,350.0,Taita-Taveta,2025-12-27,143,Product-143
 Arrow Root,-,-,-,Kagio,50.00/Kg,80.00/Kg,350.0,Kirinyaga,2025-12-26,143,Product-143
 Arrow Root,-,-,-,Gakoromone,92.86/Kg,95.71/Kg,1000.0,Meru,2025-12-26,143,Product-143
-Arrow Root,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-24,143,Product-143
+Lemons,-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,150.0,Kirinyaga,2026-01-23,145,Product-145
+Lemons,-,-,-,Mumias,-,120.00/Kg,,Kakamega,2026-01-23,145,Product-145
+Lemons,-,-,-,Voi Retail,-,10.00/Kg,10.0,Taita-Taveta,2026-01-23,145,Product-145
+Lemons,-,-,-,Voi Retail,-,10.00/Kg,10.0,Taita-Taveta,2026-01-23,145,Product-145
+Lemons,-,-,-,Wundanyi,-,60.00/Kg,280.0,Taita-Taveta,2026-01-23,145,Product-145
+Lemons,-,-,-,Kitale Municipality Market,42.86/Kg,64.29/Kg,400.0,Trans-Nzoia,2026-01-23,145,Product-145
+Lemons,-,-,-,Kinango,45.00/Kg,70.00/Kg,400.0,Kwale,2026-01-22,145,Product-145
+Lemons,-,-,-,Kitale Municipality Market,42.86/Kg,64.29/Kg,500.0,Trans-Nzoia,2026-01-22,145,Product-145
+Lemons,-,-,-,Makutano Kirinyaga,50.00/Kg,80.00/Kg,750.0,Kirinyaga,2026-01-22,145,Product-145
 Lemons,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,145,Product-145
 Lemons,-,-,-,Kangeta,80.00/Kg,90.00/Kg,25.0,Meru,2026-01-21,145,Product-145
 Lemons,-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,300.0,Trans-Nzoia,2026-01-21,145,Product-145
@@ -1998,7 +2021,21 @@ Lemons,-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,170.0,Kirinyaga,2025-12-27,145,P
 Lemons,-,-,-,Kagio,50.00/Kg,70.00/Kg,250.0,Kirinyaga,2025-12-26,145,Product-145
 Lemons,-,-,-,Gakoromone,30.00/Kg,35.00/Kg,500.0,Meru,2025-12-26,145,Product-145
 Lemons,-,-,-,Kinango,42.00/Kg,60.00/Kg,300.0,Kwale,2025-12-25,145,Product-145
-Lemons,-,-,-,Kagio,50.00/Kg,60.00/Kg,300.0,Kirinyaga,2025-12-24,145,Product-145
+Mangoes,Improved,-,-,Gakoromone,25.00/Kg,30.00/Kg,40000.0,Meru,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Mumias,-,120.00/Kg,,Kakamega,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Mumias,-,100.00/Kg,,Kakamega,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Voi Retail,-,30.00/Kg,90.0,Taita-Taveta,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Wundanyi,-,60.00/Kg,300.0,Taita-Taveta,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Voi Wholesale,30.00/Kg,-,1200.0,Taita-Taveta,2026-01-23,147,Product-147
+Mangoes,Local,-,-,Kitale Municipality Market,40.00/Kg,60.00/Kg,3000.0,Trans-Nzoia,2026-01-23,147,Product-147
+Mangoes,Local,-,-,Kitale Municipality Market,46.67/Kg,66.67/Kg,2000.0,Trans-Nzoia,2026-01-23,147,Product-147
+Mangoes,Local,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,1500.0,Trans-Nzoia,2026-01-23,147,Product-147
+Mangoes,Improved,-,-,Kinango,58.00/Kg,100.00/Kg,3000.0,Kwale,2026-01-22,147,Product-147
+Mangoes,Improved,-,-,Kagio,40.00/Kg,60.00/Kg,4000.0,Kirinyaga,2026-01-22,147,Product-147
+Mangoes,Local,-,-,Kagio,10.00/Kg,15.00/Kg,30000.0,Kirinyaga,2026-01-22,147,Product-147
+Mangoes,Local,-,-,Kitale Municipality Market,46.67/Kg,66.67/Kg,2000.0,Trans-Nzoia,2026-01-22,147,Product-147
+Mangoes,Local,-,-,Kitale Municipality Market,40.00/Kg,60.00/Kg,4000.0,Trans-Nzoia,2026-01-22,147,Product-147
+Mangoes,Improved,-,-,Makutano Kirinyaga,15.00/Kg,25.00/Kg,3200.0,Kirinyaga,2026-01-22,147,Product-147
 Mangoes,Improved,-,-,Mukuyu Market,-,20.00/Kg,,Muranga,2026-01-21,147,Product-147
 Mangoes,Local,-,-,Mwingi Town,10.00/Kg,20.00/Kg,7000.0,Kitui,2026-01-21,147,Product-147
 Mangoes,Improved,-,-,Mwingi Town,30.00/Kg,50.00/Kg,8000.0,Kitui,2026-01-21,147,Product-147
@@ -2074,15 +2111,23 @@ Mangoes,Improved,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,2150.0,Kirinyaga,2025-1
 Mangoes,Local,-,-,Kagio,10.00/Kg,15.00/Kg,4000.0,Kirinyaga,2025-12-26,147,Product-147
 Mangoes,Improved,-,-,Kagio,30.00/Kg,60.00/Kg,800.0,Kirinyaga,2025-12-26,147,Product-147
 Mangoes,Local,-,-,Kinango,60.00/Kg,100.00/Kg,1500.0,Kwale,2025-12-25,147,Product-147
-Mangoes,Improved,-,-,Maua,60.00/Kg,75.00/Kg,1600.0,Meru,2025-12-24,147,Product-147
-Mangoes,Improved,-,-,Kabati - Muranga,40.00/Kg,90.00/Kg,,Muranga,2025-12-24,147,Product-147
-Mangoes,Local,-,-,Kangeta,25.00/Kg,30.00/Kg,500.0,Meru,2025-12-24,147,Product-147
+Limes,-,-,-,Voi Retail,-,10.00/Kg,10.0,Taita-Taveta,2026-01-23,148,Product-148
+Limes,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-22,148,Product-148
 Limes,-,-,-,Mukuyu Market,-,70.00/Kg,,Muranga,2026-01-21,148,Product-148
 Limes,-,-,-,Bondeni,80.00/Kg,120.00/Kg,200.0,Trans-Nzoia,2026-01-20,148,Product-148
 Limes,-,-,-,Voi Retail,-,10.00/Kg,10.0,Taita-Taveta,2026-01-20,148,Product-148
 Limes,-,-,-,Holo,-,200.00/Kg,,Kisumu,2026-01-13,148,Product-148
 Limes,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2026-01-11,148,Product-148
 Limes,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,148,Product-148
+Green Maize,-,-,-,Ngurubani Market,40.00/Kg,60.00/Kg,1500.0,Kirinyaga,2026-01-23,149,Product-149
+Green Maize,-,-,-,Gakoromone,30.00/Kg,50.00/Kg,800.0,Meru,2026-01-23,149,Product-149
+Green Maize,-,-,-,Voi Retail,-,30.00/Kg,100.0,Taita-Taveta,2026-01-23,149,Product-149
+Green Maize,-,-,-,Kitale Municipality Market,50.00/Kg,75.00/Kg,25000.0,Trans-Nzoia,2026-01-23,149,Product-149
+Green Maize,-,-,-,Kutus,40.00/Kg,50.00/Kg,1800.0,Kirinyaga,2026-01-22,149,Product-149
+Green Maize,-,-,-,Kinango,48.00/Kg,70.00/Kg,700.0,Kwale,2026-01-22,149,Product-149
+Green Maize,-,-,-,Kagio,40.00/Kg,60.00/Kg,3500.0,Kirinyaga,2026-01-22,149,Product-149
+Green Maize,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,1800.0,Kirinyaga,2026-01-22,149,Product-149
+Green Maize,-,-,-,Kitale Municipality Market,50.00/Kg,75.00/Kg,18000.0,Trans-Nzoia,2026-01-22,149,Product-149
 Green Maize,-,-,-,Mukuyu Market,50.00/Kg,60.00/Kg,,Muranga,2026-01-21,149,Product-149
 Green Maize,-,-,-,Kangeta,50.00/Kg,60.00/Kg,500.0,Meru,2026-01-21,149,Product-149
 Green Maize,-,-,-,Kitale Municipality Market,50.00/Kg,75.00/Kg,12000.0,Trans-Nzoia,2026-01-21,149,Product-149
@@ -2137,10 +2182,16 @@ Green Maize,-,-,-,Kangeta,50.00/Kg,60.00/Kg,650.0,Meru,2025-12-29,149,Product-14
 Green Maize,-,-,-,Kibuye,-,90.00/Kg,,Kisumu,2025-12-28,149,Product-149
 Green Maize,-,-,-,Kabati - Muranga,60.00/Kg,90.00/Kg,,Muranga,2025-12-27,149,Product-149
 Green Maize,-,-,-,Ngurubani Market,45.00/Kg,60.00/Kg,2500.0,Kirinyaga,2025-12-27,149,Product-149
-Green Maize,-,-,-,Kerugoya,60.00/Kg,80.00/Kg,200.0,Kirinyaga,2025-12-24,149,Product-149
-Green Maize,-,-,-,Kabati - Muranga,60.00/Kg,90.00/Kg,,Muranga,2025-12-24,149,Product-149
-Green Maize,-,-,-,Kagio,35.00/Kg,60.00/Kg,4000.0,Kirinyaga,2025-12-24,149,Product-149
-Green Maize,-,-,-,Kangeta,50.00/Kg,60.00/Kg,500.0,Meru,2025-12-24,149,Product-149
+Water Melon,-,-,-,Ngurubani Market,28.00/Kg,35.00/Kg,23500.0,Kirinyaga,2026-01-23,150,Product-150
+Water Melon,-,-,-,Gakoromone,35.00/Kg,40.00/Kg,40000.0,Meru,2026-01-23,150,Product-150
+Water Melon,-,-,-,Mumias,-,62.50/Kg,,Kakamega,2026-01-23,150,Product-150
+Water Melon,-,-,-,Voi Retail,-,50.00/Kg,400.0,Taita-Taveta,2026-01-23,150,Product-150
+Water Melon,-,-,-,Kitale Municipality Market,50.00/Kg,66.67/Kg,3000.0,Trans-Nzoia,2026-01-23,150,Product-150
+Water Melon,-,-,-,Kutus,28.00/Kg,35.00/Kg,,Kirinyaga,2026-01-22,150,Product-150
+Water Melon,-,-,-,Kinango,30.00/Kg,50.00/Kg,1500.0,Kwale,2026-01-22,150,Product-150
+Water Melon,-,-,-,Kagio,30.00/Kg,40.00/Kg,27000.0,Kirinyaga,2026-01-22,150,Product-150
+Water Melon,-,-,-,Kitale Municipality Market,70.00/Kg,90.00/Kg,5000.0,Trans-Nzoia,2026-01-22,150,Product-150
+Water Melon,-,-,-,Makutano Kirinyaga,20.00/Kg,30.00/Kg,3700.0,Kirinyaga,2026-01-22,150,Product-150
 Water Melon,-,-,-,Mukuyu Market,-,50.00/Kg,,Muranga,2026-01-21,150,Product-150
 Water Melon,-,-,-,Kangeta,40.00/Kg,50.00/Kg,600.0,Meru,2026-01-21,150,Product-150
 Water Melon,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,4000.0,Trans-Nzoia,2026-01-21,150,Product-150
@@ -2205,11 +2256,13 @@ Water Melon,-,-,-,Ngurubani Market,30.00/Kg,35.00/Kg,17500.0,Kirinyaga,2025-12-2
 Water Melon,-,-,-,Makutano Kirinyaga,15.00/Kg,30.00/Kg,2800.0,Kirinyaga,2025-12-27,150,Product-150
 Water Melon,-,-,-,Gakoromone,35.00/Kg,40.00/Kg,10000.0,Meru,2025-12-26,150,Product-150
 Water Melon,-,-,-,Kinango,30.00/Kg,50.00/Kg,1500.0,Kwale,2025-12-25,150,Product-150
-Water Melon,-,-,-,Makutano Kirinyaga,15.00/Kg,25.00/Kg,4500.0,Kirinyaga,2025-12-24,150,Product-150
-Water Melon,-,-,-,Maua,30.00/Kg,35.00/Kg,7200.0,Meru,2025-12-24,150,Product-150
-Water Melon,-,-,-,Kagio,35.00/Kg,50.00/Kg,30000.0,Kirinyaga,2025-12-24,150,Product-150
-Water Melon,-,-,-,Kabati - Muranga,45.00/Kg,280.00/Kg,,Muranga,2025-12-24,150,Product-150
-Water Melon,-,-,-,Kangeta,30.00/Kg,40.00/Kg,1000.0,Meru,2025-12-24,150,Product-150
+Pineapples,-,-,-,Gakoromone,60.00/Kg,80.00/Kg,1200.0,Meru,2026-01-23,151,Product-151
+Pineapples,-,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-23,151,Product-151
+Pineapples,-,-,-,Voi Retail,-,150.00/Kg,300.0,Taita-Taveta,2026-01-23,151,Product-151
+Pineapples,-,-,-,Kitale Municipality Market,50.00/Kg,66.67/Kg,3000.0,Trans-Nzoia,2026-01-23,151,Product-151
+Pineapples,-,-,-,Kagio,50.00/Kg,70.00/Kg,3000.0,Kirinyaga,2026-01-22,151,Product-151
+Pineapples,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,5000.0,Trans-Nzoia,2026-01-22,151,Product-151
+Pineapples,-,-,-,Makutano Kirinyaga,66.67/Kg,100.00/Kg,250.0,Kirinyaga,2026-01-22,151,Product-151
 Pineapples,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,151,Product-151
 Pineapples,-,-,-,Kitale Municipality Market,50.00/Kg,66.67/Kg,3000.0,Trans-Nzoia,2026-01-21,151,Product-151
 Pineapples,-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,800.0,Kirinyaga,2026-01-20,151,Product-151
@@ -2245,9 +2298,14 @@ Pineapples,-,-,-,Kibuye,-,115.38/Kg,,Kisumu,2025-12-28,151,Product-151
 Pineapples,-,-,-,Kabati - Muranga,22.50/Kg,35.00/Kg,,Muranga,2025-12-27,151,Product-151
 Pineapples,-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,825.0,Kirinyaga,2025-12-27,151,Product-151
 Pineapples,-,-,-,Kagio,50.00/Kg,70.00/Kg,3200.0,Kirinyaga,2025-12-26,151,Product-151
-Pineapples,-,-,-,Makutano Kirinyaga,66.67/Kg,100.00/Kg,430.0,Kirinyaga,2025-12-24,151,Product-151
-Pineapples,-,-,-,Kabati - Muranga,22.50/Kg,30.00/Kg,,Muranga,2025-12-24,151,Product-151
-Pineapples,-,-,-,Kangeta,80.00/Kg,100.00/Kg,100.0,Meru,2025-12-24,151,Product-151
+Pawpaw,-,-,-,Ngurubani Market,30.00/Kg,50.00/Kg,550.0,Kirinyaga,2026-01-23,152,Product-152
+Pawpaw,-,-,-,Mumias,-,50.00/Kg,,Kakamega,2026-01-23,152,Product-152
+Pawpaw,-,-,-,Voi Retail,-,70.00/Kg,50.0,Taita-Taveta,2026-01-23,152,Product-152
+Pawpaw,-,-,-,Wundanyi,-,70.00/Kg,200.0,Taita-Taveta,2026-01-23,152,Product-152
+Pawpaw,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,3000.0,Trans-Nzoia,2026-01-23,152,Product-152
+Pawpaw,-,-,-,Kagio,25.00/Kg,40.00/Kg,2000.0,Kirinyaga,2026-01-22,152,Product-152
+Pawpaw,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,3000.0,Trans-Nzoia,2026-01-22,152,Product-152
+Pawpaw,-,-,-,Makutano Kirinyaga,30.00/Kg,55.00/Kg,680.0,Kirinyaga,2026-01-22,152,Product-152
 Pawpaw,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,152,Product-152
 Pawpaw,-,-,-,Kangeta,30.00/Kg,40.00/Kg,80.0,Meru,2026-01-21,152,Product-152
 Pawpaw,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,2000.0,Trans-Nzoia,2026-01-21,152,Product-152
@@ -2291,8 +2349,8 @@ Pawpaw,-,-,-,Ngurubani Market,30.00/Kg,45.00/Kg,240.0,Kirinyaga,2025-12-27,152,P
 Pawpaw,-,-,-,Makutano Kirinyaga,30.00/Kg,50.00/Kg,700.0,Kirinyaga,2025-12-27,152,Product-152
 Pawpaw,-,-,-,Kagio,30.00/Kg,50.00/Kg,3000.0,Kirinyaga,2025-12-26,152,Product-152
 Pawpaw,-,-,-,Gakoromone,30.00/Kg,50.00/Kg,600.0,Meru,2025-12-26,152,Product-152
-Pawpaw,-,-,-,Maua,30.00/Kg,25.00/Kg,3000.0,Meru,2025-12-24,152,Product-152
-Pawpaw,-,-,-,Kangeta,30.00/Kg,40.00/Kg,400.0,Meru,2025-12-24,152,Product-152
+Cow Milk(Processd),-,-,-,Katito,108.33/Lt,120.00/Lt,7500.0,Kisumu,2026-01-22,153,Product-153
+Cow Milk(Processd),-,-,-,Makutano Kirinyaga,100.00/Lt,120.00/Lt,1200.0,Kirinyaga,2026-01-22,153,Product-153
 Cow Milk(Processd),-,-,-,Kabati - Muranga,100.00/Lt,110.00/Lt,,Muranga,2026-01-20,153,Product-153
 Cow Milk(Processd),-,-,-,Ahero,110.00/Lt,120.00/Lt,2000.0,Kisumu,2026-01-20,153,Product-153
 Cow Milk(Processd),-,-,-,Ngundune,94.00/Lt,120.00/Lt,1500.0,Meru,2026-01-20,153,Product-153
@@ -2301,7 +2359,19 @@ Cow Milk(Processd),-,-,-,Ngundune,94.00/Lt,120.00/Lt,1200.0,Meru,2026-01-15,153,
 Cow Milk(Processd),-,-,-,Ngundune,98.00/Lt,120.00/Lt,800.0,Meru,2026-01-06,153,Product-153
 Cow Milk(Processd),-,-,-,Kibuye,-,120.00/Lt,,Kisumu,2025-12-28,153,Product-153
 Cow Milk(Processd),-,-,-,Kabati - Muranga,100.00/Lt,110.00/Lt,,Muranga,2025-12-27,153,Product-153
-Cow Milk(Processd),-,-,-,Kabati - Muranga,100.00/Lt,110.00/Lt,,Muranga,2025-12-24,153,Product-153
+Kales/Sukuma Wiki,-,-,-,Ngurubani Market,20.00/Kg,30.00/Kg,1200.0,Kirinyaga,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Ndanai Market,11.11/Kg,30.00/Kg,2500.0,Bomet,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Gakoromone,20.00/Kg,25.00/Kg,4500.0,Meru,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Voi Retail,-,100.00/Kg,50.0,Taita-Taveta,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Mumias,-,100.00/Kg,,Kakamega,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Wundanyi,-,40.00/Kg,,Taita-Taveta,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Voi Wholesale,50.00/Kg,-,1300.0,Taita-Taveta,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Kitale Municipality Market,15.00/Kg,20.00/Kg,500.0,Trans-Nzoia,2026-01-23,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Kutus,25.00/Kg,30.00/Kg,500.0,Kirinyaga,2026-01-22,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Kinango,40.00/Kg,60.00/Kg,2200.0,Kwale,2026-01-22,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Kagio,20.00/Kg,30.00/Kg,2500.0,Kirinyaga,2026-01-22,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Makutano Kirinyaga,25.00/Kg,40.00/Kg,1300.0,Kirinyaga,2026-01-22,154,Product-154
+Kales/Sukuma Wiki,-,-,-,Kitale Municipality Market,15.00/Kg,20.00/Kg,500.0,Trans-Nzoia,2026-01-22,154,Product-154
 Kales/Sukuma Wiki,-,-,-,Mwingi Town,30.00/Kg,50.00/Kg,4000.0,Kitui,2026-01-21,154,Product-154
 Kales/Sukuma Wiki,-,-,-,Sabatia,45.83/Kg,90.00/Kg,1800.0,Kakamega,2026-01-21,154,Product-154
 Kales/Sukuma Wiki,-,-,-,Kangeta,30.00/Kg,40.00/Kg,350.0,Meru,2026-01-21,154,Product-154
@@ -2391,12 +2461,21 @@ Kales/Sukuma Wiki,-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-27,1
 Kales/Sukuma Wiki,-,-,-,Ngurubani Market,22.00/Kg,30.00/Kg,1200.0,Kirinyaga,2025-12-27,154,Product-154
 Kales/Sukuma Wiki,-,-,-,Makutano Kirinyaga,15.00/Kg,25.00/Kg,1300.0,Kirinyaga,2025-12-27,154,Product-154
 Kales/Sukuma Wiki,-,-,-,Kinango,45.00/Kg,65.00/Kg,1500.0,Kwale,2025-12-25,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Makutano Kirinyaga,25.00/Kg,40.00/Kg,1200.0,Kirinyaga,2025-12-24,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Maua,15.00/Kg,40.00/Kg,400.0,Meru,2025-12-24,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Kerugoya,20.00/Kg,40.00/Kg,200.0,Kirinyaga,2025-12-24,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-24,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Kagio,25.00/Kg,30.00/Kg,2600.0,Kirinyaga,2025-12-24,154,Product-154
-Kales/Sukuma Wiki,-,-,-,Kangeta,30.00/Kg,40.00/Kg,500.0,Meru,2025-12-24,154,Product-154
+Dry Onions,-,-,-,Diani Market,100.00/Kg,120.00/Kg,3000.0,Kwale,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,6800.0,Kirinyaga,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Ndanai Market,75.00/Kg,100.00/Kg,8000.0,Bomet,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Gakoromone,70.00/Kg,80.00/Kg,40000.0,Meru,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Voi Retail,-,120.00/Kg,30.0,Taita-Taveta,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Mumias,-,83.33/Kg,,Kakamega,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Wundanyi,-,130.00/Kg,2000.0,Taita-Taveta,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Voi Wholesale,70.00/Kg,-,3000.0,Taita-Taveta,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Kitale Municipality Market,50.00/Kg,70.00/Kg,5000.0,Trans-Nzoia,2026-01-23,158,Product-158
+Dry Onions,-,-,-,Kutus,70.00/Kg,80.00/Kg,8500.0,Kirinyaga,2026-01-22,158,Product-158
+Dry Onions,-,-,-,Kinango,116.67/Kg,170.00/Kg,2500.0,Kwale,2026-01-22,158,Product-158
+Dry Onions,-,-,-,Kagio,65.00/Kg,100.00/Kg,2500.0,Kirinyaga,2026-01-22,158,Product-158
+Dry Onions,-,-,-,Diani Market,100.00/Kg,120.00/Kg,3500.0,Kwale,2026-01-22,158,Product-158
+Dry Onions,-,-,-,Makutano Kirinyaga,75.00/Kg,90.00/Kg,2100.0,Kirinyaga,2026-01-22,158,Product-158
+Dry Onions,-,-,-,Kitale Municipality Market,50.00/Kg,70.00/Kg,5000.0,Trans-Nzoia,2026-01-22,158,Product-158
 Dry Onions,-,-,-,Mukuyu Market,80.00/Kg,100.00/Kg,,Muranga,2026-01-21,158,Product-158
 Dry Onions,-,-,-,Diani Market,100.00/Kg,120.00/Kg,1500.0,Kwale,2026-01-21,158,Product-158
 Dry Onions,-,-,-,Mwingi Town,65.00/Kg,80.00/Kg,7500.0,Kitui,2026-01-21,158,Product-158
@@ -2513,13 +2592,15 @@ Dry Onions,-,-,-,Kakamega Town,60.00/Kg,120.00/Kg,6000.0,Kakamega,2025-12-26,158
 Dry Onions,-,-,-,Kakamega Town,60.00/Kg,100.00/Kg,7000.0,Kakamega,2025-12-25,158,Product-158
 Dry Onions,-,-,-,Kinango,100.00/Kg,150.00/Kg,1700.0,Kwale,2025-12-25,158,Product-158
 Dry Onions,-,-,-,Diani Market,100.00/Kg,120.00/Kg,4000.0,Kwale,2025-12-25,158,Product-158
-Dry Onions,-,-,-,Makutano Kirinyaga,80.00/Kg,100.00/Kg,6500.0,Kirinyaga,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Mwingi Town,90.00/Kg,100.00/Kg,8000.0,Kitui,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Maua,80.00/Kg,100.00/Kg,6000.0,Meru,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Kerugoya,60.00/Kg,100.00/Kg,2500.0,Kirinyaga,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Kagio,70.00/Kg,100.00/Kg,3200.0,Kirinyaga,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Diani Market,100.00/Kg,120.00/Kg,4000.0,Kwale,2025-12-24,158,Product-158
-Dry Onions,-,-,-,Kangeta,80.00/Kg,90.00/Kg,2500.0,Meru,2025-12-24,158,Product-158
+Spring Onions,-,-,-,Ngurubani Market,40.00/Kg,60.00/Kg,500.0,Kirinyaga,2026-01-23,159,Product-159
+Spring Onions,-,-,-,Gakoromone,60.00/Kg,70.00/Kg,1200.0,Meru,2026-01-23,159,Product-159
+Spring Onions,-,-,-,Voi Retail,-,90.00/Kg,40.0,Taita-Taveta,2026-01-23,159,Product-159
+Spring Onions,-,-,-,Mumias,-,66.67/Kg,,Kakamega,2026-01-23,159,Product-159
+Spring Onions,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,159,Product-159
+Spring Onions,-,-,-,Kutus,50.00/Kg,80.00/Kg,650.0,Kirinyaga,2026-01-22,159,Product-159
+Spring Onions,-,-,-,Kagio,50.00/Kg,70.00/Kg,400.0,Kirinyaga,2026-01-22,159,Product-159
+Spring Onions,-,-,-,Makutano Kirinyaga,45.00/Kg,60.00/Kg,1800.0,Kirinyaga,2026-01-22,159,Product-159
+Spring Onions,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,500.0,Trans-Nzoia,2026-01-22,159,Product-159
 Spring Onions,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,159,Product-159
 Spring Onions,-,-,-,Kangeta,50.00/Kg,60.00/Kg,150.0,Meru,2026-01-21,159,Product-159
 Spring Onions,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,200.0,Trans-Nzoia,2026-01-21,159,Product-159
@@ -2568,10 +2649,14 @@ Spring Onions,-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,159,Product-159
 Spring Onions,-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,350.0,Kirinyaga,2025-12-27,159,Product-159
 Spring Onions,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,3500.0,Kirinyaga,2025-12-27,159,Product-159
 Spring Onions,-,-,-,Gakoromone,65.00/Kg,70.00/Kg,2500.0,Meru,2025-12-26,159,Product-159
-Spring Onions,-,-,-,Makutano Kirinyaga,45.00/Kg,60.00/Kg,3800.0,Kirinyaga,2025-12-24,159,Product-159
-Spring Onions,-,-,-,Maua,60.00/Kg,80.00/Kg,2600.0,Meru,2025-12-24,159,Product-159
-Spring Onions,-,-,-,Kagio,40.00/Kg,60.00/Kg,200.0,Kirinyaga,2025-12-24,159,Product-159
-Spring Onions,-,-,-,Kangeta,70.00/Kg,80.00/Kg,350.0,Meru,2025-12-24,159,Product-159
+Fresh Peas,On pods,-,-,Gakoromone,100.00/Kg,110.00/Kg,800.0,Meru,2026-01-23,160,Product-160
+Fresh Peas,Shelled Peas,-,-,Voi Retail,-,140.00/Kg,100.0,Taita-Taveta,2026-01-23,160,Product-160
+Fresh Peas,Shelled Peas,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-23,160,Product-160
+Fresh Peas,On pods,-,-,Kitale Municipality Market,40.00/Kg,60.00/Kg,500.0,Trans-Nzoia,2026-01-23,160,Product-160
+Fresh Peas,On pods,-,-,Kutus,80.00/Kg,100.00/Kg,3500.0,Kirinyaga,2026-01-22,160,Product-160
+Fresh Peas,On pods,-,-,Kagio,55.00/Kg,80.00/Kg,500.0,Kirinyaga,2026-01-22,160,Product-160
+Fresh Peas,On pods,-,-,Makutano Kirinyaga,75.00/Kg,100.00/Kg,2200.0,Kirinyaga,2026-01-22,160,Product-160
+Fresh Peas,Shelled Peas,-,-,Kitale Municipality Market,240.00/Kg,300.00/Kg,500.0,Trans-Nzoia,2026-01-22,160,Product-160
 Fresh Peas,On pods,-,-,Mukuyu Market,-,120.00/Kg,,Muranga,2026-01-21,160,Product-160
 Fresh Peas,On pods,-,-,Kangeta,90.00/Kg,100.00/Kg,250.0,Meru,2026-01-21,160,Product-160
 Fresh Peas,On pods,-,-,Kangeta,80.00/Kg,90.00/Kg,200.0,Meru,2026-01-21,160,Product-160
@@ -2624,11 +2709,17 @@ Fresh Peas,On pods,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,850.0,Kirinyaga,2025-
 Fresh Peas,On pods,-,-,Makutano Kirinyaga,50.00/Kg,80.00/Kg,3500.0,Kirinyaga,2025-12-27,160,Product-160
 Fresh Peas,On pods,-,-,Kagio,65.00/Kg,90.00/Kg,1200.0,Kirinyaga,2025-12-26,160,Product-160
 Fresh Peas,On pods,-,-,Gakoromone,120.00/Kg,140.00/Kg,1200.0,Meru,2025-12-26,160,Product-160
-Fresh Peas,On pods,-,-,Makutano Kirinyaga,65.00/Kg,80.00/Kg,4900.0,Kirinyaga,2025-12-24,160,Product-160
-Fresh Peas,On pods,-,-,Kerugoya,60.00/Kg,100.00/Kg,450.0,Kirinyaga,2025-12-24,160,Product-160
-Fresh Peas,On pods,-,-,Kagio,60.00/Kg,80.00/Kg,500.0,Kirinyaga,2025-12-24,160,Product-160
-Fresh Peas,On pods,-,-,Kangeta,140.00/Kg,150.00/Kg,700.0,Meru,2025-12-24,160,Product-160
-Fresh Peas,On pods,-,-,Kangeta,130.00/Kg,140.00/Kg,400.0,Meru,2025-12-24,160,Product-160
+Spinach,-,-,-,Ngurubani Market,30.00/Kg,40.00/Kg,450.0,Kirinyaga,2026-01-23,161,Product-161
+Spinach,-,-,-,Gakoromone,25.00/Kg,30.00/Kg,3000.0,Meru,2026-01-23,161,Product-161
+Spinach,-,-,-,Voi Retail,-,100.00/Kg,80.0,Taita-Taveta,2026-01-23,161,Product-161
+Spinach,-,-,-,Mumias,-,50.00/Kg,,Kakamega,2026-01-23,161,Product-161
+Spinach,-,-,-,Wundanyi,-,60.00/Kg,400.0,Taita-Taveta,2026-01-23,161,Product-161
+Spinach,-,-,-,Voi Wholesale,60.00/Kg,-,900.0,Taita-Taveta,2026-01-23,161,Product-161
+Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,27.00/Kg,400.0,Trans-Nzoia,2026-01-23,161,Product-161
+Spinach,-,-,-,Kutus,30.00/Kg,40.00/Kg,600.0,Kirinyaga,2026-01-22,161,Product-161
+Spinach,-,-,-,Kinango,49.00/Kg,70.00/Kg,500.0,Kwale,2026-01-22,161,Product-161
+Spinach,-,-,-,Makutano Kirinyaga,30.00/Kg,40.00/Kg,1400.0,Kirinyaga,2026-01-22,161,Product-161
+Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,25.00/Kg,500.0,Trans-Nzoia,2026-01-22,161,Product-161
 Spinach,-,-,-,Mukuyu Market,20.00/Kg,30.00/Kg,,Muranga,2026-01-21,161,Product-161
 Spinach,-,-,-,Sabatia,54.17/Kg,58.33/Kg,360.0,Kakamega,2026-01-21,161,Product-161
 Spinach,-,-,-,Kangeta,30.00/Kg,40.00/Kg,300.0,Meru,2026-01-21,161,Product-161
@@ -2700,8 +2791,12 @@ Spinach,-,-,-,Ngurubani Market,30.00/Kg,40.00/Kg,450.0,Kirinyaga,2025-12-27,161,
 Spinach,-,-,-,Makutano Kirinyaga,20.00/Kg,30.00/Kg,950.0,Kirinyaga,2025-12-27,161,Product-161
 Spinach,-,-,-,Gakoromone,40.00/Kg,45.00/Kg,5000.0,Meru,2025-12-26,161,Product-161
 Spinach,-,-,-,Kinango,55.00/Kg,75.00/Kg,400.0,Kwale,2025-12-25,161,Product-161
-Spinach,-,-,-,Makutano Kirinyaga,30.00/Kg,45.00/Kg,1350.0,Kirinyaga,2025-12-24,161,Product-161
-Spinach,-,-,-,Kangeta,35.00/Kg,40.00/Kg,400.0,Meru,2025-12-24,161,Product-161
+Cassava Fresh,-,-,-,Gakoromone,40.00/Kg,50.00/Kg,700.0,Meru,2026-01-23,162,Product-162
+Cassava Fresh,-,-,-,Mumias,-,55.56/Kg,,Kakamega,2026-01-23,162,Product-162
+Cassava Fresh,-,-,-,Voi Retail,-,90.00/Kg,30.0,Taita-Taveta,2026-01-23,162,Product-162
+Cassava Fresh,-,-,-,Kitale Municipality Market,100.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-23,162,Product-162
+Cassava Fresh,-,-,-,Kitale Municipality Market,100.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-22,162,Product-162
+Cassava Fresh,-,-,-,Makutano Kirinyaga,40.00/Kg,60.00/Kg,350.0,Kirinyaga,2026-01-22,162,Product-162
 Cassava Fresh,-,-,-,Kitale Municipality Market,100.00/Kg,150.00/Kg,400.0,Trans-Nzoia,2026-01-21,162,Product-162
 Cassava Fresh,-,-,-,Bondeni,100.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-20,162,Product-162
 Cassava Fresh,-,-,-,Ahero,60.00/Kg,70.00/Kg,3600.0,Kisumu,2026-01-20,162,Product-162
@@ -2728,7 +2823,14 @@ Cassava Fresh,-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,162,Product-162
 Cassava Fresh,-,-,-,Kabati - Muranga,18.00/Kg,30.00/Kg,,Muranga,2025-12-27,162,Product-162
 Cassava Fresh,-,-,-,Taveta Retail Market,80.00/Kg,110.00/Kg,250.0,Taita-Taveta,2025-12-27,162,Product-162
 Cassava Fresh,-,-,-,Kagio,50.00/Kg,60.00/Kg,200.0,Kirinyaga,2025-12-26,162,Product-162
-Cassava Fresh,-,-,-,Kabati - Muranga,18.00/Kg,35.00/Kg,,Muranga,2025-12-24,162,Product-162
+White Irish Potatoes,-,-,-,Ngurubani Market,34.00/Kg,50.00/Kg,24400.0,Kirinyaga,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Gakoromone,50.00/Kg,57.14/Kg,55000.0,Meru,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Voi Retail,-,60.00/Kg,360.0,Taita-Taveta,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Wundanyi,-,60.00/Kg,,Taita-Taveta,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Voi Wholesale,51.11/Kg,-,7200.0,Taita-Taveta,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Kitale Municipality Market,55.00/Kg,80.00/Kg,3000.0,Trans-Nzoia,2026-01-23,163,Product-163
+White Irish Potatoes,-,-,-,Kinango,57.89/Kg,80.00/Kg,7000.0,Kwale,2026-01-22,163,Product-163
+White Irish Potatoes,-,-,-,Kitale Municipality Market,42.67/Kg,48.00/Kg,4000.0,Trans-Nzoia,2026-01-22,163,Product-163
 White Irish Potatoes,-,-,-,Mukuyu Market,-,50.00/Kg,,Muranga,2026-01-21,163,Product-163
 White Irish Potatoes,-,-,-,Sabatia,61.54/Kg,54.35/Kg,9500.0,Kakamega,2026-01-21,163,Product-163
 White Irish Potatoes,-,-,-,Kangeta,74.00/Kg,76.00/Kg,13000.0,Meru,2026-01-21,163,Product-163
@@ -2797,11 +2899,8 @@ White Irish Potatoes,-,-,-,Kagio,32.00/Kg,48.00/Kg,8000.0,Kirinyaga,2025-12-26,1
 White Irish Potatoes,-,-,-,Gakoromone,52.86/Kg,55.71/Kg,40000.0,Meru,2025-12-26,163,Product-163
 White Irish Potatoes,-,-,-,Lungalunga,50.00/Kg,100.00/Kg,30000.0,Kwale,2025-12-26,163,Product-163
 White Irish Potatoes,-,-,-,Kakamega Town,50.00/Kg,80.00/Kg,10000.0,Kakamega,2025-12-26,163,Product-163
-White Irish Potatoes,-,-,-,Mwingi Town,40.91/Kg,80.00/Kg,8000.0,Kitui,2025-12-24,163,Product-163
-White Irish Potatoes,-,-,-,Makutano Embu,35.00/Kg,60.00/Kg,,Embu,2025-12-24,163,Product-163
-White Irish Potatoes,-,-,-,Maua,50.00/Kg,70.00/Kg,96000.0,Meru,2025-12-24,163,Product-163
-White Irish Potatoes,-,-,-,Kerugoya,35.00/Kg,60.00/Kg,2500.0,Kirinyaga,2025-12-24,163,Product-163
-White Irish Potatoes,-,-,-,Kangeta,68.00/Kg,70.00/Kg,15000.0,Meru,2025-12-24,163,Product-163
+Cassava Chips (dry),-,-,-,Mumias,-,71.43/Kg,,Kakamega,2026-01-23,164,Product-164
+Cassava Chips (dry),-,-,-,Kitale Municipality Market,75.00/Kg,90.00/Kg,500.0,Trans-Nzoia,2026-01-22,164,Product-164
 Cassava Chips (dry),-,-,-,Kitale Municipality Market,75.00/Kg,90.00/Kg,300.0,Trans-Nzoia,2026-01-21,164,Product-164
 Cassava Chips (dry),-,-,-,Kabati - Muranga,-,35.00/Kg,,Muranga,2026-01-20,164,Product-164
 Cassava Chips (dry),-,-,-,Bondeni,85.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-20,164,Product-164
@@ -2812,6 +2911,14 @@ Cassava Chips (dry),-,-,-,Mumias,-,71.43/Kg,,Kakamega,2026-01-16,164,Product-164
 Cassava Chips (dry),-,-,-,Holo,-,75.00/Kg,,Kisumu,2026-01-13,164,Product-164
 Cassava Chips (dry),-,-,-,Ahero,40.00/Kg,50.00/Kg,900.0,Kisumu,2026-01-06,164,Product-164
 Cassava Chips (dry),-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,164,Product-164
+Chillies,-,-,-,Wundanyi,-,80.00/Kg,100.0,Taita-Taveta,2026-01-23,165,Product-165
+Chillies,-,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-23,165,Product-165
+Chillies,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-23,165,Product-165
+Chillies,-,-,-,Kutus,120.00/Kg,150.00/Kg,,Kirinyaga,2026-01-22,165,Product-165
+Chillies,-,-,-,Kinango,90.00/Kg,150.00/Kg,150.0,Kwale,2026-01-22,165,Product-165
+Chillies,-,-,-,Kagio,80.00/Kg,100.00/Kg,250.0,Kirinyaga,2026-01-22,165,Product-165
+Chillies,-,-,-,Makutano Kirinyaga,80.00/Kg,100.00/Kg,180.0,Kirinyaga,2026-01-22,165,Product-165
+Chillies,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-22,165,Product-165
 Chillies,-,-,-,Kangeta,180.00/Kg,200.00/Kg,10.0,Meru,2026-01-21,165,Product-165
 Chillies,-,-,-,Kitale Municipality Market,90.00/Kg,120.00/Kg,200.0,Trans-Nzoia,2026-01-21,165,Product-165
 Chillies,-,-,-,Ngurubani Market,80.00/Kg,120.00/Kg,180.0,Kirinyaga,2026-01-20,165,Product-165
@@ -2857,10 +2964,10 @@ Chillies,-,-,-,Kabati - Muranga,65.00/Kg,120.00/Kg,,Muranga,2025-12-27,165,Produ
 Chillies,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,210.0,Kirinyaga,2025-12-27,165,Product-165
 Chillies,-,-,-,Kinango,100.00/Kg,150.00/Kg,60.0,Kwale,2025-12-25,165,Product-165
 Chillies,-,-,-,Diani Market,140.00/Kg,160.00/Kg,50.0,Kwale,2025-12-25,165,Product-165
-Chillies,-,-,-,Makutano Kirinyaga,60.00/Kg,80.00/Kg,480.0,Kirinyaga,2025-12-24,165,Product-165
-Chillies,-,-,-,Kabati - Muranga,60.00/Kg,120.00/Kg,,Muranga,2025-12-24,165,Product-165
-Chillies,-,-,-,Diani Market,140.00/Kg,160.00/Kg,50.0,Kwale,2025-12-24,165,Product-165
-Chillies,-,-,-,Kangeta,180.00/Kg,200.00/Kg,25.0,Meru,2025-12-24,165,Product-165
+Lettuce,-,-,-,Wundanyi,-,100.00/Kg,200.0,Taita-Taveta,2026-01-23,166,Product-166
+Lettuce,-,-,-,Kitale Municipality Market,40.00/Kg,60.00/Kg,200.0,Trans-Nzoia,2026-01-23,166,Product-166
+Lettuce,-,-,-,Kagio,80.00/Kg,130.00/Kg,100.0,Kirinyaga,2026-01-22,166,Product-166
+Lettuce,-,-,-,Kitale Municipality Market,40.00/Kg,60.00/Kg,100.0,Trans-Nzoia,2026-01-22,166,Product-166
 Lettuce,-,-,-,Kitale Municipality Market,35.00/Kg,50.00/Kg,100.0,Trans-Nzoia,2026-01-21,166,Product-166
 Lettuce,-,-,-,Kagio,120.00/Kg,160.00/Kg,100.0,Kirinyaga,2026-01-20,166,Product-166
 Lettuce,-,-,-,Bondeni,30.00/Kg,50.00/Kg,100.0,Trans-Nzoia,2026-01-20,166,Product-166
@@ -2871,7 +2978,13 @@ Lettuce,-,-,-,Wundanyi,-,120.00/Kg,200.0,Taita-Taveta,2026-01-09,166,Product-166
 Lettuce,-,-,-,Diani Market,120.00/Kg,150.00/Kg,200.0,Kwale,2026-01-05,166,Product-166
 Lettuce,-,-,-,Wundanyi,-,140.00/Kg,100.0,Taita-Taveta,2025-12-30,166,Product-166
 Lettuce,-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,166,Product-166
-Lettuce,-,-,-,Kagio,120.00/Kg,160.00/Kg,100.0,Kirinyaga,2025-12-24,166,Product-166
+Sheep,Red Maasai,Grade 2,Male,Malimili Livestock Market,5000.00/Head,-,14.0,Kakamega,2026-01-23,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Malimili Livestock Market,5000.00/Head,-,14.0,Kakamega,2026-01-23,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Malimili Livestock Market,5000.00/Head,-,14.0,Kakamega,2026-01-23,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Malimili Livestock Market,5000.00/Head,-,14.0,Kakamega,2026-01-23,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Katito,6200.00/Head,-,580.0,Kisumu,2026-01-22,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Katito,6800.00/Head,-,1400.0,Kisumu,2026-01-22,167,Product-167
+Sheep,Red Maasai,Grade 2,Male,Lubao Livestock Market,6000.00/Head,-,60.0,Kakamega,2026-01-22,167,Product-167
 Sheep,Blackhead Persian,Grade 1,Male,Ahero,600.00/Head,-,36.0,Kisumu,2026-01-20,167,Product-167
 Sheep,Blackhead Persian,Grade 3,Male,Chumvini Livestock Market,7500.00/Head,-,15.0,Taita-Taveta,2026-01-20,167,Product-167
 Sheep,Blackhead Persian,Grade 2,Male,Ngundune,6000.00/Head,-,60.0,Meru,2026-01-20,167,Product-167
@@ -2966,9 +3079,14 @@ Sheep,Blackhead Persian,Grade 2,Male,Mwingi Town,7500.00/Head,-,80.0,Kitui,2025-
 Sheep,Blackhead Persian,Grade 2,Female,Mwingi Town,8000.00/Head,-,80.0,Kitui,2025-12-31,167,Product-167
 Sheep,Blackhead Persian,Grade 2,Male,Mwingi Town,12000.00/Head,-,50.0,Kitui,2025-12-31,167,Product-167
 Sheep,Red Maasai,Grade 2,Male,Lubao Livestock Market,10000.00/Head,-,5.0,Kakamega,2025-12-25,167,Product-167
-Sheep,Blackhead Persian,Grade 2,Male,Mwingi Town,8000.00/Head,-,100.0,Kitui,2025-12-24,167,Product-167
-Sheep,Blackhead Persian,Grade 2,Female,Mwingi Town,8000.00/Head,-,150.0,Kitui,2025-12-24,167,Product-167
-Sheep,Blackhead Persian,Grade 2,Male,Mwingi Town,10000.00/Head,-,100.0,Kitui,2025-12-24,167,Product-167
+Goat,Mixed,Grade 2,Female,Malimili Livestock Market,6000.00/Head,-,11.0,Kakamega,2026-01-23,168,Product-168
+Goat,Mixed,Grade 2,Female,Malimili Livestock Market,6500.00/Head,-,16.0,Kakamega,2026-01-23,168,Product-168
+Goat,Mixed,Grade 2,Male,Malimili Livestock Market,5500.00/Head,-,7.0,Kakamega,2026-01-23,168,Product-168
+Goat,Mixed,Grade 2,Male,Malimili Livestock Market,6500.00/Head,-,6.0,Kakamega,2026-01-23,168,Product-168
+Goat,East African Goat,Grade 2,Female,Katito,6800.00/Head,-,780.0,Kisumu,2026-01-22,168,Product-168
+Goat,East African Goat,Grade 2,Male,Katito,7500.00/Head,-,830.0,Kisumu,2026-01-22,168,Product-168
+Goat,East African Goat,Grade 2,Female,Lubao Livestock Market,-,-,60000.0,Kakamega,2026-01-22,168,Product-168
+Goat,East African Goat,Grade 2,Male,Lubao Livestock Market,6000.00/Head,-,80.0,Kakamega,2026-01-22,168,Product-168
 Goat,Mixed,Grade 2,Female,Mwingi Town,4800.00/Head,-,180.0,Kitui,2026-01-21,168,Product-168
 Goat,Mixed,Grade 2,Male,Mwingi Town,4800.00/Head,-,230.0,Kitui,2026-01-21,168,Product-168
 Goat,Mixed,Grade 2,Female,Mwingi Town,8000.00/Head,-,250.0,Kitui,2026-01-21,168,Product-168
@@ -3123,12 +3241,6 @@ Goat,Mixed,Grade 2,Female,Mwingi Town,9000.00/Head,-,100.0,Kitui,2025-12-31,168,
 Goat,Mixed,Grade 2,Male,Mwingi Town,14000.00/Head,-,100.0,Kitui,2025-12-31,168,Product-168
 Goat,East African Goat,Grade 2,Male,Ngundune,12000.00/Head,-,150.0,Meru,2025-12-31,168,Product-168
 Goat,East African Goat,Grade 2,Male,Lubao Livestock Market,10000.00/Head,-,10.0,Kakamega,2025-12-25,168,Product-168
-Goat,Mixed,Grade 2,Female,Mwingi Town,4500.00/Head,-,200.0,Kitui,2025-12-24,168,Product-168
-Goat,Mixed,Grade 2,Male,Mwingi Town,5000.00/Head,-,250.0,Kitui,2025-12-24,168,Product-168
-Goat,Mixed,Grade 2,Female,Mwingi Town,7000.00/Head,-,300.0,Kitui,2025-12-24,168,Product-168
-Goat,Mixed,Grade 2,Male,Mwingi Town,8000.00/Head,-,400.0,Kitui,2025-12-24,168,Product-168
-Goat,Mixed,Grade 2,Female,Mwingi Town,9000.00/Head,-,350.0,Kitui,2025-12-24,168,Product-168
-Goat,Mixed,Grade 2,Male,Mwingi Town,12000.00/Head,-,300.0,Kitui,2025-12-24,168,Product-168
 Donkey,-,-,Female,Kisasi,9000.00/Head,-,,Kitui,2026-01-16,169,Product-169
 Donkey,-,-,Male,Kisasi,7000.00/Head,-,,Kitui,2026-01-16,169,Product-169
 Donkey,-,-,Female,Kisasi,18000.00/Head,-,,Kitui,2026-01-16,169,Product-169
@@ -3137,6 +3249,12 @@ Donkey,-,-,Female,Kisasi,9000.00/Head,-,,Kitui,2026-01-09,169,Product-169
 Donkey,-,-,Male,Kisasi,8000.00/Head,-,,Kitui,2026-01-09,169,Product-169
 Donkey,-,-,Female,Kisasi,17000.00/Head,-,,Kitui,2026-01-09,169,Product-169
 Donkey,-,-,Male,Kisasi,11000.00/Head,-,,Kitui,2026-01-09,169,Product-169
+Pumpkin,-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,205.0,Kirinyaga,2026-01-23,170,Product-170
+Pumpkin,-,-,-,Gakoromone,50.00/Kg,60.00/Kg,1000.0,Meru,2026-01-23,170,Product-170
+Pumpkin,-,-,-,Mumias,-,55.56/Kg,,Kakamega,2026-01-23,170,Product-170
+Pumpkin,-,-,-,Kitale Municipality Market,30.00/Kg,50.00/Kg,500.0,Trans-Nzoia,2026-01-23,170,Product-170
+Pumpkin,-,-,-,Kutus,30.00/Kg,40.00/Kg,800.0,Kirinyaga,2026-01-22,170,Product-170
+Pumpkin,-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,1000.0,Trans-Nzoia,2026-01-22,170,Product-170
 Pumpkin,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,170,Product-170
 Pumpkin,-,-,-,Kitale Municipality Market,50.00/Kg,80.00/Kg,300.0,Trans-Nzoia,2026-01-21,170,Product-170
 Pumpkin,-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,2500.0,Kirinyaga,2026-01-20,170,Product-170
@@ -3182,9 +3300,16 @@ Pumpkin,-,-,-,Ngurubani Market,30.00/Kg,35.00/Kg,2100.0,Kirinyaga,2025-12-27,170
 Pumpkin,-,-,-,Makutano Kirinyaga,35.00/Kg,50.00/Kg,3500.0,Kirinyaga,2025-12-27,170,Product-170
 Pumpkin,-,-,-,Kagio,30.00/Kg,50.00/Kg,3600.0,Kirinyaga,2025-12-26,170,Product-170
 Pumpkin,-,-,-,Gakoromone,60.00/Kg,70.00/Kg,400.0,Meru,2025-12-26,170,Product-170
-Pumpkin,-,-,-,Kerugoya,40.00/Kg,80.00/Kg,180.0,Kirinyaga,2025-12-24,170,Product-170
-Pumpkin,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-24,170,Product-170
-Pumpkin,-,-,-,Kagio,25.00/Kg,40.00/Kg,2000.0,Kirinyaga,2025-12-24,170,Product-170
+Butternuts,-,-,-,Ngurubani Market,35.00/Kg,45.00/Kg,4600.0,Kirinyaga,2026-01-23,171,Product-171
+Butternuts,-,-,-,Gakoromone,40.00/Kg,60.00/Kg,400.0,Meru,2026-01-23,171,Product-171
+Butternuts,-,-,-,Voi Retail,-,60.00/Kg,58.0,Taita-Taveta,2026-01-23,171,Product-171
+Butternuts,-,-,-,Wundanyi,-,120.00/Kg,308.0,Taita-Taveta,2026-01-23,171,Product-171
+Butternuts,-,-,-,Wundanyi,-,120.00/Kg,308.0,Taita-Taveta,2026-01-23,171,Product-171
+Butternuts,-,-,-,Mumias,-,83.33/Kg,,Kakamega,2026-01-23,171,Product-171
+Butternuts,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,600.0,Trans-Nzoia,2026-01-23,171,Product-171
+Butternuts,-,-,-,Kutus,25.00/Kg,35.00/Kg,,Kirinyaga,2026-01-22,171,Product-171
+Butternuts,-,-,-,Kagio,35.00/Kg,50.00/Kg,1500.0,Kirinyaga,2026-01-22,171,Product-171
+Butternuts,-,-,-,Kitale Municipality Market,50.00/Kg,80.00/Kg,1000.0,Trans-Nzoia,2026-01-22,171,Product-171
 Butternuts,-,-,-,Kangeta,60.00/Kg,70.00/Kg,150.0,Meru,2026-01-21,171,Product-171
 Butternuts,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,400.0,Trans-Nzoia,2026-01-21,171,Product-171
 Butternuts,-,-,-,Ngurubani Market,30.00/Kg,40.00/Kg,4250.0,Kirinyaga,2026-01-20,171,Product-171
@@ -3239,11 +3364,18 @@ Butternuts,-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2025-12-28,171,Product-171
 Butternuts,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-27,171,Product-171
 Butternuts,-,-,-,Ngurubani Market,40.00/Kg,50.00/Kg,1350.0,Kirinyaga,2025-12-27,171,Product-171
 Butternuts,-,-,-,Gakoromone,40.00/Kg,50.00/Kg,400.0,Meru,2025-12-26,171,Product-171
-Butternuts,-,-,-,Maua,60.00/Kg,80.00/Kg,2800.0,Meru,2025-12-24,171,Product-171
-Butternuts,-,-,-,Kerugoya,50.00/Kg,100.00/Kg,180.0,Kirinyaga,2025-12-24,171,Product-171
-Butternuts,-,-,-,Kabati - Muranga,80.00/Kg,100.00/Kg,,Muranga,2025-12-24,171,Product-171
-Butternuts,-,-,-,Kagio,40.00/Kg,60.00/Kg,2500.0,Kirinyaga,2025-12-24,171,Product-171
-Butternuts,-,-,-,Kangeta,60.00/Kg,70.00/Kg,300.0,Meru,2025-12-24,171,Product-171
+Capsicums,-,-,-,Diani Market,80.00/Kg,100.00/Kg,300.0,Kwale,2026-01-23,172,Product-172
+Capsicums,-,-,-,Gakoromone,70.00/Kg,80.00/Kg,1200.0,Meru,2026-01-23,172,Product-172
+Capsicums,-,-,-,Voi Retail,-,120.00/Kg,20.0,Taita-Taveta,2026-01-23,172,Product-172
+Capsicums,-,-,-,Wundanyi,-,80.00/Kg,300.0,Taita-Taveta,2026-01-23,172,Product-172
+Capsicums,-,-,-,Mumias,-,178.57/Kg,,Kakamega,2026-01-23,172,Product-172
+Capsicums,-,-,-,Voi Wholesale,70.00/Kg,-,300.0,Taita-Taveta,2026-01-23,172,Product-172
+Capsicums,-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,400.0,Trans-Nzoia,2026-01-23,172,Product-172
+Capsicums,-,-,-,Kutus,60.00/Kg,80.00/Kg,,Kirinyaga,2026-01-22,172,Product-172
+Capsicums,-,-,-,Kinango,98.00/Kg,150.00/Kg,600.0,Kwale,2026-01-22,172,Product-172
+Capsicums,-,-,-,Kagio,180.00/Kg,250.00/Kg,100.0,Kirinyaga,2026-01-22,172,Product-172
+Capsicums,-,-,-,Diani Market,80.00/Kg,100.00/Kg,600.0,Kwale,2026-01-22,172,Product-172
+Capsicums,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,500.0,Trans-Nzoia,2026-01-22,172,Product-172
 Capsicums,-,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,172,Product-172
 Capsicums,-,-,-,Mwingi Town,40.00/Kg,100.00/Kg,3000.0,Kitui,2026-01-21,172,Product-172
 Capsicums,-,-,-,Kangeta,50.00/Kg,60.00/Kg,200.0,Meru,2026-01-21,172,Product-172
@@ -3338,16 +3470,13 @@ Capsicums,-,-,-,Kagio,30.00/Kg,50.00/Kg,1400.0,Kirinyaga,2025-12-26,172,Product-
 Capsicums,-,-,-,Gakoromone,70.00/Kg,80.00/Kg,2500.0,Meru,2025-12-26,172,Product-172
 Capsicums,-,-,-,Kinango,100.00/Kg,150.00/Kg,300.0,Kwale,2025-12-25,172,Product-172
 Capsicums,-,-,-,Diani Market,100.00/Kg,120.00/Kg,600.0,Kwale,2025-12-25,172,Product-172
-Capsicums,-,-,-,Makutano Kirinyaga,120.00/Kg,150.00/Kg,300.0,Kirinyaga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Makutano Kirinyaga,50.00/Kg,70.00/Kg,950.0,Kirinyaga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Mwingi Town,60.00/Kg,100.00/Kg,1500.0,Kitui,2025-12-24,172,Product-172
-Capsicums,-,-,-,Maua,60.00/Kg,80.00/Kg,2200.0,Meru,2025-12-24,172,Product-172
-Capsicums,-,-,-,Kerugoya,40.00/Kg,80.00/Kg,300.0,Kirinyaga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Kabati - Muranga,40.00/Kg,60.00/Kg,,Muranga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Kagio,40.00/Kg,60.00/Kg,600.0,Kirinyaga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Kagio,200.00/Kg,300.00/Kg,150.0,Kirinyaga,2025-12-24,172,Product-172
-Capsicums,-,-,-,Diani Market,100.00/Kg,120.00/Kg,600.0,Kwale,2025-12-24,172,Product-172
-Capsicums,-,-,-,Kangeta,80.00/Kg,90.00/Kg,400.0,Meru,2025-12-24,172,Product-172
+Cucumber,-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,200.0,Kirinyaga,2026-01-23,173,Product-173
+Cucumber,-,-,-,Gakoromone,80.00/Kg,90.00/Kg,500.0,Meru,2026-01-23,173,Product-173
+Cucumber,-,-,-,Mumias,-,166.67/Kg,,Kakamega,2026-01-23,173,Product-173
+Cucumber,-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-23,173,Product-173
+Cucumber,-,-,-,Kutus,70.00/Kg,80.00/Kg,,Kirinyaga,2026-01-22,173,Product-173
+Cucumber,-,-,-,Kagio,35.00/Kg,50.00/Kg,800.0,Kirinyaga,2026-01-22,173,Product-173
+Cucumber,-,-,-,Kitale Municipality Market,50.00/Kg,80.00/Kg,300.0,Trans-Nzoia,2026-01-22,173,Product-173
 Cucumber,-,-,-,Mukuyu Market,-,120.00/Kg,,Muranga,2026-01-21,173,Product-173
 Cucumber,-,-,-,Kangeta,100.00/Kg,110.00/Kg,20.0,Meru,2026-01-21,173,Product-173
 Cucumber,-,-,-,Kitale Municipality Market,50.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-21,173,Product-173
@@ -3387,10 +3516,12 @@ Cucumber,-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-27,173,Produc
 Cucumber,-,-,-,Ngurubani Market,40.00/Kg,70.00/Kg,220.0,Kirinyaga,2025-12-27,173,Product-173
 Cucumber,-,-,-,Makutano Kirinyaga,60.00/Kg,80.00/Kg,680.0,Kirinyaga,2025-12-27,173,Product-173
 Cucumber,-,-,-,Gakoromone,90.00/Kg,100.00/Kg,400.0,Meru,2025-12-26,173,Product-173
-Cucumber,-,-,-,Makutano Kirinyaga,60.00/Kg,80.00/Kg,390.0,Kirinyaga,2025-12-24,173,Product-173
-Cucumber,-,-,-,Kerugoya,60.00/Kg,120.00/Kg,350.0,Kirinyaga,2025-12-24,173,Product-173
-Cucumber,-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-24,173,Product-173
-Cucumber,-,-,-,Kangeta,170.00/Kg,180.00/Kg,100.0,Meru,2025-12-24,173,Product-173
+Egg plant (Brinjals),-,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-23,174,Product-174
+Egg plant (Brinjals),-,-,-,Kutus,60.00/Kg,80.00/Kg,400.0,Kirinyaga,2026-01-22,174,Product-174
+Egg plant (Brinjals),-,-,-,Kinango,75.00/Kg,120.00/Kg,800.0,Kwale,2026-01-22,174,Product-174
+Egg plant (Brinjals),-,-,-,Kagio,25.00/Kg,40.00/Kg,200.0,Kirinyaga,2026-01-22,174,Product-174
+Egg plant (Brinjals),-,-,-,Diani Market,40.00/Kg,60.00/Kg,480.0,Kwale,2026-01-22,174,Product-174
+Egg plant (Brinjals),-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-22,174,Product-174
 Egg plant (Brinjals),-,-,-,Kitale Municipality Market,60.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-21,174,Product-174
 Egg plant (Brinjals),-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,48.0,Kirinyaga,2026-01-20,174,Product-174
 Egg plant (Brinjals),-,-,-,Bondeni,50.00/Kg,80.00/Kg,200.0,Trans-Nzoia,2026-01-20,174,Product-174
@@ -3428,7 +3559,8 @@ Egg plant (Brinjals),-,-,-,Kagio,30.00/Kg,40.00/Kg,250.0,Kirinyaga,2025-12-30,17
 Egg plant (Brinjals),-,-,-,Diani Market,40.00/Kg,60.00/Kg,350.0,Kwale,2025-12-29,174,Product-174
 Egg plant (Brinjals),-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,50.0,Kirinyaga,2025-12-27,174,Product-174
 Egg plant (Brinjals),-,-,-,Kinango,70.00/Kg,120.00/Kg,400.0,Kwale,2025-12-25,174,Product-174
-Egg plant (Brinjals),-,-,-,Kagio,30.00/Kg,40.00/Kg,150.0,Kirinyaga,2025-12-24,174,Product-174
+Cauliflower,-,-,-,Kagio,100.00/Kg,160.00/Kg,100.0,Kirinyaga,2026-01-22,175,Product-175
+Cauliflower,-,-,-,Kitale Municipality Market,120.00/Kg,180.00/Kg,200.0,Trans-Nzoia,2026-01-22,175,Product-175
 Cauliflower,-,-,-,Kagio,120.00/Kg,180.00/Kg,100.0,Kirinyaga,2026-01-20,175,Product-175
 Cauliflower,-,-,-,Bondeni,120.00/Kg,170.00/Kg,200.0,Trans-Nzoia,2026-01-20,175,Product-175
 Cauliflower,-,-,-,Kagio,120.00/Kg,180.00/Kg,100.0,Kirinyaga,2026-01-16,175,Product-175
@@ -3438,6 +3570,11 @@ Cauliflower,-,-,-,Diani Market,150.00/Kg,200.00/Kg,300.0,Kwale,2026-01-12,175,Pr
 Cauliflower,-,-,-,Kagio,120.00/Kg,160.00/Kg,100.0,Kirinyaga,2026-01-09,175,Product-175
 Cauliflower,-,-,-,Kagio,120.00/Kg,180.00/Kg,100.0,Kirinyaga,2026-01-02,175,Product-175
 Cauliflower,-,-,-,Kagio,100.00/Kg,150.00/Kg,150.0,Kirinyaga,2025-12-30,175,Product-175
+French beans,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,177,Product-177
+French beans,-,-,-,Kutus,60.00/Kg,80.00/Kg,,Kirinyaga,2026-01-22,177,Product-177
+French beans,-,-,-,Kagio,60.00/Kg,80.00/Kg,200.0,Kirinyaga,2026-01-22,177,Product-177
+French beans,-,-,-,Makutano Kirinyaga,60.00/Kg,100.00/Kg,420.0,Kirinyaga,2026-01-22,177,Product-177
+French beans,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-22,177,Product-177
 French beans,-,-,-,Kangeta,90.00/Kg,100.00/Kg,20.0,Meru,2026-01-21,177,Product-177
 French beans,-,-,-,Kitale Municipality Market,70.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-21,177,Product-177
 French beans,-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,350.0,Kirinyaga,2026-01-20,177,Product-177
@@ -3471,10 +3608,15 @@ French beans,-,-,-,Kangeta,120.00/Kg,130.00/Kg,35.0,Meru,2025-12-29,177,Product-
 French beans,-,-,-,Kabati - Muranga,40.00/Kg,60.00/Kg,,Muranga,2025-12-27,177,Product-177
 French beans,-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,650.0,Kirinyaga,2025-12-27,177,Product-177
 French beans,-,-,-,Makutano Kirinyaga,60.00/Kg,100.00/Kg,1100.0,Kirinyaga,2025-12-27,177,Product-177
-French beans,-,-,-,Makutano Kirinyaga,70.00/Kg,100.00/Kg,650.0,Kirinyaga,2025-12-24,177,Product-177
-French beans,-,-,-,Kabati - Muranga,45.00/Kg,60.00/Kg,,Muranga,2025-12-24,177,Product-177
-French beans,-,-,-,Kagio,70.00/Kg,100.00/Kg,300.0,Kirinyaga,2025-12-24,177,Product-177
-French beans,-,-,-,Kangeta,130.00/Kg,140.00/Kg,50.0,Meru,2025-12-24,177,Product-177
+Ginger,-,-,-,Mumias,-,333.33/Kg,,Kakamega,2026-01-23,178,Product-178
+Ginger,-,-,-,Wundanyi,-,150.00/Kg,400.0,Taita-Taveta,2026-01-23,178,Product-178
+Ginger,-,-,-,Voi Wholesale,170.00/Kg,-,400.0,Taita-Taveta,2026-01-23,178,Product-178
+Ginger,-,-,-,Kitale Municipality Market,160.00/Kg,200.00/Kg,200.0,Trans-Nzoia,2026-01-23,178,Product-178
+Ginger,-,-,-,Kutus,200.00/Kg,250.00/Kg,200.0,Kirinyaga,2026-01-22,178,Product-178
+Ginger,-,-,-,Kinango,190.00/Kg,250.00/Kg,700.0,Kwale,2026-01-22,178,Product-178
+Ginger,-,-,-,Kagio,180.00/Kg,250.00/Kg,200.0,Kirinyaga,2026-01-22,178,Product-178
+Ginger,-,-,-,Diani Market,180.00/Kg,200.00/Kg,350.0,Kwale,2026-01-22,178,Product-178
+Ginger,-,-,-,Kitale Municipality Market,160.00/Kg,200.00/Kg,300.0,Trans-Nzoia,2026-01-22,178,Product-178
 Ginger,-,-,-,Kangeta,200.00/Kg,220.00/Kg,60.0,Meru,2026-01-21,178,Product-178
 Ginger,-,-,-,Bondeni,160.00/Kg,200.00/Kg,300.0,Trans-Nzoia,2026-01-20,178,Product-178
 Ginger,-,-,-,Ahero,300.00/Kg,350.00/Kg,240.0,Kisumu,2026-01-20,178,Product-178
@@ -3526,9 +3668,13 @@ Ginger,-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,178,Product-178
 Ginger,-,-,-,Makutano Kirinyaga,150.00/Kg,200.00/Kg,450.0,Kirinyaga,2025-12-27,178,Product-178
 Ginger,-,-,-,Kagio,180.00/Kg,250.00/Kg,250.0,Kirinyaga,2025-12-26,178,Product-178
 Ginger,-,-,-,Kinango,200.00/Kg,250.00/Kg,500.0,Kwale,2025-12-25,178,Product-178
-Ginger,-,-,-,Kerugoya,180.00/Kg,270.00/Kg,200.0,Kirinyaga,2025-12-24,178,Product-178
-Ginger,-,-,-,Kagio,150.00/Kg,200.00/Kg,300.0,Kirinyaga,2025-12-24,178,Product-178
-Ginger,-,-,-,Kangeta,240.00/Kg,250.00/Kg,100.0,Meru,2025-12-24,178,Product-178
+Garlic,-,-,-,Voi Retail,-,600.00/Kg,80.0,Taita-Taveta,2026-01-23,180,Product-180
+Garlic,-,-,-,Mumias,-,500.00/Kg,,Kakamega,2026-01-23,180,Product-180
+Garlic,-,-,-,Kitale Municipality Market,200.00/Kg,350.00/Kg,200.0,Trans-Nzoia,2026-01-23,180,Product-180
+Garlic,-,-,-,Kutus,380.00/Kg,450.00/Kg,,Kirinyaga,2026-01-22,180,Product-180
+Garlic,-,-,-,Kinango,450.00/Kg,550.00/Kg,500.0,Kwale,2026-01-22,180,Product-180
+Garlic,-,-,-,Kitale Municipality Market,200.00/Kg,380.00/Kg,200.0,Trans-Nzoia,2026-01-22,180,Product-180
+Garlic,-,-,-,Kitale Municipality Market,380.00/Kg,480.00/Kg,500.0,Trans-Nzoia,2026-01-22,180,Product-180
 Garlic,-,-,-,Mwingi Town,400.00/Kg,600.00/Kg,1500.0,Kitui,2026-01-21,180,Product-180
 Garlic,-,-,-,Kangeta,350.00/Kg,380.00/Kg,50.0,Meru,2026-01-21,180,Product-180
 Garlic,-,-,-,Kitale Municipality Market,200.00/Kg,350.00/Kg,200.0,Trans-Nzoia,2026-01-21,180,Product-180
@@ -3586,16 +3732,19 @@ Garlic,-,-,-,Kabati - Muranga,420.00/Kg,500.00/Kg,,Muranga,2025-12-27,180,Produc
 Garlic,-,-,-,Makutano Kirinyaga,350.00/Kg,450.00/Kg,680.0,Kirinyaga,2025-12-27,180,Product-180
 Garlic,-,-,-,Kinango,45.00/Kg,550.00/Kg,300.0,Kwale,2025-12-25,180,Product-180
 Garlic,-,-,-,Diani Market,500.00/Kg,600.00/Kg,600.0,Kwale,2025-12-25,180,Product-180
-Garlic,-,-,-,Makutano Kirinyaga,350.00/Kg,400.00/Kg,230.0,Kirinyaga,2025-12-24,180,Product-180
-Garlic,-,-,-,Kerugoya,380.00/Kg,480.00/Kg,180.0,Kirinyaga,2025-12-24,180,Product-180
-Garlic,-,-,-,Kabati - Muranga,400.00/Kg,480.00/Kg,,Muranga,2025-12-24,180,Product-180
-Garlic,-,-,-,Kagio,400.00/Kg,550.00/Kg,200.0,Kirinyaga,2025-12-24,180,Product-180
-Garlic,-,-,-,Diani Market,500.00/Kg,600.00/Kg,600.0,Kwale,2025-12-24,180,Product-180
-Garlic,-,-,-,Kangeta,450.00/Kg,480.00/Kg,150.0,Meru,2025-12-24,180,Product-180
+Njugu Mawe,-,-,-,Mumias,-,545.45/Kg,,Kakamega,2026-01-23,182,Product-182
+Njugu Mawe,-,-,-,Kitale Municipality Market,300.00/Kg,400.00/Kg,200.0,Trans-Nzoia,2026-01-22,182,Product-182
 Njugu Mawe,-,-,-,Bondeni,300.00/Kg,400.00/Kg,100.0,Trans-Nzoia,2026-01-20,182,Product-182
 Njugu Mawe,-,-,-,Mumias,-,545.45/Kg,,Kakamega,2026-01-16,182,Product-182
 Njugu Mawe,-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2026-01-11,182,Product-182
 Njugu Mawe,-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,182,Product-182
+Beans Rosecoco (Nyayo),-,-,-,Kerugoya,130.00/Kg,175.00/Kg,2600.0,Kirinyaga,2026-01-23,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Kawangware,80.00/Kg,100.00/Kg,,Nairobi,2026-01-23,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Gikomba,105.56/Kg,200.00/Kg,,Nairobi,2026-01-23,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Mumias,-,165.22/Kg,,Kakamega,2026-01-23,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Kitale Municipality Market,130.00/Kg,160.00/Kg,400.0,Trans-Nzoia,2026-01-23,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Gikomba,105.56/Kg,200.00/Kg,,Nairobi,2026-01-22,183,Product-183
+Beans Rosecoco (Nyayo),-,-,-,Kitale Municipality Market,110.00/Kg,150.00/Kg,300.0,Trans-Nzoia,2026-01-22,183,Product-183
 Beans Rosecoco (Nyayo),-,-,-,Mukuyu Market,-,150.00/Kg,,Muranga,2026-01-21,183,Product-183
 Beans Rosecoco (Nyayo),-,-,-,Mwingi Town,100.00/Kg,120.00/Kg,15000.0,Kitui,2026-01-21,183,Product-183
 Beans Rosecoco (Nyayo),-,-,-,Kawangware,80.00/Kg,100.00/Kg,,Nairobi,2026-01-21,183,Product-183
@@ -3637,12 +3786,14 @@ Beans Rosecoco (Nyayo),-,-,-,Kerugoya,135.00/Kg,180.00/Kg,2600.0,Kirinyaga,2025-
 Beans Rosecoco (Nyayo),-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,183,Product-183
 Beans Rosecoco (Nyayo),-,-,-,Ngurubani Market,112.22/Kg,185.00/Kg,3250.0,Kirinyaga,2025-12-27,183,Product-183
 Beans Rosecoco (Nyayo),-,-,-,Makutano Kirinyaga,100.00/Kg,115.00/Kg,3050.0,Kirinyaga,2025-12-27,183,Product-183
-Beans Rosecoco (Nyayo),-,-,-,Maua,133.33/Kg,150.00/Kg,900.0,Meru,2025-12-24,183,Product-183
-Beans Rosecoco (Nyayo),-,-,-,Kerugoya,130.00/Kg,170.00/Kg,2650.0,Kirinyaga,2025-12-24,183,Product-183
+Nile Perch,Smoked,-,-,Mumias,-,218.75/Kg,,Kakamega,2026-01-23,184,Product-184
 Nile Perch,Fillet,-,-,Katito,36.36/Kg,447.23/Kg,2500.0,Kisumu,2026-01-15,184,Product-184
 Nile Perch,Fresh,-,-,Holo,-,320.00/Kg,,Kisumu,2026-01-13,184,Product-184
 Nile Perch,Fresh,-,-,Kibuye,-,400.00/Kg,,Kisumu,2026-01-11,184,Product-184
 Nile Perch,Fresh,-,-,Kibuye,-,400.00/Kg,,Kisumu,2025-12-28,184,Product-184
+Pigeon peas,-,-,-,Kawangware,115.00/Kg,130.00/Kg,,Nairobi,2026-01-23,188,Product-188
+Pigeon peas,-,-,-,Mumias,-,236.36/Kg,,Kakamega,2026-01-23,188,Product-188
+Pigeon peas,-,-,-,Kitale Municipality Market,111.11/Kg,133.33/Kg,300.0,Trans-Nzoia,2026-01-22,188,Product-188
 Pigeon peas,-,-,-,Mukuyu Market,-,125.00/Kg,,Muranga,2026-01-21,188,Product-188
 Pigeon peas,-,-,-,Mwingi Town,80.00/Kg,100.00/Kg,6000.0,Kitui,2026-01-21,188,Product-188
 Pigeon peas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,300.0,Meru,2026-01-21,188,Product-188
@@ -3678,9 +3829,15 @@ Pigeon peas,-,-,-,Kerugoya,130.00/Kg,175.00/Kg,2300.0,Kirinyaga,2025-12-29,188,P
 Pigeon peas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,150.0,Meru,2025-12-29,188,Product-188
 Pigeon peas,-,-,-,Ngurubani Market,50.00/Kg,75.00/Kg,3500.0,Kirinyaga,2025-12-27,188,Product-188
 Pigeon peas,-,-,-,Makutano Kirinyaga,100.00/Kg,120.00/Kg,390.0,Kirinyaga,2025-12-27,188,Product-188
-Pigeon peas,-,-,-,Maua,77.78/Kg,90.00/Kg,6300.0,Meru,2025-12-24,188,Product-188
-Pigeon peas,-,-,-,Kerugoya,135.00/Kg,175.00/Kg,2400.0,Kirinyaga,2025-12-24,188,Product-188
-Pigeon peas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,250.0,Meru,2025-12-24,188,Product-188
+Cowpeas,-,-,-,Kerugoya,95.00/Kg,130.00/Kg,2300.0,Kirinyaga,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Ngurubani Market,105.56/Kg,135.00/Kg,9000.0,Kirinyaga,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Kawangware,90.00/Kg,110.00/Kg,,Nairobi,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Gikomba,88.89/Kg,150.00/Kg,,Nairobi,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Mumias,-,136.36/Kg,,Kakamega,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,300.0,Trans-Nzoia,2026-01-23,189,Product-189
+Cowpeas,-,-,-,Katito,158.89/Kg,163.55/Kg,2500.0,Kisumu,2026-01-22,189,Product-189
+Cowpeas,-,-,-,Gikomba,88.89/Kg,150.00/Kg,,Nairobi,2026-01-22,189,Product-189
+Cowpeas,-,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,400.0,Trans-Nzoia,2026-01-22,189,Product-189
 Cowpeas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,300.0,Meru,2026-01-21,189,Product-189
 Cowpeas,-,-,-,Kawangware,80.00/Kg,90.00/Kg,,Nairobi,2026-01-21,189,Product-189
 Cowpeas,-,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,300.0,Trans-Nzoia,2026-01-21,189,Product-189
@@ -3726,10 +3883,6 @@ Cowpeas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,250.0,Meru,2025-12-29,189,Product-189
 Cowpeas,-,-,-,Kibuye,-,150.00/Kg,,Kisumu,2025-12-28,189,Product-189
 Cowpeas,-,-,-,Ngurubani Market,102.22/Kg,175.00/Kg,1250.0,Kirinyaga,2025-12-27,189,Product-189
 Cowpeas,-,-,-,Makutano Kirinyaga,105.00/Kg,125.00/Kg,1600.0,Kirinyaga,2025-12-27,189,Product-189
-Cowpeas,-,-,-,Makutano Kirinyaga,100.00/Kg,120.00/Kg,2300.0,Kirinyaga,2025-12-24,189,Product-189
-Cowpeas,-,-,-,Maua,77.78/Kg,80.00/Kg,1980.0,Meru,2025-12-24,189,Product-189
-Cowpeas,-,-,-,Kerugoya,95.00/Kg,130.00/Kg,2300.0,Kirinyaga,2025-12-24,189,Product-189
-Cowpeas,-,-,-,Kangeta,90.00/Kg,100.00/Kg,250.0,Meru,2025-12-24,189,Product-189
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,400.0,Kwale,2026-01-20,190,Product-190
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,310.0,Kwale,2026-01-19,190,Product-190
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,230.0,Kwale,2026-01-18,190,Product-190
@@ -3751,7 +3904,6 @@ Scavengers (Changu/Tangu),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,260.0,Kwale,2025-1
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,230.00/Kg,280.00/Kg,300.0,Kwale,2025-12-30,190,Product-190
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,400.0,Kwale,2025-12-29,190,Product-190
 Scavengers (Changu/Tangu),Fresh,-,-,Vanga,200.00/Kg,250.00/Kg,400.0,Kwale,2025-12-25,190,Product-190
-Scavengers (Changu/Tangu),Fresh,-,-,Vanga,250.00/Kg,350.00/Kg,250.0,Kwale,2025-12-24,190,Product-190
 Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,50.0,Kwale,2026-01-21,191,Product-191
 Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,500.0,Kwale,2026-01-20,191,Product-191
 Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,60.0,Kwale,2026-01-19,191,Product-191
@@ -3774,7 +3926,6 @@ Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,95.0,Kwale,2026-01-01,191
 Parrotfishes(Pono),Fresh,-,-,Vanga,170.00/Kg,220.00/Kg,200.0,Kwale,2025-12-30,191,Product-191
 Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,80.0,Kwale,2025-12-29,191,Product-191
 Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,150.0,Kwale,2025-12-25,191,Product-191
-Parrotfishes(Pono),Fresh,-,-,Vanga,150.00/Kg,200.00/Kg,105.0,Kwale,2025-12-24,191,Product-191
 Rayfish,Dried,-,-,Kipini Fish market,300.00/ Kg,400.00/ Kg,23.0,Tana-River,2026-01-15,198,Product-198
 Needlefishes,Fresh,-,-,Vanga,200.00/ Kg,250.00/ Kg,300.0,Kwale,2026-01-20,199,Product-199
 Needlefishes,Fresh,-,-,Vanga,150.00/ Kg,200.00/ Kg,210.0,Kwale,2026-01-19,199,Product-199
@@ -3794,14 +3945,25 @@ Jacks/Trevallies(Kolekole),Fresh,-,-,Vanga,200.00/ Kg,300.00/ Kg,300.0,Kwale,202
 Jacks/Trevallies(Kolekole),Fresh,-,-,Vanga,150.00/ Kg,200.00/ Kg,200.0,Kwale,2026-01-10,200,Product-200
 Jacks/Trevallies(Kolekole),Fresh,-,-,Vanga,200.00/ Kg,250.00/ Kg,120.0,Kwale,2026-01-01,200,Product-200
 Anchovies,Fresh,-,-,Vanga,120.00/Kg,250.00/Kg,4200.0,Kwale,2025-12-30,202,Product-202
+Meat Chevon,-,-,-,Katito,-,750.00/Kg,3200.0,Kisumu,2026-01-22,209,Product-209
 Meat Chevon,-,-,-,Ngundune,700.00/Kg,800.00/Kg,250.0,Meru,2026-01-20,209,Product-209
 Meat Chevon,-,-,-,Kagio,800.00/Kg,950.00/Kg,,Kirinyaga,2026-01-06,209,Product-209
-Meat Chevon,-,-,-,Kagio,650.00/Kg,850.00/Kg,,Kirinyaga,2025-12-24,209,Product-209
 Pigs,Interbreed,-,Male,Lubao Livestock Market,20000.00/Head,-,6.0,Kakamega,2026-01-15,211,Product-211
+Honey,Crude,-,-,Katito,-,1000.00/Kg,1500.0,Kisumu,2026-01-22,212,Product-212
 Honey,Crude,-,-,Mukuyu Market,-,800.00/Kg,,Muranga,2026-01-14,212,Product-212
 Honey,Crude,-,-,Holo,-,1000.00/Kg,,Kisumu,2026-01-13,212,Product-212
 Honey,Processed,-,-,Kibuye,-,1000.00/Kg,,Kisumu,2026-01-11,212,Product-212
 Honey,Processed,-,-,Kibuye,-,1000.00/Kg,,Kisumu,2025-12-28,212,Product-212
+Fertilizer,NPK,-,-,Ngurubani Market,95.00/Kg,100.00/Kg,225000.0,Kirinyaga,2026-01-23,217,Product-217
+Fertilizer,DAP,-,-,Ngurubani Market,111.00/Kg,120.00/Kg,140000.0,Kirinyaga,2026-01-23,217,Product-217
+Fertilizer,CAN,-,-,Ngurubani Market,72.00/Kg,80.00/Kg,50000.0,Kirinyaga,2026-01-23,217,Product-217
+Fertilizer,Urea,-,-,Mumias,-,92.00/Kg,,Kakamega,2026-01-23,217,Product-217
+Fertilizer,CAN,-,-,Mumias,-,72.00/Kg,,Kakamega,2026-01-23,217,Product-217
+Fertilizer,NPK,-,-,Mumias,-,96.00/Kg,,Kakamega,2026-01-23,217,Product-217
+Fertilizer,DAP,-,-,Mumias,-,106.00/Kg,,Kakamega,2026-01-23,217,Product-217
+Fertilizer,NPK,-,-,Katito,-,140.00/Kg,4500.0,Kisumu,2026-01-22,217,Product-217
+Fertilizer,DAP,-,-,Katito,-,130.00/Kg,3500.0,Kisumu,2026-01-22,217,Product-217
+Fertilizer,CAN,-,-,Katito,-,90.00/Kg,2500.0,Kisumu,2026-01-22,217,Product-217
 Fertilizer,NPK,-,-,Ngurubani Market,90.00/Kg,100.00/Kg,205000.0,Kirinyaga,2026-01-20,217,Product-217
 Fertilizer,DAP,-,-,Ngurubani Market,124.00/Kg,130.00/Kg,135000.0,Kirinyaga,2026-01-20,217,Product-217
 Fertilizer,CAN,-,-,Ngurubani Market,62.00/Kg,75.00/Kg,52500.0,Kirinyaga,2026-01-20,217,Product-217
@@ -3866,6 +4028,14 @@ Wheat Bran,-,-,-,Kibuye,-,33.00/Kg,,Kisumu,2026-11-01,220,Product-220
 Maize Bran,-,-,-,Kibuye,-,44.00/Kg,,Kisumu,2026-11-01,221,Product-221
 Sunflower Cake,-,-,-,Kibuye,-,50.00/Kg,,Kisumu,2026-11-01,222,Product-222
 Cotton,-,-,-,Kibuye,-,75.00/Kg,,Kisumu,2026-11-01,224,Product-224
+Banana (Ripening),-,-,-,Mumias,-,47.62/Kg,,Kakamega,2026-01-23,226,Product-226
+Banana (Ripening),-,-,-,Wundanyi,-,80.00/Kg,500.0,Taita-Taveta,2026-01-23,226,Product-226
+Banana (Ripening),-,-,-,Voi Wholesale,40.00/Kg,-,700.0,Taita-Taveta,2026-01-23,226,Product-226
+Banana (Ripening),-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,3000.0,Trans-Nzoia,2026-01-23,226,Product-226
+Banana (Ripening),-,-,-,Kinango,48.00/Kg,70.00/Kg,2500.0,Kwale,2026-01-22,226,Product-226
+Banana (Ripening),-,-,-,Kagio,35.00/Kg,50.00/Kg,28000.0,Kirinyaga,2026-01-22,226,Product-226
+Banana (Ripening),-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,6000.0,Trans-Nzoia,2026-01-22,226,Product-226
+Banana (Ripening),-,-,-,Makutano Kirinyaga,25.00/Kg,35.00/Kg,2100.0,Kirinyaga,2026-01-22,226,Product-226
 Banana (Ripening),-,-,-,Mukuyu Market,-,50.00/Kg,,Muranga,2026-01-21,226,Product-226
 Banana (Ripening),-,-,-,Mwingi Town,26.00/Kg,60.00/Kg,7000.0,Kitui,2026-01-21,226,Product-226
 Banana (Ripening),-,-,-,Kangeta,40.00/Kg,50.00/Kg,900.0,Meru,2026-01-21,226,Product-226
@@ -3918,10 +4088,20 @@ Banana (Ripening),-,-,-,Kibuye,-,180.00/Kg,,Kisumu,2025-12-28,226,Product-226
 Banana (Ripening),-,-,-,Kabati - Muranga,23.00/Kg,35.00/Kg,,Muranga,2025-12-27,226,Product-226
 Banana (Ripening),-,-,-,Kagio,35.00/Kg,50.00/Kg,24000.0,Kirinyaga,2025-12-26,226,Product-226
 Banana (Ripening),-,-,-,Kinango,48.00/Kg,65.00/Kg,800.0,Kwale,2025-12-25,226,Product-226
-Banana (Ripening),-,-,-,Mwingi Town,27.50/Kg,60.00/Kg,600.0,Kitui,2025-12-24,226,Product-226
-Banana (Ripening),-,-,-,Kerugoya,25.00/Kg,50.00/Kg,350.0,Kirinyaga,2025-12-24,226,Product-226
-Banana (Ripening),-,-,-,Kagio,35.00/Kg,45.00/Kg,30000.0,Kirinyaga,2025-12-24,226,Product-226
-Banana (Ripening),-,-,-,Kangeta,40.00/Kg,50.00/Kg,1000.0,Meru,2025-12-24,226,Product-226
+Chicken,Indigenous,-,Female,Malimili Livestock Market,600.00/Head,-,30.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Improved Kienyeji,-,Female,Malimili Livestock Market,550.00/Head,-,20.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Female,Malimili Livestock Market,750.00/Head,-,35.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Improved Kienyeji,-,Female,Malimili Livestock Market,800.00/Head,-,30.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Male,Malimili Livestock Market,700.00/Head,-,25.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Improved Kienyeji,-,Male,Malimili Livestock Market,700.00/Head,-,30.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Male,Malimili Livestock Market,1100.00/Head,-,35.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Improved Kienyeji,-,Male,Malimili Livestock Market,1000.00/Head,-,40.0,Kakamega,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Female,Ndanai Market,600.00/Head,-,2000.0,Bomet,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Male,Ndanai Market,900.00/Head,-,1500.0,Bomet,2026-01-23,227,Product-227
+Chicken,Indigenous,-,Female,Katito,750.00/Head,-,1300.0,Kisumu,2026-01-22,227,Product-227
+Chicken,Indigenous,-,Male,Katito,950.00/Head,-,1500.0,Kisumu,2026-01-22,227,Product-227
+Chicken,Improved Kienyeji,-,Female,Lubao Livestock Market,800.00/Head,-,200.0,Kakamega,2026-01-22,227,Product-227
+Chicken,Improved Kienyeji,-,Male,Lubao Livestock Market,1000.00/Head,-,200.0,Kakamega,2026-01-22,227,Product-227
 Chicken,Indigenous,-,Female,Mwingi Town,700.00/Head,-,120.0,Kitui,2026-01-21,227,Product-227
 Chicken,Indigenous,-,Male,Mwingi Town,800.00/Head,-,150.0,Kitui,2026-01-21,227,Product-227
 Chicken,Indigenous,-,Female,Mwingi Town,850.00/Head,-,100.0,Kitui,2026-01-21,227,Product-227
@@ -4086,13 +4266,19 @@ Chicken,Improved Kienyeji,-,Male,Kibuye,1500.00/Head,-,,Kisumu,2025-12-28,227,Pr
 Chicken,Broiler,-,Male,Kibuye,430.00/Head,-,,Kisumu,2025-12-28,227,Product-227
 Chicken,Improved Kienyeji,-,Female,Lubao Livestock Market,1200.00/Head,-,20.0,Kakamega,2025-12-25,227,Product-227
 Chicken,Improved Kienyeji,-,Male,Lubao Livestock Market,1500.00/Head,-,30.0,Kakamega,2025-12-25,227,Product-227
-Chicken,Indigenous,-,Female,Mwingi Town,800.00/Head,-,450.0,Kitui,2025-12-24,227,Product-227
-Chicken,Indigenous,-,Male,Mwingi Town,900.00/Head,-,500.0,Kitui,2025-12-24,227,Product-227
-Chicken,Indigenous,-,Female,Mwingi Town,1000.00/Head,-,350.0,Kitui,2025-12-24,227,Product-227
-Chicken,Indigenous,-,Male,Mwingi Town,1300.00/Head,-,350.0,Kitui,2025-12-24,227,Product-227
+Macadamia Seed,-,-,-,Kitale Municipality Market,180.00/Kg,230.00/Kg,200.0,Trans-Nzoia,2026-01-23,228,Product-228
+Macadamia Seed,-,-,-,Kitale Municipality Market,200.00/Kg,250.00/Kg,200.0,Trans-Nzoia,2026-01-22,228,Product-228
 Macadamia Seed,-,-,-,Bondeni,200.00/Kg,250.00/Kg,100.0,Trans-Nzoia,2026-01-20,228,Product-228
 Macadamia Seed,-,-,-,Kitale Municipality Market,200.00/Kg,250.00/Kg,300.0,Trans-Nzoia,2026-01-20,228,Product-228
 Macadamia Seed,-,-,-,Kitale Municipality Market,200.00/Kg,250.00/Kg,200.0,Trans-Nzoia,2026-01-19,228,Product-228
+Cowpea leaves (Kunde),-,-,-,Voi Retail,-,100.00/Kg,50.0,Taita-Taveta,2026-01-23,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Mumias,-,150.00/Kg,,Kakamega,2026-01-23,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Kitale Municipality Market,12.00/Kg,17.00/Kg,500.0,Trans-Nzoia,2026-01-23,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Kutus,40.00/Kg,50.00/Kg,,Kirinyaga,2026-01-22,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Katito,36.00/Kg,27.97/Kg,4500.0,Kisumu,2026-01-22,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Kagio,30.00/Kg,60.00/Kg,150.0,Kirinyaga,2026-01-22,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Kitale Municipality Market,13.00/Kg,18.00/Kg,300.0,Trans-Nzoia,2026-01-22,230,Product-230
+Cowpea leaves (Kunde),-,-,-,Makutano Kirinyaga,30.00/Kg,40.00/Kg,250.0,Kirinyaga,2026-01-22,230,Product-230
 Cowpea leaves (Kunde),-,-,-,Kitale Municipality Market,30.00/Kg,40.00/Kg,300.0,Trans-Nzoia,2026-01-21,230,Product-230
 Cowpea leaves (Kunde),-,-,-,Ngurubani Market,40.00/Kg,60.00/Kg,220.0,Kirinyaga,2026-01-20,230,Product-230
 Cowpea leaves (Kunde),-,-,-,Kabati - Muranga,-,50.00/Kg,,Muranga,2026-01-20,230,Product-230
@@ -4131,13 +4317,21 @@ Cowpea leaves (Kunde),-,-,-,Kabati - Muranga,30.00/Kg,45.00/Kg,,Muranga,2025-12-
 Cowpea leaves (Kunde),-,-,-,Kibuye,-,100.00/Kg,,Kisumu,2025-12-28,230,Product-230
 Cowpea leaves (Kunde),-,-,-,Ngurubani Market,40.00/Kg,60.00/Kg,250.0,Kirinyaga,2025-12-27,230,Product-230
 Cowpea leaves (Kunde),-,-,-,Kagio,25.00/Kg,50.00/Kg,,Kirinyaga,2025-12-26,230,Product-230
-Cowpea leaves (Kunde),-,-,-,Kagio,30.00/Kg,60.00/Kg,100.0,Kirinyaga,2025-12-24,230,Product-230
+Nderema- Vine Spinach,-,-,-,Mumias,-,166.67/Kg,,Kakamega,2026-01-23,231,Product-231
+Nderema- Vine Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,30.00/Kg,200.0,Trans-Nzoia,2026-01-23,231,Product-231
+Nderema- Vine Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,30.00/Kg,200.0,Trans-Nzoia,2026-01-22,231,Product-231
 Nderema- Vine Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,30.00/Kg,100.0,Trans-Nzoia,2026-01-21,231,Product-231
 Nderema- Vine Spinach,-,-,-,Bondeni,20.00/Kg,30.00/Kg,200.0,Trans-Nzoia,2026-01-20,231,Product-231
 Nderema- Vine Spinach,-,-,-,Kitale Municipality Market,20.00/Kg,30.00/Kg,200.0,Trans-Nzoia,2026-01-20,231,Product-231
 Nderema- Vine Spinach,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2026-01-11,231,Product-231
 Nderema- Vine Spinach,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2026-01-11,231,Product-231
 Nderema- Vine Spinach,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,231,Product-231
+Pumpkin Leaves,-,-,-,Voi Retail,-,100.00/Kg,20.0,Taita-Taveta,2026-01-23,233,Product-233
+Pumpkin Leaves,-,-,-,Mumias,-,75.00/Kg,,Kakamega,2026-01-23,233,Product-233
+Pumpkin Leaves,-,-,-,Kitale Municipality Market,17.00/Kg,23.00/Kg,400.0,Trans-Nzoia,2026-01-23,233,Product-233
+Pumpkin Leaves,-,-,-,Kutus,40.00/Kg,50.00/Kg,,Kirinyaga,2026-01-22,233,Product-233
+Pumpkin Leaves,-,-,-,Kagio,25.00/Kg,50.00/Kg,100.0,Kirinyaga,2026-01-22,233,Product-233
+Pumpkin Leaves,-,-,-,Kitale Municipality Market,20.00/Kg,25.00/Kg,400.0,Trans-Nzoia,2026-01-22,233,Product-233
 Pumpkin Leaves,-,-,-,Kitale Municipality Market,30.00/Kg,40.00/Kg,400.0,Trans-Nzoia,2026-01-21,233,Product-233
 Pumpkin Leaves,-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,155.0,Kirinyaga,2026-01-20,233,Product-233
 Pumpkin Leaves,-,-,-,Bondeni,20.00/Kg,25.00/Kg,400.0,Trans-Nzoia,2026-01-20,233,Product-233
@@ -4165,7 +4359,10 @@ Pumpkin Leaves,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,233,Product-233
 Pumpkin Leaves,-,-,-,Kabati - Muranga,35.00/Kg,45.00/Kg,,Muranga,2025-12-27,233,Product-233
 Pumpkin Leaves,-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,320.0,Kirinyaga,2025-12-27,233,Product-233
 Pumpkin Leaves,-,-,-,Kagio,25.00/Kg,50.00/Kg,100.0,Kirinyaga,2025-12-26,233,Product-233
-Pumpkin Leaves,-,-,-,Kagio,30.00/Kg,60.00/Kg,100.0,Kirinyaga,2025-12-24,233,Product-233
+Ethiopian Kales -Kanzira,-,-,-,Mumias,-,166.67/Kg,,Kakamega,2026-01-23,234,Product-234
+Ethiopian Kales -Kanzira,-,-,-,Kitale Municipality Market,15.00/Kg,20.00/Kg,200.0,Trans-Nzoia,2026-01-23,234,Product-234
+Ethiopian Kales -Kanzira,-,-,-,Katito,50.00/Kg,36.70/Kg,2600.0,Kisumu,2026-01-22,234,Product-234
+Ethiopian Kales -Kanzira,-,-,-,Kitale Municipality Market,20.00/Kg,25.00/Kg,200.0,Trans-Nzoia,2026-01-22,234,Product-234
 Ethiopian Kales -Kanzira,-,-,-,Kitale Municipality Market,40.00/Kg,50.00/Kg,300.0,Trans-Nzoia,2026-01-21,234,Product-234
 Ethiopian Kales -Kanzira,-,-,-,Bondeni,15.00/Kg,23.00/Kg,300.0,Trans-Nzoia,2026-01-20,234,Product-234
 Ethiopian Kales -Kanzira,-,-,-,Ahero,70.00/Kg,80.00/Kg,180.0,Kisumu,2026-01-20,234,Product-234
@@ -4176,6 +4373,9 @@ Ethiopian Kales -Kanzira,-,-,-,Ahero,70.00/Kg,80.00/Kg,350.0,Kisumu,2026-01-13,2
 Ethiopian Kales -Kanzira,-,-,-,Holo,-,70.00/Kg,,Kisumu,2026-01-13,234,Product-234
 Ethiopian Kales -Kanzira,-,-,-,Ahero,70.00/Kg,80.00/Kg,300.0,Kisumu,2026-01-06,234,Product-234
 Ethiopian Kales -Kanzira,-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2025-12-28,234,Product-234
+Indigenous Crotolaria (Mito/Miro),-,-,-,Mumias,-,100.00/Kg,,Kakamega,2026-01-23,235,Product-235
+Indigenous Crotolaria (Mito/Miro),-,-,-,Kitale Municipality Market,25.00/Kg,30.00/Kg,300.0,Trans-Nzoia,2026-01-23,235,Product-235
+Indigenous Crotolaria (Mito/Miro),-,-,-,Kitale Municipality Market,25.00/Kg,30.00/Kg,300.0,Trans-Nzoia,2026-01-22,235,Product-235
 Indigenous Crotolaria (Mito/Miro),-,-,-,Kitale Municipality Market,50.00/Kg,60.00/Kg,200.0,Trans-Nzoia,2026-01-21,235,Product-235
 Indigenous Crotolaria (Mito/Miro),-,-,-,Bondeni,20.00/Kg,28.00/Kg,300.0,Trans-Nzoia,2026-01-20,235,Product-235
 Indigenous Crotolaria (Mito/Miro),-,-,-,Ahero,70.00/Kg,80.00/Kg,320.0,Kisumu,2026-01-20,235,Product-235
@@ -4191,6 +4391,15 @@ Indigenous Crotolaria (Mito/Miro),-,-,-,Kibuye,-,70.00/Kg,,Kisumu,2025-12-28,235
 Coconut Oil,-,-,-,Kitale Municipality Market,160.00/Lt,200.00/Lt,1000.0,Trans-Nzoia,2026-01-19,238,Product-238
 Sunflower Seeds,-,-,-,Kibuye,-,50.00/Kg,,Kisumu,2026-11-01,239,Product-239
 Sunflower Oil,-,-,-,Kibuye,-,45.00/Lt,,Kisumu,2025-12-28,240,Product-240
+Coriander (Dhania),-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,170.0,Kirinyaga,2026-01-23,242,Product-242
+Coriander (Dhania),-,-,-,Gakoromone,40.00/Kg,50.00/Kg,1000.0,Meru,2026-01-23,242,Product-242
+Coriander (Dhania),-,-,-,Wundanyi,-,100.00/Kg,300.0,Taita-Taveta,2026-01-23,242,Product-242
+Coriander (Dhania),-,-,-,Mumias,-,312.50/Kg,,Kakamega,2026-01-23,242,Product-242
+Coriander (Dhania),-,-,-,Kitale Municipality Market,80.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-23,242,Product-242
+Coriander (Dhania),-,-,-,Kutus,60.00/Kg,80.00/Kg,,Kirinyaga,2026-01-22,242,Product-242
+Coriander (Dhania),-,-,-,Kinango,70.00/Kg,120.00/Kg,200.0,Kwale,2026-01-22,242,Product-242
+Coriander (Dhania),-,-,-,Kagio,15.00/Kg,30.00/Kg,200.0,Kirinyaga,2026-01-22,242,Product-242
+Coriander (Dhania),-,-,-,Kitale Municipality Market,100.00/Kg,160.00/Kg,300.0,Trans-Nzoia,2026-01-22,242,Product-242
 Coriander (Dhania),-,-,-,Kangeta,40.00/Kg,50.00/Kg,200.0,Meru,2026-01-21,242,Product-242
 Coriander (Dhania),-,-,-,Kangeta,40.00/Kg,50.00/Kg,200.0,Meru,2026-01-21,242,Product-242
 Coriander (Dhania),-,-,-,Kitale Municipality Market,100.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-21,242,Product-242
@@ -4247,10 +4456,8 @@ Coriander (Dhania),-,-,-,Ngurubani Market,50.00/Kg,70.00/Kg,150.0,Kirinyaga,2025
 Coriander (Dhania),-,-,-,Makutano Kirinyaga,80.00/Kg,120.00/Kg,680.0,Kirinyaga,2025-12-27,242,Product-242
 Coriander (Dhania),-,-,-,Gakoromone,50.00/Kg,60.00/Kg,2000.0,Meru,2025-12-26,242,Product-242
 Coriander (Dhania),-,-,-,Kinango,100.00/Kg,150.00/Kg,100.0,Kwale,2025-12-25,242,Product-242
-Coriander (Dhania),-,-,-,Makutano Kirinyaga,80.00/Kg,110.00/Kg,750.0,Kirinyaga,2025-12-24,242,Product-242
-Coriander (Dhania),-,-,-,Kerugoya,50.00/Kg,100.00/Kg,150.0,Kirinyaga,2025-12-24,242,Product-242
-Coriander (Dhania),-,-,-,Kabati - Muranga,35.00/Kg,50.00/Kg,,Muranga,2025-12-24,242,Product-242
-Coriander (Dhania),-,-,-,Kangeta,50.00/Kg,60.00/Kg,350.0,Meru,2025-12-24,242,Product-242
+Grapes,Black-Dark,-,-,Mumias,-,740.00/Kg,,Kakamega,2026-01-23,243,Product-243
+Grapes,Black-Dark,-,-,Kitale Municipality Market,120.00/Kg,140.00/Kg,300.0,Trans-Nzoia,2026-01-22,243,Product-243
 Grapes,Black-Dark,-,-,Mukuyu Market,-,700.00/Kg,,Muranga,2026-01-21,243,Product-243
 Grapes,White,-,-,Kabati - Muranga,-,600.00/Kg,,Muranga,2026-01-20,243,Product-243
 Grapes,Black-Dark,-,-,Bondeni,120.00/Kg,140.00/Kg,200.0,Trans-Nzoia,2026-01-20,243,Product-243
@@ -4270,8 +4477,10 @@ Grapes,Black-Dark,-,-,Kagio,180.00/Kg,230.00/Kg,100.0,Kirinyaga,2026-01-02,243,P
 Grapes,Red,-,-,Kabati - Muranga,480.00/Kg,600.00/Kg,,Muranga,2025-12-30,243,Product-243
 Grapes,Red,-,-,Kabati - Muranga,480.00/Kg,600.00/Kg,,Muranga,2025-12-27,243,Product-243
 Grapes,Black-Dark,-,-,Kagio,150.00/Kg,200.00/Kg,100.0,Kirinyaga,2025-12-26,243,Product-243
-Grapes,Black-Dark,-,-,Kagio,180.00/Kg,230.00/Kg,100.0,Kirinyaga,2025-12-24,243,Product-243
-Grapes,Red,-,-,Kabati - Muranga,400.00/Kg,600.00/Kg,,Muranga,2025-12-24,243,Product-243
+Apples,-,-,-,Mumias,-,520.00/Kg,,Kakamega,2026-01-23,244,Product-244
+Apples,-,-,-,Voi Retail,-,40.00/Kg,90.0,Taita-Taveta,2026-01-23,244,Product-244
+Apples,-,-,-,Kagio,180.00/Kg,250.00/Kg,200.0,Kirinyaga,2026-01-22,244,Product-244
+Apples,-,-,-,Kitale Municipality Market,300.00/Kg,380.00/Kg,1000.0,Trans-Nzoia,2026-01-22,244,Product-244
 Apples,-,-,-,Mukuyu Market,-,350.00/Kg,,Muranga,2026-01-21,244,Product-244
 Apples,-,-,-,Kangeta,140.00/Kg,160.00/Kg,100.0,Meru,2026-01-21,244,Product-244
 Apples,-,-,-,Kabati - Muranga,100.00/Kg,180.00/Kg,,Muranga,2026-01-20,244,Product-244
@@ -4307,9 +4516,9 @@ Apples,-,-,-,Kangeta,140.00/Kg,160.00/Kg,120.0,Meru,2025-12-29,244,Product-244
 Apples,-,-,-,Kibuye,-,200.00/Kg,,Kisumu,2025-12-28,244,Product-244
 Apples,-,-,-,Kabati - Muranga,120.00/Kg,180.00/Kg,,Muranga,2025-12-27,244,Product-244
 Apples,-,-,-,Kagio,180.00/Kg,250.00/Kg,200.0,Kirinyaga,2025-12-26,244,Product-244
-Apples,-,-,-,Maua,322.22/Kg,440.00/Kg,180.0,Meru,2025-12-24,244,Product-244
-Apples,-,-,-,Kabati - Muranga,120.00/Kg,180.00/Kg,,Muranga,2025-12-24,244,Product-244
-Apples,-,-,-,Kangeta,140.00/Kg,160.00/Kg,200.0,Meru,2025-12-24,244,Product-244
+Dry Peas,-,-,-,Kawangware,145.00/Kg,165.00/Kg,,Nairobi,2026-01-23,245,Product-245
+Dry Peas,-,-,-,Mumias,-,380.00/Kg,,Kakamega,2026-01-23,245,Product-245
+Dry Peas,-,-,-,Kitale Municipality Market,150.00/Kg,175.00/Kg,300.0,Trans-Nzoia,2026-01-22,245,Product-245
 Dry Peas,-,-,-,Kawangware,145.00/Kg,165.00/Kg,,Nairobi,2026-01-21,245,Product-245
 Dry Peas,-,-,-,Kitale Municipality Market,150.00/Kg,190.00/Kg,300.0,Trans-Nzoia,2026-01-21,245,Product-245
 Dry Peas,-,-,-,Bondeni,150.00/Kg,190.00/Kg,200.0,Trans-Nzoia,2026-01-20,245,Product-245
@@ -4322,6 +4531,12 @@ Dry Peas,-,-,-,Nkubu,144.44/Kg,170.00/Kg,540.0,Meru,2026-01-06,245,Product-245
 Dry Peas,-,-,-,Maua,166.67/Kg,200.00/Kg,1800.0,Meru,2026-01-06,245,Product-245
 Dry Peas,-,-,-,Maua,166.67/Kg,200.00/Kg,2700.0,Meru,2025-12-30,245,Product-245
 Dry Peas,-,-,-,Nkubu,150.00/Kg,170.00/Kg,630.0,Meru,2025-12-30,245,Product-245
+Mixed Beans,-,-,-,Kerugoya,95.00/Kg,140.00/Kg,1200.0,Kirinyaga,2026-01-23,246,Product-246
+Mixed Beans,-,-,-,Ngurubani Market,86.67/Kg,120.00/Kg,800.0,Kirinyaga,2026-01-23,246,Product-246
+Mixed Beans,-,-,-,Gakoromone,82.22/Kg,83.33/Kg,18000.0,Meru,2026-01-23,246,Product-246
+Mixed Beans,-,-,-,Mumias,-,127.27/Kg,,Kakamega,2026-01-23,246,Product-246
+Mixed Beans,-,-,-,Kitale Municipality Market,75.00/Kg,100.00/Kg,300.0,Trans-Nzoia,2026-01-23,246,Product-246
+Mixed Beans,-,-,-,Kitale Municipality Market,80.00/Kg,110.00/Kg,500.0,Trans-Nzoia,2026-01-22,246,Product-246
 Mixed Beans,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,400.0,Trans-Nzoia,2026-01-21,246,Product-246
 Mixed Beans,-,-,-,Ngurubani Market,86.67/Kg,110.00/Kg,1250.0,Kirinyaga,2026-01-20,246,Product-246
 Mixed Beans,-,-,-,Maua,77.78/Kg,90.00/Kg,9000.0,Meru,2026-01-20,246,Product-246
@@ -4353,7 +4568,30 @@ Mixed Beans,-,-,-,Maua,77.78/Kg,90.00/Kg,8100.0,Meru,2025-12-30,246,Product-246
 Mixed Beans,-,-,-,Kerugoya,120.00/Kg,150.00/Kg,1200.0,Kirinyaga,2025-12-29,246,Product-246
 Mixed Beans,-,-,-,Kibuye,-,75.00/Kg,,Kisumu,2025-12-28,246,Product-246
 Mixed Beans,-,-,-,Ngurubani Market,83.33/Kg,125.00/Kg,1350.0,Kirinyaga,2025-12-27,246,Product-246
-Mixed Beans,-,-,-,Kerugoya,120.00/Kg,150.00/Kg,1200.0,Kirinyaga,2025-12-24,246,Product-246
+Maize Flour,Posho Mill,-,-,Mumias,-,68.18/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Soko,-,-,Mumias,-,80.00/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Jogoo wimbi,-,-,Mumias,-,145.00/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Posho Mill,-,-,Voi Retail,-,75.00/Kg,180.0,Taita-Taveta,2026-01-23,249,Product-249
+Maize Flour,Jogoo,-,-,Mumias,-,82.50/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Ugali Afya,-,-,Nairobi Supermarkets,-,145.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Soko,-,-,Nairobi Supermarkets,-,78.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Raha Premium,-,-,Nairobi Supermarkets,-,100.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Pembe,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Oryx,-,-,Nairobi Supermarkets,-,82.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Ndovu,-,-,Nairobi Supermarkets,-,70.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Mama,-,-,Nairobi Supermarkets,-,76.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Jogoo wimbi,-,-,Nairobi Supermarkets,-,139.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Jogoo,-,-,Nairobi Supermarkets,-,76.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Hostess,-,-,Nairobi Supermarkets,-,94.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Equatorial afya ugali,-,-,Nairobi Supermarkets,-,136.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Dola,-,-,Nairobi Supermarkets,-,79.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Cosmo,-,-,Nairobi Supermarkets,-,67.50/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Amaize,-,-,Nairobi Supermarkets,-,102.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Ajab,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,210(two ten),-,-,Nairobi Supermarkets,-,78.00/Kg,,Nairobi,2026-01-23,249,Product-249
+Maize Flour,Hostess,-,-,Mumias,-,100.00/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Dola,-,-,Mumias,-,77.50/Kg,,Kakamega,2026-01-23,249,Product-249
+Maize Flour,Amaize,-,-,Mumias,-,110.00/Kg,,Kakamega,2026-01-23,249,Product-249
 Maize Flour,Ugali Afya,-,-,Nairobi Supermarkets,-,145.00/Kg,,Nairobi,2026-01-21,249,Product-249
 Maize Flour,Soko,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-21,249,Product-249
 Maize Flour,Raha Premium,-,-,Nairobi Supermarkets,-,100.50/Kg,,Nairobi,2026-01-21,249,Product-249
@@ -4457,20 +4695,6 @@ Maize Flour,Amaize,-,-,Nairobi Supermarkets,-,99.50/Kg,,Nairobi,2026-01-09,249,P
 Maize Flour,Ajab,-,-,Nairobi Supermarkets,-,86.50/Kg,,Nairobi,2026-01-09,249,Product-249
 Maize Flour,210(two ten),-,-,Nairobi Supermarkets,-,73.50/Kg,,Nairobi,2026-01-09,249,Product-249
 Maize Flour,Dola,-,-,Kibuye,-,80.00/Kg,,Kisumu,2025-12-28,249,Product-249
-Maize Flour,Ugali Afya,-,-,Nairobi Supermarkets,-,145.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Soko,-,-,Nairobi Supermarkets,-,73.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Raha Premium,-,-,Nairobi Supermarkets,-,100.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Pembe,-,-,Nairobi Supermarkets,-,73.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Ndovu,-,-,Nairobi Supermarkets,-,67.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Mama,-,-,Nairobi Supermarkets,-,76.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Jogoo wimbi,-,-,Nairobi Supermarkets,-,139.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Jogoo,-,-,Nairobi Supermarkets,-,72.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Hostess,-,-,Nairobi Supermarkets,-,91.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Equatorial afya ugali,-,-,Nairobi Supermarkets,-,136.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Dola,-,-,Nairobi Supermarkets,-,73.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Amaize,-,-,Nairobi Supermarkets,-,90.50/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,Ajab,-,-,Nairobi Supermarkets,-,87.00/Kg,,Nairobi,2025-12-24,249,Product-249
-Maize Flour,210(two ten),-,-,Nairobi Supermarkets,-,72.00/Kg,,Nairobi,2025-12-24,249,Product-249
 Duck,Black Swedish,Grade 1,Male,Sabatia,-,-,2.0,Kakamega,2026-01-21,251,Product-251
 Duck,Black Swedish,Grade 1,Female,Sabatia,-,-,4.0,Kakamega,2026-01-14,251,Product-251
 Duck,Black Swedish,Grade 1,Male,Sabatia,-,-,2.0,Kakamega,2026-01-14,251,Product-251
@@ -4480,6 +4704,19 @@ Duck,Black Swedish,Grade 1,Male,Kibuye,-,-,,Kisumu,2026-01-11,251,Product-251
 Duck,Black Swedish,Grade 1,Female,Sabatia,-,-,1.0,Kakamega,2026-01-07,251,Product-251
 Duck,Black Swedish,Grade 1,Male,Sabatia,-,-,1.0,Kakamega,2026-01-07,251,Product-251
 Duck,Black Swedish,Grade 1,Male,Kibuye,-,-,,Kisumu,2025-12-28,251,Product-251
+Banana (Cooking),-,-,-,Kerugoya,15.00/Kg,30.00/Kg,800.0,Kirinyaga,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Ngurubani Market,25.00/Kg,35.00/Kg,2500.0,Kirinyaga,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Gakoromone,14.00/Kg,15.00/Kg,24000.0,Meru,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Voi Retail,-,10.00/Kg,208.0,Taita-Taveta,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Wundanyi,-,100.00/Kg,1500.0,Taita-Taveta,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Mumias,-,30.30/Kg,,Kakamega,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Voi Wholesale,32.50/Kg,-,1600.0,Taita-Taveta,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Voi Wholesale,40.00/Kg,-,1500.0,Taita-Taveta,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Kitale Municipality Market,60.00/Kg,70.00/Kg,3000.0,Trans-Nzoia,2026-01-23,255,Product-255
+Banana (Cooking),-,-,-,Kutus,17.00/Kg,20.00/Kg,,Kirinyaga,2026-01-22,255,Product-255
+Banana (Cooking),-,-,-,Kinango,46.67/Kg,70.00/Kg,600.0,Kwale,2026-01-22,255,Product-255
+Banana (Cooking),-,-,-,Kagio,35.00/Kg,50.00/Kg,35000.0,Kirinyaga,2026-01-22,255,Product-255
+Banana (Cooking),-,-,-,Kitale Municipality Market,60.00/Kg,70.00/Kg,5000.0,Trans-Nzoia,2026-01-22,255,Product-255
 Banana (Cooking),-,-,-,Mukuyu Market,-,50.00/Kg,,Muranga,2026-01-21,255,Product-255
 Banana (Cooking),-,-,-,Mwingi Town,25.00/Kg,50.00/Kg,2000.0,Kitui,2026-01-21,255,Product-255
 Banana (Cooking),-,-,-,Kangeta,125.00/Kg,30.00/Kg,500.0,Meru,2026-01-21,255,Product-255
@@ -4560,11 +4797,10 @@ Banana (Cooking),-,-,-,Taveta Retail Market,12.00/Kg,20.00/Kg,520.0,Taita-Taveta
 Banana (Cooking),-,-,-,Kagio,30.00/Kg,50.00/Kg,25000.0,Kirinyaga,2025-12-26,255,Product-255
 Banana (Cooking),-,-,-,Gakoromone,15.00/Kg,17.00/Kg,26000.0,Meru,2025-12-26,255,Product-255
 Banana (Cooking),-,-,-,Kinango,46.67/Kg,70.00/Kg,300.0,Kwale,2025-12-25,255,Product-255
-Banana (Cooking),-,-,-,Mwingi Town,20.00/Kg,60.00/Kg,3500.0,Kitui,2025-12-24,255,Product-255
-Banana (Cooking),-,-,-,Kerugoya,17.00/Kg,30.00/Kg,800.0,Kirinyaga,2025-12-24,255,Product-255
-Banana (Cooking),-,-,-,Kabati - Muranga,18.00/Kg,35.00/Kg,,Muranga,2025-12-24,255,Product-255
-Banana (Cooking),-,-,-,Kagio,35.00/Kg,50.00/Kg,25000.0,Kirinyaga,2025-12-24,255,Product-255
-Banana (Cooking),-,-,-,Kangeta,20.00/Kg,25.00/Kg,1000.0,Meru,2025-12-24,255,Product-255
+Banana (Plantain),-,-,-,Gakoromone,14.00/Kg,15.00/Kg,22000.0,Meru,2026-01-23,256,Product-256
+Banana (Plantain),-,-,-,Mumias,-,52.63/Kg,,Kakamega,2026-01-23,256,Product-256
+Banana (Plantain),-,-,-,Kutus,60.00/Kg,80.00/Kg,2000.0,Kirinyaga,2026-01-22,256,Product-256
+Banana (Plantain),-,-,-,Kagio,65.00/Kg,90.00/Kg,300.0,Kirinyaga,2026-01-22,256,Product-256
 Banana (Plantain),-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,256,Product-256
 Banana (Plantain),-,-,-,Kabati - Muranga,20.00/Kg,35.00/Kg,,Muranga,2026-01-20,256,Product-256
 Banana (Plantain),-,-,-,Ahero,100.00/Kg,150.00/Kg,2500.0,Kisumu,2026-01-20,256,Product-256
@@ -4599,7 +4835,13 @@ Banana (Plantain),-,-,-,Gakoromone,14.00/Kg,15.00/Kg,16000.0,Meru,2026-01-02,256
 Banana (Plantain),-,-,-,Kabati - Muranga,18.00/Kg,35.00/Kg,,Muranga,2025-12-30,256,Product-256
 Banana (Plantain),-,-,-,Kabati - Muranga,25.00/Kg,40.00/Kg,,Muranga,2025-12-27,256,Product-256
 Banana (Plantain),-,-,-,Gakoromone,15.00/Kg,16.00/Kg,22000.0,Meru,2025-12-26,256,Product-256
-Banana (Plantain),-,-,-,Kabati - Muranga,20.00/Kg,35.00/Kg,,Muranga,2025-12-24,256,Product-256
+Courgette,-,-,-,Ngurubani Market,70.00/Kg,100.00/Kg,250.0,Kirinyaga,2026-01-23,257,Product-257
+Courgette,-,-,-,Gakoromone,70.00/Kg,80.00/Kg,4000.0,Meru,2026-01-23,257,Product-257
+Courgette,-,-,-,Mumias,-,142.86/Kg,,Kakamega,2026-01-23,257,Product-257
+Courgette,-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-23,257,Product-257
+Courgette,-,-,-,Kutus,50.00/Kg,70.00/Kg,,Kirinyaga,2026-01-22,257,Product-257
+Courgette,-,-,-,Kagio,55.00/Kg,70.00/Kg,1200.0,Kirinyaga,2026-01-22,257,Product-257
+Courgette,-,-,-,Kitale Municipality Market,60.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-22,257,Product-257
 Courgette,-,-,-,Mukuyu Market,-,100.00/Kg,,Muranga,2026-01-21,257,Product-257
 Courgette,-,-,-,Kangeta,80.00/Kg,90.00/Kg,70.0,Meru,2026-01-21,257,Product-257
 Courgette,-,-,-,Kitale Municipality Market,60.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-21,257,Product-257
@@ -4643,10 +4885,8 @@ Courgette,-,-,-,Ngurubani Market,60.00/Kg,80.00/Kg,205.0,Kirinyaga,2025-12-27,25
 Courgette,-,-,-,Makutano Kirinyaga,75.00/Kg,100.00/Kg,1250.0,Kirinyaga,2025-12-27,257,Product-257
 Courgette,-,-,-,Kagio,50.00/Kg,70.00/Kg,500.0,Kirinyaga,2025-12-26,257,Product-257
 Courgette,-,-,-,Gakoromone,80.00/Kg,90.00/Kg,1500.0,Meru,2025-12-26,257,Product-257
-Courgette,-,-,-,Makutano Kirinyaga,75.00/Kg,100.00/Kg,1800.0,Kirinyaga,2025-12-24,257,Product-257
-Courgette,-,-,-,Kerugoya,50.00/Kg,100.00/Kg,450.0,Kirinyaga,2025-12-24,257,Product-257
-Courgette,-,-,-,Kagio,40.00/Kg,60.00/Kg,300.0,Kirinyaga,2025-12-24,257,Product-257
-Courgette,-,-,-,Kangeta,110.00/Kg,120.00/Kg,200.0,Meru,2025-12-24,257,Product-257
+Broccoli,-,-,-,Kagio,120.00/Kg,150.00/Kg,100.0,Kirinyaga,2026-01-22,258,Product-258
+Broccoli,-,-,-,Kitale Municipality Market,120.00/Kg,180.00/Kg,200.0,Trans-Nzoia,2026-01-22,258,Product-258
 Broccoli,-,-,-,Kagio,120.00/Kg,160.00/Kg,150.0,Kirinyaga,2026-01-20,258,Product-258
 Broccoli,-,-,-,Bondeni,120.00/Kg,170.00/Kg,100.0,Trans-Nzoia,2026-01-20,258,Product-258
 Broccoli,-,-,-,Kitale Municipality Market,100.00/Kg,120.00/Kg,100.0,Trans-Nzoia,2026-01-20,258,Product-258
@@ -4657,7 +4897,13 @@ Broccoli,-,-,-,Kagio,80.00/Kg,120.00/Kg,100.0,Kirinyaga,2026-01-09,258,Product-2
 Broccoli,-,-,-,Kagio,75.00/Kg,120.00/Kg,100.0,Kirinyaga,2026-01-02,258,Product-258
 Broccoli,-,-,-,Kagio,80.00/Kg,120.00/Kg,150.0,Kirinyaga,2025-12-30,258,Product-258
 Broccoli,-,-,-,Kagio,100.00/Kg,150.00/Kg,100.0,Kirinyaga,2025-12-26,258,Product-258
-Broccoli,-,-,-,Kagio,80.00/Kg,120.00/Kg,100.0,Kirinyaga,2025-12-24,258,Product-258
+Lentils,-,-,-,Kerugoya,230.00/Kg,280.00/Kg,1300.0,Kirinyaga,2026-01-23,259,Product-259
+Lentils,-,-,-,Kawangware,180.00/Kg,200.00/Kg,,Nairobi,2026-01-23,259,Product-259
+Lentils,-,-,-,Gikomba,260.00/Kg,300.00/Kg,,Nairobi,2026-01-23,259,Product-259
+Lentils,-,-,-,Mumias,-,480.00/Kg,,Kakamega,2026-01-23,259,Product-259
+Lentils,-,-,-,Gikomba,260.00/Kg,300.00/Kg,,Nairobi,2026-01-22,259,Product-259
+Lentils,-,-,-,Makutano Kirinyaga,200.00/Kg,250.00/Kg,850.0,Kirinyaga,2026-01-22,259,Product-259
+Lentils,-,-,-,Kitale Municipality Market,170.00/Kg,200.00/Kg,300.0,Trans-Nzoia,2026-01-22,259,Product-259
 Lentils,-,-,-,Mukuyu Market,-,250.00/Kg,,Muranga,2026-01-21,259,Product-259
 Lentils,-,-,-,Gikomba,260.00/Kg,300.00/Kg,,Nairobi,2026-01-21,259,Product-259
 Lentils,-,-,-,Kawangware,180.00/Kg,200.00/Kg,,Nairobi,2026-01-21,259,Product-259
@@ -4689,9 +4935,8 @@ Lentils,-,-,-,Nkubu,200.00/Kg,120.00/Kg,500.0,Meru,2025-12-30,259,Product-259
 Lentils,-,-,-,Kerugoya,230.00/Kg,300.00/Kg,1350.0,Kirinyaga,2025-12-29,259,Product-259
 Lentils,-,-,-,Ngurubani Market,200.00/Kg,250.00/Kg,1850.0,Kirinyaga,2025-12-27,259,Product-259
 Lentils,-,-,-,Makutano Kirinyaga,150.00/Kg,170.00/Kg,800.0,Kirinyaga,2025-12-27,259,Product-259
-Lentils,-,-,-,Kerugoya,250.00/Kg,300.00/Kg,1350.0,Kirinyaga,2025-12-24,259,Product-259
-Lentils,-,-,-,Kangeta,230.00/Kg,250.00/Kg,150.0,Meru,2025-12-24,259,Product-259
 Fish Scales,-,-,-,Kibuye,-,40.00/Kg,,Kisumu,2026-11-01,261,Product-261
+Tangerine (Sandara),-,-,-,Kitale Municipality Market,80.00/Kg,100.00/Kg,200.0,Trans-Nzoia,2026-01-22,262,Product-262
 Tangerine (Sandara),-,-,-,Mukuyu Market,-,130.00/Kg,,Muranga,2026-01-21,262,Product-262
 Tangerine (Sandara),-,-,-,Kabati - Muranga,-,100.00/Kg,,Muranga,2026-01-20,262,Product-262
 Tangerine (Sandara),-,-,-,Bondeni,100.00/Kg,120.00/Kg,300.0,Trans-Nzoia,2026-01-20,262,Product-262
@@ -4704,7 +4949,41 @@ Tangerine (Sandara),-,-,-,Kabati - Muranga,50.00/Kg,70.00/Kg,,Muranga,2026-01-07
 Tangerine (Sandara),-,-,-,Kabati - Muranga,50.00/Kg,70.00/Kg,,Muranga,2025-12-30,262,Product-262
 Tangerine (Sandara),-,-,-,Kibuye,-,180.00/Kg,,Kisumu,2025-12-28,262,Product-262
 Tangerine (Sandara),-,-,-,Kabati - Muranga,50.00/Kg,70.00/Kg,,Muranga,2025-12-27,262,Product-262
-Tangerine (Sandara),-,-,-,Kabati - Muranga,45.00/Kg,70.00/Kg,,Muranga,2025-12-24,262,Product-262
+Wheat Flour,Exe All purpose fortified wheat flour,-,-,Mumias,-,85.00/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Soko All Purpose HBF,-,-,Mumias,-,80.00/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Ndovu all purpose HBF,-,-,Mumias,-,80.00/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Exe Mandazi Fortified Wheat Flour,-,-,Mumias,-,92.50/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Exe Chapati fortified wheat flour,-,-,Mumias,-,90.00/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Ajab fortigied Home Baking flour,-,-,Mumias,-,87.50/Kg,,Kakamega,2026-01-23,265,Product-265
+Wheat Flour,Winnie's Pure Health Atta Mark 1,-,-,Nairobi Supermarkets,-,128.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Tropicana HBF,-,-,Nairobi Supermarkets,-,88.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Soko Atta Mark 1,-,-,Nairobi Supermarkets,-,83.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Soko All Purpose HBF,-,-,Nairobi Supermarkets,-,81.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Phulka Atta Mark 1 Chapati Flour,-,-,Nairobi Supermarkets,-,80.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Pembe Atta Mark 1,-,-,Nairobi Supermarkets,-,84.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Pembe All Purpose HBF,-,-,Nairobi Supermarkets,-,82.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Oboma all purpose HBF,-,-,Nairobi Supermarkets,-,79.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Nutra Meal Atta Mark 1,-,-,Nairobi Supermarkets,-,135.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Ndovu all purpose HBF,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Mama Home Baking Flour,-,-,Nairobi Supermarkets,-,76.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Kifaru All Purpose HBF,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Golden All Purpose,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe self raising,-,-,Nairobi Supermarkets,-,91.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe Mandazi Fortified Wheat Flour,-,-,Nairobi Supermarkets,-,91.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe Chapati fortified wheat flour,-,-,Nairobi Supermarkets,-,88.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe brown bread,-,-,Nairobi Supermarkets,-,91.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe Atta Mark 1,-,-,Nairobi Supermarkets,-,90.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Exe All purpose fortified wheat flour,-,-,Nairobi Supermarkets,-,84.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Elliots self raising flour,-,-,Nairobi Supermarkets,-,90.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Elliots all purpose HBK,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Dola premium all pupose,-,-,Nairobi Supermarkets,-,80.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Dola Atta Mark 1,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Chapati Afya,-,-,Nairobi Supermarkets,-,135.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Ajab fortofied self raising,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Ajab fortigied Home Baking flour,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,Ajab fortified mandazi flour,-,-,Nairobi Supermarkets,-,82.50/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,210 Home baking flour,-,-,Nairobi Supermarkets,-,80.00/Kg,,Nairobi,2026-01-23,265,Product-265
+Wheat Flour,210 Atta Mark 1,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2026-01-23,265,Product-265
 Wheat Flour,Winnie's Pure Health Atta Mark 1,-,-,Nairobi Supermarkets,-,128.50/Kg,,Nairobi,2026-01-21,265,Product-265
 Wheat Flour,Tropicana HBF,-,-,Nairobi Supermarkets,-,88.50/Kg,,Nairobi,2026-01-21,265,Product-265
 Wheat Flour,Soko Atta Mark 1,-,-,Nairobi Supermarkets,-,83.00/Kg,,Nairobi,2026-01-21,265,Product-265
@@ -4886,35 +5165,7 @@ Wheat Flour,210 Atta Mark 1,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2026-01
 Wheat Flour,210 Atta Mark 1,-,-,Ahero,175.00/Kg,190.00/Kg,7000.0,Kisumu,2026-01-06,265,Product-265
 Wheat Flour,Exe All purpose fortified wheat flour,-,-,Ahero,90.00/Kg,100.00/Kg,17000.0,Kisumu,2026-01-06,265,Product-265
 Wheat Flour,Ajab fortigied Home Baking flour,-,-,Kibuye,-,85.00/Kg,,Kisumu,2025-12-28,265,Product-265
-Wheat Flour,Winnie's Pure Health Atta Mark 1,-,-,Nairobi Supermarkets,-,128.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Tropicana HBF,-,-,Nairobi Supermarkets,-,88.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Soko Atta Mark 1,-,-,Nairobi Supermarkets,-,84.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Soko All Purpose HBF,-,-,Nairobi Supermarkets,-,79.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Phulka Atta Mark 1 Chapati Flour,-,-,Nairobi Supermarkets,-,80.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Pembe Atta Mark 1,-,-,Nairobi Supermarkets,-,86.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Pembe All Purpose HBF,-,-,Nairobi Supermarkets,-,82.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Oboma all purpose HBF,-,-,Nairobi Supermarkets,-,80.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Nutra Meal Atta Mark 1,-,-,Nairobi Supermarkets,-,123.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Ndovu all purpose HBF,-,-,Nairobi Supermarkets,-,76.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Mama Home Baking Flour,-,-,Nairobi Supermarkets,-,76.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Kifaru All Purpose HBF,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Golden All Purpose,-,-,Nairobi Supermarkets,-,81.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe self raising,-,-,Nairobi Supermarkets,-,92.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe Mandazi Fortified Wheat Flour,-,-,Nairobi Supermarkets,-,91.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe Chapati fortified wheat flour,-,-,Nairobi Supermarkets,-,88.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe brown bread,-,-,Nairobi Supermarkets,-,91.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe Atta Mark 1,-,-,Nairobi Supermarkets,-,90.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Exe All purpose fortified wheat flour,-,-,Nairobi Supermarkets,-,84.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Elliots self raising flour,-,-,Nairobi Supermarkets,-,92.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Elliots all purpose HBK,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Dola premium all pupose,-,-,Nairobi Supermarkets,-,83.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Dola Atta Mark 1,-,-,Nairobi Supermarkets,-,82.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Chapati Afya,-,-,Nairobi Supermarkets,-,135.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Ajab fortofied self raising,-,-,Nairobi Supermarkets,-,85.00/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Ajab fortigied Home Baking flour,-,-,Nairobi Supermarkets,-,83.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,Ajab fortified mandazi flour,-,-,Nairobi Supermarkets,-,84.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,210 Home baking flour,-,-,Nairobi Supermarkets,-,78.50/Kg,,Nairobi,2025-12-24,265,Product-265
-Wheat Flour,210 Atta Mark 1,-,-,Nairobi Supermarkets,-,77.50/Kg,,Nairobi,2025-12-24,265,Product-265
+Paddy Rice,Pishori,-,-,Ngurubani Market,80.00/Kg,85.00/Kg,120000.0,Kirinyaga,2026-01-23,267,Product-267
 Paddy Rice,Pishori,-,-,Makutano Embu,82.00/Kg,85.00/Kg,,Embu,2026-01-17,267,Product-267
 Paddy Rice,Pishori,-,-,Makutano Kirinyaga,82.00/Kg,85.00/Kg,2400.0,Kirinyaga,2026-01-17,267,Product-267
 Paddy Rice,Pishori,-,-,Ngurubani Market,150.00/Kg,170.00/Kg,145000.0,Kirinyaga,2026-01-16,267,Product-267
@@ -4932,6 +5183,9 @@ Paddy Rice,IRR,-,-,Kagio,65.00/Kg,70.00/Kg,,Kirinyaga,2025-12-30,267,Product-267
 Paddy Rice,Pishori,-,-,Kibuye,-,60.00/Kg,,Kisumu,2025-12-28,267,Product-267
 Paddy Rice,IRR,-,-,Kibuye,-,35.00/Kg,,Kisumu,2025-12-28,267,Product-267
 Paddy Rice,Pishori,-,-,Makutano Kirinyaga,80.00/Kg,83.00/Kg,2800.0,Kirinyaga,2025-12-27,267,Product-267
+Coconut,-,-,-,Mumias,-,125.00/Kg,,Kakamega,2026-01-23,270,Product-270
+Coconut,-,-,-,Lungalunga,40.00/Kg,65.00/Kg,3000.0,Kwale,2026-01-23,270,Product-270
+Coconut,-,-,-,Kitale Municipality Market,150.00/Kg,180.00/Kg,2000.0,Trans-Nzoia,2026-01-22,270,Product-270
 Coconut,-,-,-,Bondeni,140.00/Kg,180.00/Kg,400.0,Trans-Nzoia,2026-01-20,270,Product-270
 Coconut,-,-,-,Voi Retail,-,70.00/Kg,50.0,Taita-Taveta,2026-01-20,270,Product-270
 Coconut,-,-,-,Kitale Municipality Market,150.00/Kg,180.00/Kg,300.0,Trans-Nzoia,2026-01-20,270,Product-270
@@ -4941,6 +5195,11 @@ Coconut,-,-,-,Taveta Retail Market,55.00/Kg,70.00/Kg,650.0,Taita-Taveta,2026-01-
 Coconut,-,-,-,Taveta Retail Market,4.55/Kg,80.00/Kg,500.0,Taita-Taveta,2025-12-31,270,Product-270
 Coconut,-,-,-,Wundanyi,-,120.00/Kg,200.0,Taita-Taveta,2025-12-30,270,Product-270
 Coconut,-,-,-,Taveta Retail Market,50.00/Kg,100.00/Kg,1250.0,Taita-Taveta,2025-12-27,270,Product-270
+Okra (Lady's fingers or Gumbo),-,-,-,Voi Retail,-,140.00/Kg,30.0,Taita-Taveta,2026-01-23,272,Product-272
+Okra (Lady's fingers or Gumbo),-,-,-,Wundanyi,-,140.00/Kg,250.0,Taita-Taveta,2026-01-23,272,Product-272
+Okra (Lady's fingers or Gumbo),-,-,-,Kutus,120.00/Kg,150.00/Kg,,Kirinyaga,2026-01-22,272,Product-272
+Okra (Lady's fingers or Gumbo),-,-,-,Diani Market,60.00/Kg,80.00/Kg,450.0,Kwale,2026-01-22,272,Product-272
+Okra (Lady's fingers or Gumbo),-,-,-,Kitale Municipality Market,150.00/Kg,200.00/Kg,200.0,Trans-Nzoia,2026-01-22,272,Product-272
 Okra (Lady's fingers or Gumbo),-,-,-,Kitale Municipality Market,150.00/Kg,200.00/Kg,200.0,Trans-Nzoia,2026-01-21,272,Product-272
 Okra (Lady's fingers or Gumbo),-,-,-,Bondeni,120.00/Kg,180.00/Kg,100.0,Trans-Nzoia,2026-01-20,272,Product-272
 Okra (Lady's fingers or Gumbo),-,-,-,Voi Retail,-,140.00/Kg,20.0,Taita-Taveta,2026-01-20,272,Product-272
@@ -4962,5 +5221,4 @@ Okra (Lady's fingers or Gumbo),-,-,-,Kinango,100.00/Kg,150.00/Kg,400.0,Kwale,202
 Okra (Lady's fingers or Gumbo),-,-,-,Kagio,80.00/Kg,120.00/Kg,100.0,Kirinyaga,2025-12-30,272,Product-272
 Okra (Lady's fingers or Gumbo),-,-,-,Diani Market,100.00/Kg,120.00/Kg,400.0,Kwale,2025-12-29,272,Product-272
 Okra (Lady's fingers or Gumbo),-,-,-,Makutano Kirinyaga,25.00/Kg,40.00/Kg,380.0,Kirinyaga,2025-12-27,272,Product-272
-Okra (Lady's fingers or Gumbo),-,-,-,Makutano Kirinyaga,30.00/Kg,40.00/Kg,800.0,Kirinyaga,2025-12-24,272,Product-272
 Dragon Fruit,-,-,-,Mukuyu Market,-,350.00/Kg,,Muranga,2026-01-14,273,Product-273
