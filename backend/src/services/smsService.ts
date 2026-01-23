@@ -92,24 +92,7 @@ export interface TextBeeApiResponse {
   message?: string;
 }
 
-const TEXTBEE_API_KEY = process.env.TEXTBEE_API_KEY;
-const TEXTBEE_DEVICE_ID = process.env.TEXTBEE_DEVICE_ID;
-const TEXTBEE_API_URL = process.env.TEXTBEE_API_URL || 'https://api.textbee.dev/api/v1';
-const TEXTBEE_WEBHOOK_SECRET = process.env.TEXTBEE_WEBHOOK_SECRET;
-
-const APP_BASE_URL = process.env.APP_BASE_URL || '';
-const SMS_RATE_LIMIT_DELAY = parseInt(process.env.SMS_RATE_LIMIT_DELAY || '500', 10);
-
-const MAX_WEBHOOK_DATA_LENGTH = 100;
-const DEFAULT_SMS_TYPE = 'general';
-
-const SMS_TYPE_VALUES = ['alert', 'update', 'prediction', 'weather', 'general', 'password-reset', 'test'];
-const SMS_STATUS_VALUES = ['pending', 'sent', 'failed', 'delivered'];
-
-logger.info(`📱 SMS Service initialized with TextBee API`);
-
-// Add SIM-based conversation tracking
-interface ConversationContext {
+export interface ConversationContext {
   farmerPhone: string;
   lastMessage: string;
   lastReply: string;
@@ -117,14 +100,43 @@ interface ConversationContext {
   lastActivity: Date;
 }
 
+export interface ReceivedSms {
+  id: string;
+  sender: string;
+  message: string;
+  receivedAt: string;
+  deviceId: string;
+  processed: boolean;
+}
+
+const TEXTBEE_API_KEY = process.env.TEXTBEE_API_KEY;
+const TEXTBEE_DEVICE_ID = process.env.TEXTBEE_DEVICE_ID;
+const TEXTBEE_API_URL = process.env.TEXTBEE_API_URL || 'https://api.textbee.dev/api/v1';
+const TEXTBEE_WEBHOOK_SECRET = process.env.TEXTBEE_WEBHOOK_SECRET;
+
+const APP_BASE_URL = process.env.APP_BASE_URL || '';
+const SMS_RATE_LIMIT_DELAY = parseInt(process.env.SMS_RATE_LIMIT_DELAY || '500', 10);
+const SIM_PHONE_NUMBER = process.env.SIM_PHONE_NUMBER || '+254111423809';
+const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+254111423809';
+const AUTO_POLL_SMS = process.env.AUTO_POLL_SMS === 'true';
+const POLL_INTERVAL_MS = parseInt(process.env.POLL_INTERVAL_MS || '30000', 10);
+
+const MAX_WEBHOOK_DATA_LENGTH = 100;
+const DEFAULT_SMS_TYPE = 'general';
+
+const SMS_TYPE_VALUES = ['alert', 'update', 'prediction', 'weather', 'general', 'password-reset', 'test'];
+const SMS_STATUS_VALUES = ['pending', 'sent', 'failed', 'delivered'];
+
+logger.info(`📱 SMS Service initialized with TextBee API (SIM: ${SIM_PHONE_NUMBER})`);
+
+// Add SIM-based conversation tracking
 const activeConversations = new Map<string, ConversationContext>();
-const SIM_PHONE_NUMBER = process.env.SIM_PHONE_NUMBER || '+254790178387';
 
 // Clean up old conversations every hour
 setInterval(() => {
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-  
+
   for (const [key, conversation] of activeConversations.entries()) {
     if (conversation.lastActivity < oneHourAgo) {
       activeConversations.delete(key);
@@ -227,6 +239,7 @@ export const validatePhoneNumber = (phone: string): boolean => {
   }
 };
 
+// ==================== ENHANCED TEXTBEE CLIENT ====================
 class TextBeeClient {
   private apiKey: string;
   private deviceId: string;
@@ -426,8 +439,330 @@ class TextBeeClient {
       return { balance: 0, success: false };
     }
   }
+
+  // =============== NEW: INCOMING SMS METHODS ===============
+  async getReceivedSms(limit: number = 50, offset: number = 0): Promise<{
+    success: boolean;
+    messages: ReceivedSms[];
+    total: number;
+  }> {
+    try {
+      logger.debug('📨 Fetching received SMS from TextBee', { limit, offset });
+
+      const response = await axios.get(
+        `${this.baseUrl}/gateway/devices/${this.deviceId}/get-received-sms`,
+        {
+          params: { limit, offset },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey
+          },
+          timeout: 30000
+        }
+      );
+
+      const messages = response.data?.data || response.data?.messages || [];
+
+      const formattedMessages: ReceivedSms[] = messages.map((msg: any) => ({
+        id: msg._id || msg.id || `sms_${Date.now()}_${Math.random()}`,
+        sender: msg.sender || msg.from || msg.phone || '',
+        message: msg.message || msg.text || msg.content || '',
+        receivedAt: msg.receivedAt || msg.timestamp || msg.createdAt || new Date().toISOString(),
+        deviceId: msg.deviceId || this.deviceId,
+        processed: false
+      }));
+
+      logger.debug('✅ Received SMS fetched', {
+        count: formattedMessages.length,
+        sample: formattedMessages.length > 0 ? formattedMessages[0] : null
+      });
+
+      return {
+        success: true,
+        messages: formattedMessages,
+        total: response.data?.total || formattedMessages.length
+      };
+    } catch (error: any) {
+      logger.error('❌ Failed to get received SMS:', {
+        error: error.message,
+        response: error.response?.data
+      });
+
+      return {
+        success: false,
+        messages: [],
+        total: 0
+      };
+    }
+  }
+
+  async getMessageHistory(limit: number = 50): Promise<{
+    success: boolean;
+    messages: Array<{
+      id: string;
+      type: 'sent' | 'received';
+      sender?: string;
+      recipient?: string;
+      message: string;
+      status?: string;
+      timestamp: string;
+    }>;
+  }> {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/gateway/devices/${this.deviceId}/messages`,
+        {
+          params: { limit },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey
+          },
+          timeout: 30000
+        }
+      );
+
+      const messages = response.data?.data || response.data?.messages || [];
+
+      return {
+        success: true,
+        messages: messages.map((msg: any) => ({
+          id: msg._id || msg.id,
+          type: msg.type || (msg.direction === 'incoming' ? 'received' : 'sent'),
+          sender: msg.sender || msg.from,
+          recipient: msg.recipient || msg.to,
+          message: msg.message || msg.text,
+          status: msg.status,
+          timestamp: msg.timestamp || msg.createdAt || msg.receivedAt
+        }))
+      };
+    } catch (error: any) {
+      logger.error('Failed to get message history:', error.message);
+      return {
+        success: false,
+        messages: []
+      };
+    }
+  }
 }
 
+// ==================== INCOMING SMS SERVICE ====================
+class IncomingSmsService {
+  private processedMessageIds = new Set<string>();
+  private isRunning = false;
+  private pollInterval = POLL_INTERVAL_MS;
+  private pollTimer: NodeJS.Timeout | null = null;
+  private textBeeClient: TextBeeClient;
+
+  constructor() {
+    this.textBeeClient = new TextBeeClient();
+    logger.info('📱 Incoming SMS Service initialized');
+  }
+
+  startPolling(intervalMs: number = POLL_INTERVAL_MS): void {
+    if (this.isRunning) {
+      logger.warn('Polling already running');
+      return;
+    }
+
+    this.pollInterval = intervalMs;
+    this.isRunning = true;
+
+    logger.info(`🔄 Starting SMS polling every ${intervalMs}ms`);
+
+    // Immediate first poll
+    this.pollForNewMessages();
+
+    // Set up interval
+    this.pollTimer = setInterval(() => {
+      this.pollForNewMessages();
+    }, this.pollInterval);
+  }
+
+  stopPolling(): void {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+    this.isRunning = false;
+    logger.info('⏹️ Stopped SMS polling');
+  }
+
+  async pollForNewMessages(): Promise<{
+    success: boolean;
+    newMessages: number;
+    totalProcessed: number;
+  }> {
+    try {
+      logger.debug('🔍 Polling for new incoming SMS...');
+
+      const result = await this.textBeeClient.getReceivedSms(100, 0);
+
+      if (!result.success || result.messages.length === 0) {
+        logger.debug('No new messages found');
+        return {
+          success: true,
+          newMessages: 0,
+          totalProcessed: this.processedMessageIds.size
+        };
+      }
+
+      let newMessagesCount = 0;
+
+      // Process each message
+      for (const msg of result.messages) {
+        // Skip if already processed
+        if (this.processedMessageIds.has(msg.id)) {
+          continue;
+        }
+
+        // Check if this is a valid farmer message
+        if (this.isValidFarmerMessage(msg)) {
+          logger.info(`📨 New farmer message from ${msg.sender}`, {
+            messageId: msg.id,
+            messagePreview: msg.message.substring(0, 50)
+          });
+
+          // Process the message
+          await this.processIncomingMessage(msg);
+
+          // Mark as processed
+          this.processedMessageIds.add(msg.id);
+          newMessagesCount++;
+        }
+      }
+
+      if (newMessagesCount > 0) {
+        logger.info(`✅ Processed ${newMessagesCount} new farmer messages`);
+      }
+
+      // Clean up old message IDs (keep last 1000)
+      if (this.processedMessageIds.size > 1000) {
+        const idsArray = Array.from(this.processedMessageIds);
+        this.processedMessageIds = new Set(idsArray.slice(-500));
+      }
+
+      return {
+        success: true,
+        newMessages: newMessagesCount,
+        totalProcessed: this.processedMessageIds.size
+      };
+
+    } catch (error: any) {
+      logger.error('Failed to poll for messages:', error);
+      return {
+        success: false,
+        newMessages: 0,
+        totalProcessed: this.processedMessageIds.size
+      };
+    }
+  }
+
+  private isValidFarmerMessage(msg: ReceivedSms): boolean {
+    // Skip if no sender or message
+    if (!msg.sender || !msg.message) {
+      return false;
+    }
+
+    // Should be a Kenyan mobile number
+    const cleanedSender = msg.sender.replace('+', '');
+    const isKenyanNumber = cleanedSender.startsWith('2547') ||
+      cleanedSender.startsWith('07');
+
+    if (!isKenyanNumber) {
+      logger.debug('Skipping non-Kenyan number:', { sender: msg.sender });
+      return false;
+    }
+
+    // Skip very short messages (likely errors)
+    if (msg.message.trim().length < 2) {
+      return false;
+    }
+
+    // Skip system messages
+    const systemKeywords = [
+      'DELIVERED', 'FAILED', 'SENT', 'ACCEPTED',
+      'Balance', 'Credit', 'Your balance',
+      'Dear customer', 'Service message'
+    ];
+
+    const upperMessage = msg.message.toUpperCase();
+    if (systemKeywords.some(keyword => upperMessage.includes(keyword))) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private async processIncomingMessage(msg: ReceivedSms): Promise<void> {
+    try {
+      const formattedPhone = formatPhoneNumber(msg.sender);
+
+      // 1. Track conversation
+      updateConversation(formattedPhone, msg.message, 'incoming');
+
+      // 2. Save to database
+      const logId = await saveIncomingMessageToDatabase(msg);
+
+      // 3. Process and auto-reply
+      const result = await processFarmerMessage(
+        formattedPhone,
+        msg.message.trim(),
+        msg.id,
+        logId ?? undefined
+      );
+
+      // 4. Log the interaction
+      if (result.processed && result.action) {
+        await logFarmerInteraction(
+          formattedPhone,
+          msg.message,
+          result.message || '',
+          result.action,
+          await isFarmerSubscribed(formattedPhone)
+        );
+      }
+
+      logger.info(`✅ Processed farmer message from ${formattedPhone}`, {
+        action: result.action,
+        processed: result.processed
+      });
+
+    } catch (error: any) {
+      logger.error(`Failed to process incoming message from ${msg.sender}:`, error);
+    }
+  }
+
+  getStats(): {
+    isRunning: boolean;
+    processedCount: number;
+    pollInterval: number;
+  } {
+    return {
+      isRunning: this.isRunning,
+      processedCount: this.processedMessageIds.size,
+      pollInterval: this.pollInterval
+    };
+  }
+
+  clearProcessedMessages(): number {
+    const count = this.processedMessageIds.size;
+    this.processedMessageIds.clear();
+    logger.info(`🧹 Cleared ${count} processed message IDs`);
+    return count;
+  }
+}
+
+// Create singleton instance
+const incomingSmsService = new IncomingSmsService();
+
+// Start polling automatically if enabled
+if (AUTO_POLL_SMS) {
+  setTimeout(() => {
+    incomingSmsService.startPolling(POLL_INTERVAL_MS);
+  }, 5000); // Start after 5 seconds
+}
+
+// ==================== HELPER FUNCTIONS ====================
 async function saveSmsLog(
   recipient: string,
   message: string,
@@ -509,6 +844,691 @@ async function saveSmsLog(
   }
 }
 
+// SIM-BASED CONVERSATION HELPER FUNCTIONS
+function updateConversation(
+  farmerPhone: string,
+  message: string,
+  direction: 'incoming' | 'outgoing'
+): void {
+  const key = farmerPhone;
+  const now = new Date();
+
+  if (!activeConversations.has(key)) {
+    activeConversations.set(key, {
+      farmerPhone,
+      lastMessage: direction === 'incoming' ? message : '',
+      lastReply: direction === 'outgoing' ? message : '',
+      messageCount: 1,
+      lastActivity: now
+    });
+  } else {
+    const conversation = activeConversations.get(key)!;
+    if (direction === 'incoming') {
+      conversation.lastMessage = message;
+    } else {
+      conversation.lastReply = message;
+    }
+    conversation.messageCount++;
+    conversation.lastActivity = now;
+    activeConversations.set(key, conversation);
+  }
+}
+
+async function saveIncomingMessageToDatabase(msg: {
+  id: string;
+  sender: string;
+  message: string;
+  receivedAt: string;
+  deviceId: string;
+  processed: boolean;
+}): Promise<string | null> {
+  try {
+    // Try to save to incoming_sms table
+    const result = await query(
+      `INSERT INTO incoming_sms (
+        sender, message, received_at, message_id, device_id, processed
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id`,
+      [
+        msg.sender,
+        msg.message,
+        new Date(msg.receivedAt),
+        msg.id,
+        msg.deviceId,
+        false
+      ]
+    );
+
+    const logId = result.rows[0]?.id;
+    logger.info('✅ Incoming message saved to incoming_sms', {
+      messageId: msg.id,
+      sender: msg.sender,
+      logId
+    });
+
+    return logId;
+  } catch (error: any) {
+    // If table doesn't exist yet or other error, fall back to sms_logs
+    logger.warn('Could not save to incoming_sms, using sms_logs fallback:', {
+      error: error.message,
+      sender: msg.sender
+    });
+    
+    try {
+      // FALLBACK: Save to sms_logs but with correct semantics
+      const fallbackResult = await query(
+        `INSERT INTO sms_logs (
+          recipient,  -- This is actually the SENDER (farmer's number)
+          message,    -- Farmer's message
+          sms_type,
+          status,
+          external_id,
+          reply_received,  -- TRUE because we received this message
+          reply_text,      -- The message they sent
+          reply_timestamp, -- When they sent it
+          sent_at,         -- When we received it
+          created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP)
+        RETURNING id`,
+        [
+          msg.sender,      // Farmer's number in recipient field
+          msg.message,
+          'alert',
+          'delivered',
+          msg.id,
+          true,           // This is a received message
+          msg.message,
+          new Date(msg.receivedAt),
+          new Date(msg.receivedAt)
+        ]
+      );
+      
+      return fallbackResult.rows[0]?.id;
+    } catch (fallbackError) {
+      logger.error('Both database saves failed:', fallbackError);
+      return null;
+    }
+  }
+}
+
+async function isFarmerSubscribed(farmerPhone: string): Promise<boolean> {
+  try {
+    const result = await query(
+      `SELECT is_active FROM sms_subscriptions WHERE phone = $1`,
+      [farmerPhone]
+    );
+    return result.rows[0]?.is_active === true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function logFarmerInteraction(
+  farmerPhone: string,
+  incoming: string,
+  outgoing: string,
+  action: string,
+  isSubscribed: boolean
+): Promise<void> {
+  try {
+    await query(
+      `INSERT INTO farmer_interactions (
+        farmer_phone,
+        incoming_message,
+        outgoing_message,
+        action,
+        is_subscribed,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
+      [farmerPhone, incoming, outgoing, action, isSubscribed]
+    );
+  } catch (error) {
+    logger.error('Failed to log farmer interaction:', error);
+  }
+}
+
+// ==================== MESSAGE PROCESSING ====================
+async function processFarmerMessage(
+  phone: string,
+  message: string,
+  messageId: string,
+  logId?: string
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  const userText = message.trim().toUpperCase();
+  let action = 'processed';
+  let replyContent = '';
+
+  try {
+    logger.info(`👨‍🌾 Processing farmer ${phone}: "${userText}"`);
+
+    // Get farmer context
+    const farmerContext = await getFarmerContext(phone);
+
+    // Process based on message content
+    if (userText === 'STOP') {
+      action = await handleUnsubscribe(phone);
+      replyContent = 'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe.';
+
+    } else if (userText === 'JOIN' || userText === 'START' || userText === 'YES') {
+      action = await handleSubscribe(phone);
+      replyContent = '✅ Welcome to AgriPrice! You are now subscribed.\n\n📍 Reply with location (e.g., NAIROBI) for prices\n📋 Reply HELP for commands\n❌ Reply STOP to unsubscribe';
+
+    } else if (userText === 'HELP' || userText === 'INFO') {
+      replyContent = `📱 AGRIHELP - Commands:\n\n📍 PRICE LOCATIONS:\n• NAIROBI\n• NAKURU\n• KISUMU\n• MOMBASA\n• ELDORET\n\n📋 OTHER COMMANDS:\n• JOIN - Subscribe\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
+      action = 'help_sent';
+
+    } else if (isLocationQuery(userText)) {
+      const location = extractLocationFromText(userText);
+      if (location) {
+        const prices = await getCropPricesByLocation(location);
+        if (prices) {
+          replyContent = `📊 ${location} MARKET PRICES:\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
+          action = 'prices_sent';
+
+          // If farmer is not subscribed, prompt them
+          if (!farmerContext.isSubscribed) {
+            replyContent += '\n\n💡 Want daily alerts? Reply JOIN';
+          }
+        } else {
+          replyContent = `❌ No data for ${location}.\n\nTry: NAIROBI, NAKURU, KISUMU\nOr reply HELP for commands`;
+          action = 'location_not_found';
+        }
+      }
+
+    } else if (userText.includes('THANK') || userText.includes('ASANTE')) {
+      replyContent = '🙏 Karibu! Happy to help.\n\nNeed more info? Reply HELP';
+      action = 'thank_you';
+
+    } else if (userText.includes('HABARI') || userText === 'HI' || userText === 'HELLO') {
+      replyContent = `👋 Habari! I'm AgriPrice Bot.\n\n📍 Reply with location for crop prices\n📋 Reply HELP for commands\n📞 Support: ${SUPPORT_PHONE}`;
+      action = 'greeting_reply';
+
+    } else {
+      // Unknown message - provide helpful response
+      replyContent = `❓ Sorry, I didn't understand: "${message}"\n\nTry:\n📍 NAIROBI (for prices)\n📋 HELP (for commands)\n📞 ${SUPPORT_PHONE}`;
+      action = 'unknown_message';
+    }
+
+    // Send the reply if we have content
+    if (replyContent) {
+      logger.info(`📤 Sending reply to ${phone}`, {
+        action,
+        replyLength: replyContent.length
+      });
+
+      const replyResult = await sendSmsMessage(
+        phone,
+        replyContent,
+        {
+          smsType: 'update',
+          sentBy: 'auto_reply_system'
+        }
+      );
+
+      if (replyResult.id || replyResult.external_id) {
+        // Track outgoing message in conversation
+        updateConversation(phone, replyContent, 'outgoing');
+
+        logger.info(`✅ Reply sent to ${phone}`, {
+          logId: replyResult.id,
+          externalId: replyResult.external_id,
+          messageLength: replyContent.length
+        });
+      } else {
+        logger.error(`❌ Failed to send reply to ${phone}`);
+        action = 'reply_failed';
+      }
+    }
+
+    return {
+      processed: true,
+      action,
+      message: replyContent
+    };
+
+  } catch (error: any) {
+    logger.error(`❌ Error processing message from ${phone}:`, error);
+
+    // Try to send error message
+    try {
+      const errorMessage = '⚠️ System error. Please try again later or contact support.';
+      await sendSmsMessage(
+        phone,
+        errorMessage,
+        { smsType: 'update' }
+      );
+
+      updateConversation(phone, errorMessage, 'outgoing');
+    } catch (smsError) {
+      logger.error('Failed to send error message:', smsError);
+    }
+
+    return {
+      processed: false,
+      action: 'error',
+      message: `Error: ${error.message}`
+    };
+  }
+}
+
+async function getFarmerContext(phone: string): Promise<{
+  isSubscribed: boolean;
+  lastInteraction: Date | null;
+  messageCount: number;
+}> {
+  try {
+    const subscriptionResult = await query(
+      `SELECT is_active, updated_at 
+       FROM sms_subscriptions 
+       WHERE phone = $1`,
+      [phone]
+    );
+
+    const historyResult = await query(
+      `SELECT COUNT(*) as message_count, MAX(created_at) as last_interaction
+       FROM sms_logs 
+       WHERE recipient = $1 
+       AND sms_type IN ('update', 'alert')`,
+      [phone]
+    );
+
+    return {
+      isSubscribed: subscriptionResult.rows[0]?.is_active === true,
+      lastInteraction: historyResult.rows[0]?.last_interaction,
+      messageCount: parseInt(historyResult.rows[0]?.message_count || '0')
+    };
+  } catch (error) {
+    logger.error('Error getting farmer context:', error);
+    return { isSubscribed: false, lastInteraction: null, messageCount: 0 };
+  }
+}
+
+function isLocationQuery(text: string): boolean {
+  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
+  return locations.some(loc => text === loc || text.includes(loc));
+}
+
+function extractLocationFromText(text: string): string | null {
+  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
+  for (const loc of locations) {
+    if (text === loc || text.includes(loc)) {
+      return loc;
+    }
+  }
+  return null;
+}
+
+// ==================== WEBHOOK HANDLERS ====================
+async function updateDeliveryStatus(
+  externalId: string,
+  status: string,
+  mobile: string
+): Promise<void> {
+  try {
+    const validStatus = getValidSmsStatus(status);
+    const statusColumn = validStatus === 'delivered' ? 'delivered_at' : 'sent_at';
+    const statusValue = validStatus === 'delivered' || validStatus === 'sent'
+      ? 'CURRENT_TIMESTAMP'
+      : 'NULL';
+
+    const result = await query(
+      `UPDATE sms_logs 
+       SET status = $1,
+           ${statusColumn} = ${statusValue},
+           created_at = CURRENT_TIMESTAMP
+       WHERE external_id = $2 
+       OR (recipient = $3 AND external_id IS NULL)
+       RETURNING id`,
+      [validStatus, externalId, mobile]
+    );
+
+    if (result.rowCount === 0) {
+      logger.warn('No matching SMS log found for delivery update', {
+        externalId,
+        mobile,
+        status: validStatus
+      });
+    } else {
+      logger.info('✅ Delivery status updated', {
+        rowsUpdated: result.rowCount,
+        externalId,
+        status: validStatus
+      });
+    }
+  } catch (error) {
+    logger.error('Failed to update delivery status:', error);
+  }
+}
+
+async function handleIncomingMessage(
+  smsId: string,
+  sender: string,
+  message: string,
+  receivedAt: string
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  try {
+    logger.info(`📨 MESSAGE_RECEIVED webhook`, {
+      smsId,
+      sender,
+      messagePreview: message?.substring(0, 50),
+      receivedAt
+    });
+
+    // This is TextBee confirming YOUR outgoing message was received for sending
+    // Update the SMS log status
+
+    const updateResult = await query(
+      `UPDATE sms_logs 
+       SET status = 'sent',
+           external_id = COALESCE(external_id, $1),
+           sent_at = COALESCE(sent_at, $2),
+           created_at = CURRENT_TIMESTAMP
+       WHERE (external_id = $1 OR message LIKE $3)
+       AND status = 'pending'
+       RETURNING id, recipient`,
+      [
+        smsId,
+        new Date(receivedAt),
+        `%${message?.substring(0, 50)}%`
+      ]
+    );
+
+    if ((updateResult?.rowCount ?? 0) > 0) {
+      logger.info(`✅ Updated SMS log for outgoing message`, {
+        smsId,
+        rowsUpdated: updateResult?.rowCount ?? 0
+      });
+    } else {
+      logger.warn(`No matching SMS log found for MESSAGE_RECEIVED`, {
+        smsId,
+        messagePreview: message?.substring(0, 50)
+      });
+    }
+
+    return {
+      processed: true,
+      action: 'outgoing_message_queued',
+      message: 'Outgoing SMS queued by TextBee'
+    };
+
+  } catch (error: any) {
+    logger.error('Failed to handle MESSAGE_RECEIVED webhook:', error);
+    return {
+      processed: false,
+      message: `Error: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageSent(data: any): Promise<{
+  processed: boolean;
+  action?: string;
+  message?: string;
+}> {
+  try {
+    const smsId = data.id || data.smsId;
+    const batchId = data.batchId || data.smsBatchId;
+    const recipient = data.recipient || data.to;
+    const message = data.message || data.text;
+
+    logger.info('✈️ MESSAGE SENT via TextBee', {
+      smsId,
+      batchId,
+      recipient,
+      messagePreview: message?.substring(0, 30)
+    });
+
+    // Update sms_logs for outgoing messages
+    await query(
+      `UPDATE sms_logs 
+       SET status = 'sent',
+           sent_at = CURRENT_TIMESTAMP,
+           external_id = COALESCE($1, external_id)
+       WHERE (external_id = $1 OR external_id = $2 OR recipient = $3)
+       RETURNING id`,
+      [smsId, batchId, recipient]
+    );
+
+    return {
+      processed: true,
+      action: 'message_sent',
+      message: `Message ${smsId} sent to ${recipient}`
+    };
+  } catch (error: any) {
+    logger.error('Failed to handle message sent:', error);
+    return {
+      processed: false,
+      message: `Error updating sent status: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageDelivered(data: any): Promise<{
+  processed: boolean;
+  action?: string;
+  message?: string;
+}> {
+  try {
+    const smsId = data.id || data.smsId;
+    const batchId = data.batchId || data.smsBatchId;
+    const recipient = data.recipient || data.to;
+
+    logger.info('✅ MESSAGE DELIVERED via TextBee', {
+      smsId,
+      batchId,
+      recipient
+    });
+
+    await query(
+      `UPDATE sms_logs 
+       SET status = 'delivered',
+           delivered_at = CURRENT_TIMESTAMP
+       WHERE (external_id = $1 OR external_id = $2 OR recipient = $3)
+       RETURNING id`,
+      [smsId, batchId, recipient]
+    );
+
+    return {
+      processed: true,
+      action: 'message_delivered',
+      message: `Message delivered to ${recipient}`
+    };
+  } catch (error: any) {
+    logger.error('Failed to handle message delivered:', error);
+    return {
+      processed: false,
+      message: `Error updating delivered status: ${error.message}`
+    };
+  }
+}
+
+async function handleMessageFailed(data: {
+  smsId: string;
+  smsBatchId: string;
+  recipient: string;
+  error?: string;
+}): Promise<{ processed: boolean; action?: string; message?: string }> {
+  const { smsId, smsBatchId, recipient, error } = data;
+  
+  try {
+    logger.error('❌ MESSAGE_FAILED webhook', {
+      smsId,
+      smsBatchId,
+      recipient,
+      error
+    });
+
+    await query(
+      `UPDATE sms_logs 
+       SET status = 'failed',
+           error_message = COALESCE($1, error_message),
+           created_at = CURRENT_TIMESTAMP
+       WHERE (external_id = $2 OR external_id = $3 OR recipient = $4)`,
+      [error, smsId, smsBatchId, recipient]
+    );
+
+    return {
+      processed: true,
+      action: 'message_failed',
+      message: `Message failed for ${recipient}: ${error || 'Unknown error'}`
+    };
+  } catch (err: any) {
+    logger.error('Failed to handle message failed:', err);
+    return {
+      processed: false,
+      message: `Error updating failed status: ${err.message}`
+    };
+  }
+}
+
+export const processTextSmsWebhook = async (
+  body: any,
+  headers?: any,
+  rawBody?: string
+): Promise<{ processed: boolean; action?: string; message?: string }> => {
+  try {
+    // TextBee uses TWO different webhook formats:
+    // 1. New format: { event: 'message.received', data: { ... } }
+    // 2. Old format: { webhookEvent: 'MESSAGE_RECEIVED', ... }
+
+    const { event, webhookEvent, data, ...rest } = body;
+    const actualEvent = event || webhookEvent;
+
+    if (!actualEvent) {
+      logger.warn('Missing event/webhookEvent in TextBee webhook', body);
+      return {
+        processed: false,
+        message: 'Missing event in webhook payload'
+      };
+    }
+
+    logger.info(`📩 TextBee webhook: ${actualEvent}`, {
+      format: event ? 'new_format' : 'old_format',
+      hasData: !!data,
+      bodyKeys: Object.keys(body)
+    });
+
+    // Handle different event types
+    switch (actualEvent.toLowerCase()) {
+      case 'message.received':  // ✅ NEW FORMAT: Farmer sends SMS
+      case 'message_received':  // ✅ OLD FORMAT: Farmer sends SMS
+        return await handleIncomingFarmerMessage(
+          data || rest  // data for new format, rest for old
+        );
+
+      case 'message.sent':      // ✅ New format
+      case 'message_sent':      // ✅ Old format
+        return await handleMessageSent(data || rest);
+
+      case 'message.delivered': // ✅ New format
+      case 'message_delivered': // ✅ Old format
+        return await handleMessageDelivered(data || rest);
+
+      case 'message.failed':    // ✅ New format
+      case 'message_failed':
+        const failedData = data || rest;
+        return await handleMessageFailed({
+          smsId: failedData.id || failedData.smsId,
+          smsBatchId: failedData.batchId || failedData.smsBatchId,
+          recipient: failedData.recipient || failedData.to,
+          error: failedData.error || failedData.message || failedData.reason
+        });
+
+      default:
+        logger.warn(`Unknown TextBee webhook event: ${actualEvent}`, body);
+        return {
+          processed: false,
+          action: 'unknown_event',
+          message: `Unknown event type: ${actualEvent}`
+        };
+    }
+
+  } catch (error: any) {
+    logger.error('❌ Failed to process TextBee webhook', {
+      error: error.message,
+      stack: error.stack,
+      body: JSON.stringify(body).substring(0, 500)
+    });
+
+    return {
+      processed: false,
+      message: `Error: ${error.message}`
+    };
+  }
+};
+
+async function handleIncomingFarmerMessage(data: any): Promise<{
+  processed: boolean;
+  action?: string;
+  message?: string;
+}> {
+  try {
+    // Handle both formats
+    const messageId = data.id || data.smsId;
+    const sender = data.sender || data.from;
+    const message = data.message || data.text || data.content;
+    const timestamp = data.timestamp || data.receivedAt || data.createdAt;
+    const deviceId = data.deviceId || TEXTBEE_DEVICE_ID;
+
+    if (!sender || !message) {
+      logger.warn('Incomplete incoming message data:', data);
+      return {
+        processed: false,
+        message: 'Missing sender or message in webhook'
+      };
+    }
+
+    logger.info('📨 FARMER MESSAGE RECEIVED VIA WEBHOOK', {
+      messageId,
+      sender,
+      messagePreview: message.substring(0, 50),
+      timestamp,
+      deviceId
+    });
+
+    // 1. Save to incoming_sms table
+    const incomingId = await saveIncomingMessageToDatabase({
+      id: messageId || `webhook_${Date.now()}`,
+      sender,
+      message,
+      receivedAt: timestamp || new Date().toISOString(),
+      deviceId: deviceId || TEXTBEE_DEVICE_ID,
+      processed: false
+    });
+
+    // 2. Process and auto-reply
+    const result = await processFarmerMessage(
+      sender,
+      message.trim(),
+      messageId,
+      incomingId || undefined
+    );
+
+    // 3. Update incoming message as processed
+    if (incomingId) {
+      await query(
+        `UPDATE incoming_sms SET processed = true WHERE id = $1`,
+        [incomingId]
+      );
+    }
+
+    return {
+      processed: true,
+      action: result.action || 'farmer_message_processed',
+      message: `Processed message from ${sender}`
+    };
+
+  } catch (error: any) {
+    logger.error('Failed to handle incoming farmer message:', error);
+    return {
+      processed: false,
+      message: `Error processing farmer message: ${error.message}`
+    };
+  }
+}
+
+
+// ==================== EXPORTED FUNCTIONS ====================
 export const sendSmsMessage = async (
   recipient: string,
   message: string,
@@ -645,7 +1665,7 @@ export const sendBulkSms = async (
   });
 
   const results: SmsLog[] = [];
- 
+
   if (validRecipients.length <= 100) {
     try {
       const smsClient = new TextBeeClient();
@@ -731,7 +1751,7 @@ export const sendBulkSms = async (
       logger.info('🔄 Falling back to individual SMS sends');
     }
   }
- 
+
   logger.info(`🔄 Sending ${validRecipients.length} SMS individually`);
 
   for (const recipient of validRecipients) {
@@ -785,7 +1805,7 @@ export const verifyWebhookSignature = (
       logger.warn('Missing signature or timestamp headers');
       return false;
     }
- 
+
     const eventTime = parseInt(timestamp, 10);
     const currentTime = Math.floor(Date.now() / 1000);
     const timeDifference = Math.abs(currentTime - eventTime);
@@ -798,14 +1818,14 @@ export const verifyWebhookSignature = (
       });
       return false;
     }
- 
+
     const signedPayload = `${timestamp}.${payload}`;
- 
+
     const crypto = require('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(signedPayload)
-      .digest('hex');  
+      .digest('hex');
     const signatureMatches = crypto.timingSafeEqual(
       Buffer.from(signature),
       Buffer.from(expectedSignature)
@@ -822,613 +1842,6 @@ export const verifyWebhookSignature = (
   } catch (error) {
     logger.error('Error verifying webhook signature:', error);
     return false;
-  }
-}; 
-
-async function updateDeliveryStatus(
-  externalId: string,
-  status: string,
-  mobile: string
-): Promise<void> {
-  try {
-    const validStatus = getValidSmsStatus(status);
-    const statusColumn = validStatus === 'delivered' ? 'delivered_at' : 'sent_at';
-    const statusValue = validStatus === 'delivered' || validStatus === 'sent'
-      ? 'CURRENT_TIMESTAMP'
-      : 'NULL';
-
-    const result = await query(
-      `UPDATE sms_logs 
-       SET status = $1,
-           ${statusColumn} = ${statusValue},
-           updated_at = CURRENT_TIMESTAMP
-       WHERE external_id = $2 
-       OR (recipient = $3 AND external_id IS NULL)
-       RETURNING id`,
-      [validStatus, externalId, mobile]
-    );
-
-    if (result.rowCount === 0) {
-      logger.warn('No matching SMS log found for delivery update', {
-        externalId,
-        mobile,
-        status: validStatus
-      });
-    } else {
-      logger.info('✅ Delivery status updated', {
-        rowsUpdated: result.rowCount,
-        externalId,
-        status: validStatus
-      });
-    }
-  } catch (error) {
-    logger.error('Failed to update delivery status:', error);
-  }
-}
-
-// ADD SIM-BASED CONVERSATION HELPER FUNCTIONS
-
-function updateConversation(
-  farmerPhone: string,
-  message: string,
-  direction: 'incoming' | 'outgoing'
-): void {
-  const key = farmerPhone;
-  const now = new Date();
-  
-  if (!activeConversations.has(key)) {
-    activeConversations.set(key, {
-      farmerPhone,
-      lastMessage: direction === 'incoming' ? message : '',
-      lastReply: direction === 'outgoing' ? message : '',
-      messageCount: 1,
-      lastActivity: now
-    });
-  } else {
-    const conversation = activeConversations.get(key)!;
-    if (direction === 'incoming') {
-      conversation.lastMessage = message;
-    } else {
-      conversation.lastReply = message;
-    }
-    conversation.messageCount++;
-    conversation.lastActivity = now;
-    activeConversations.set(key, conversation);
-  }
-}
-
-async function saveIncomingMessageWithContext(
-  smsId: string,
-  sender: string,
-  message: string,
-  receivedAt: string
-): Promise<void> {
-  try { 
-    // Check if this is a reply to a previous message
-    const contextResult = await query(
-      `SELECT id, message as original_message, sms_type
-       FROM sms_logs 
-       WHERE recipient = $1 
-       AND sent_at > NOW() - INTERVAL '24 hours'
-       AND sent_by IS NOT NULL
-       ORDER BY sent_at DESC 
-       LIMIT 1`,
-      [sender]
-    );
-
-    const contextId = contextResult.rows[0]?.id;
-    const originalMessage = contextResult.rows[0]?.original_message;
-
-    const result = await query(
-      `INSERT INTO sms_logs (
-        recipient,
-        message,
-        sms_type,
-        status,
-        external_id,
-        reply_received,
-        reply_text,
-        reply_timestamp,
-        in_reply_to_id,
-        sent_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING id`,
-      [
-        sender,
-        message,
-        'alert',
-        'delivered',
-        smsId,
-        true,
-        message,
-        new Date(receivedAt),
-        contextId || null,
-        new Date(receivedAt)
-      ]
-    );
-
-    if (contextId) {
-      logger.info('✅ Incoming message linked to previous conversation', {
-        sender,
-        contextId,
-        originalMessage: originalMessage?.substring(0, 50)
-      });
-    }
-  } catch (error) {
-    logger.error('Failed to save incoming message with context:', error);
-  }
-}
-
-async function handleIncomingMessage(
-  smsId: string,
-  sender: string,
-  message: string,
-  receivedAt: string
-): Promise<{ processed: boolean; action?: string; message?: string }> {
-  try {
-    logger.info(`📨 SMS received on SIM from ${sender}`, {
-      smsId,
-      message: message,
-      receivedAt,
-      deviceId: TEXTBEE_DEVICE_ID
-    });
-
-    // Track this conversation
-    updateConversation(sender, message, 'incoming');
-
-    // Save to database with conversation context
-    await saveIncomingMessageWithContext(smsId, sender, message, receivedAt);
-
-    // Process and reply
-    if (message && typeof message === 'string' && message.trim()) {
-      return await processFarmerMessage(sender, message.trim(), smsId);
-    }
-
-    return {
-      processed: true,
-      action: 'message_received',
-      message: 'Message received'
-    };
-    
-  } catch (error: any) {
-    logger.error('Failed to handle incoming SMS:', error);
-    return {
-      processed: false,
-      message: `Error: ${error.message}`
-    };
-  }
-}
-
-// ENHANCED PROCESSING FUNCTION
-async function processFarmerMessage(
-  phone: string,
-  message: string,
-  messageId: string
-): Promise<{ processed: boolean; action?: string; message?: string }> {
-  const userText = message.trim().toUpperCase();
-  let action = 'processed';
-  let replyContent = '';
-  
-  try {
-    logger.info(`👨‍🌾 Processing farmer ${phone}: "${userText}"`);
-
-    // Get farmer context (subscription status, last interaction)
-    const farmerContext = await getFarmerContext(phone);
-
-    // Process based on message content
-    if (userText === 'STOP') {
-      action = await handleUnsubscribe(phone);
-      replyContent = 'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe.';
-      
-    } else if (userText === 'JOIN' || userText === 'START' || userText === 'YES') {
-      action = await handleSubscribe(phone);
-      replyContent = '✅ Registered! You will get daily price alerts.\n\n📍 Send location (NAIROBI) for prices\n📋 Send HELP for commands\n❌ Send STOP to unsubscribe';
-      
-    } else if (userText === 'HELP' || userText === 'INFO') {
-      replyContent = `📱 AGRIHELP - Commands:\n\n📍 PRICES:\n• NAIROBI\n• NAKURU\n• KISUMU\n• MOMBASA\n• ELDORET\n\n📋 OTHER:\n• JOIN - Subscribe\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${process.env.SUPPORT_PHONE || '0700 000 000'}`;
-      action = 'help_sent';
-      
-    } else if (isLocationQuery(userText)) {
-      const location = extractLocationFromText(userText);
-      if (location) {
-        const prices = await getCropPricesByLocation(location);
-        if (prices) {
-          replyContent = `📊 ${location} PRICES:\n\n${prices}\n\n📍 Send another location\n📋 Send HELP`;
-          action = 'prices_sent';
-          
-          // If farmer is not subscribed, prompt them
-          if (!farmerContext.isSubscribed) {
-            replyContent += '\n\n💡 Want daily alerts? Send JOIN';
-          }
-        } else {
-          replyContent = `❌ No data for ${location}.\n\nTry: NAIROBI, NAKURU, KISUMU\nOr send HELP`;
-          action = 'location_not_found';
-        }
-      }
-      
-    } else if (userText.includes('THANK') || userText.includes('ASANTE')) {
-      replyContent = '🙏 Karibu! Happy to help.\n\nNeed more? Send HELP';
-      action = 'thank_you';
-      
-    } else if (userText.includes('HABARI') || userText === 'HI' || userText === 'HELLO') {
-      replyContent = `👋 Habari! I'm AgriPrice Bot.\n\n📍 Send location for crop prices\n📋 Send HELP for commands\n📞 Issues? Call ${process.env.SUPPORT_PHONE || 'support'}`;
-      action = 'greeting_reply';
-      
-    } else {
-      // Unknown message - provide helpful response
-      replyContent = `❓ Didn't understand: "${message}"\n\nTry:\n📍 NAIROBI (for prices)\n📋 HELP (for commands)\n📞 ${process.env.SUPPORT_PHONE || 'Call for help'}`;
-      action = 'unknown_message';
-      
-      // Log unknown messages for analysis
-      await logUnknownMessage(phone, message);
-    }
-
-    // Send the reply
-    if (replyContent) {
-      logger.info(`📤 Replying to ${phone}`, {
-        action,
-        replyLength: replyContent.length
-      });
-      
-      const replyResult = await sendSmsMessage(
-        phone,
-        replyContent,
-        { 
-          smsType: 'update',
-          sentBy: 'auto_reply_system'
-        }
-      );
-      
-      if (replyResult.id) {
-        // Track outgoing message in conversation
-        updateConversation(phone, replyContent, 'outgoing');
-        
-        logger.info(`✅ Reply sent to ${phone}`, {
-          logId: replyResult.id,
-          externalId: replyResult.external_id
-        });
-        
-        // Log the complete interaction
-        await logFarmerInteraction(
-          phone,
-          message,
-          replyContent,
-          action,
-          farmerContext.isSubscribed
-        );
-      } else {
-        logger.error(`❌ Failed to send reply to ${phone}`);
-        action = 'reply_failed';
-      }
-    }
-
-    return {
-      processed: true,
-      action,
-      message: `Processed: ${action}`
-    };
-
-  } catch (error: any) {
-    logger.error(`❌ Error processing message from ${phone}:`, error);
-    
-    // Try to send error message
-    try {
-      await sendSmsMessage(
-        phone,
-        '⚠️ System error. Please try again later or contact support.',
-        { smsType: 'update' }
-      );
-    } catch (smsError) {
-      logger.error('Failed to send error message:', smsError);
-    }
-    
-    return {
-      processed: false,
-      message: `Error: ${error.message}`
-    };
-  }
-}
-
-// NEW HELPER FUNCTIONS
-
-async function getFarmerContext(phone: string): Promise<{
-  isSubscribed: boolean;
-  lastInteraction: Date | null;
-  messageCount: number;
-}> {
-  try {
-    // Check subscription status
-    const subscriptionResult = await query(
-      `SELECT is_active, updated_at 
-       FROM sms_subscriptions 
-       WHERE phone = $1`,
-      [phone]
-    );
-    
-    // Get interaction history
-    const historyResult = await query(
-      `SELECT COUNT(*) as message_count, MAX(created_at) as last_interaction
-       FROM sms_logs 
-       WHERE recipient = $1 
-       AND sms_type IN ('update', 'alert')`,
-      [phone]
-    );
-    
-    return {
-      isSubscribed: subscriptionResult.rows[0]?.is_active === true,
-      lastInteraction: historyResult.rows[0]?.last_interaction,
-      messageCount: parseInt(historyResult.rows[0]?.message_count || '0')
-    };
-  } catch (error) {
-    logger.error('Error getting farmer context:', error);
-    return { isSubscribed: false, lastInteraction: null, messageCount: 0 };
-  }
-}
-
-function isLocationQuery(text: string): boolean {
-  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
-  return locations.some(loc => text === loc || text.startsWith(loc));
-}
-
-function extractLocationFromText(text: string): string | null {
-  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
-  for (const loc of locations) {
-    if (text === loc || text.startsWith(loc)) {
-      return loc;
-    }
-  }
-  return null;
-}
-
-async function logUnknownMessage(farmerPhone: string, message: string): Promise<void> {
-  try {
-    await query(
-      `INSERT INTO unknown_messages (
-        farmer_phone,
-        message,
-        created_at
-      ) VALUES ($1, $2, CURRENT_TIMESTAMP)`,
-      [farmerPhone, message]
-    );
-  } catch (error) {
-    logger.error('Failed to log unknown message:', error);
-  }
-}
-
-async function logFarmerInteraction(
-  farmerPhone: string,
-  incoming: string,
-  outgoing: string,
-  action: string,
-  isSubscribed: boolean
-): Promise<void> {
-  try {
-    await query(
-      `INSERT INTO farmer_interactions (
-        farmer_phone,
-        incoming_message,
-        outgoing_message,
-        action,
-        is_subscribed,
-        created_at
-      ) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
-      [farmerPhone, incoming, outgoing, action, isSubscribed]
-    );
-  } catch (error) {
-    logger.error('Failed to log farmer interaction:', error);
-  }
-}
-
-async function handleMessageSent(
-  smsId: string,
-  body: any
-): Promise<{ processed: boolean; action?: string; message?: string }> {
-  try {
-    const { recipients, sentAt } = body;
-
-    logger.info(`✈️ Message sent update`, {
-      smsId,
-      recipients,
-      sentAt
-    });
-
-    if (sentAt) {
-      await query(
-        `UPDATE sms_logs 
-         SET status = 'sent',
-             sent_at = $1,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE external_id = $2 OR recipient = $3`,
-        [new Date(sentAt), smsId, recipients?.[0]]
-      );
-    } else {
-      await updateDeliveryStatus(smsId, 'SENT', recipients?.[0]);
-    }
-
-    return {
-      processed: true,
-      action: 'message_sent',
-      message: `Message marked as sent: ${smsId}`
-    };
-  } catch (error: any) {
-    logger.error('Failed to handle message sent:', error);
-    return {
-      processed: false,
-      message: `Error updating sent status: ${error.message}`
-    };
-  }
-}
-
-async function handleMessageDelivered(
-  smsId: string,
-  body: any
-): Promise<{ processed: boolean; action?: string; message?: string }> {
-  try {
-    const { recipients, deliveredAt } = body;
-
-    logger.info(`✅ Message delivered`, {
-      smsId,
-      recipients,
-      deliveredAt
-    });
-
-    if (deliveredAt) {
-      await query(
-        `UPDATE sms_logs 
-         SET status = 'delivered',
-             delivered_at = $1,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE external_id = $2 OR recipient = $3`,
-        [new Date(deliveredAt), smsId, recipients?.[0]]
-      );
-    } else {
-      await updateDeliveryStatus(smsId, 'DELIVERED', recipients?.[0]);
-    }
-
-    return {
-      processed: true,
-      action: 'message_delivered',
-      message: `Message marked as delivered: ${smsId}`
-    };
-  } catch (error: any) {
-    logger.error('Failed to handle message delivered:', error);
-    return {
-      processed: false,
-      message: `Error updating delivered status: ${error.message}`
-    };
-  }
-}
-
-async function handleMessageFailed(
-  smsId: string,
-  body: any
-): Promise<{ processed: boolean; action?: string; message?: string }> {
-  try {
-    const { recipients, failedAt, error: errorMessage } = body;
-
-    logger.error(`❌ Message failed`, {
-      smsId,
-      recipients,
-      failedAt,
-      errorMessage
-    });
-
-    await updateDeliveryStatus(smsId, 'FAILED', recipients?.[0]);
-
-    if (errorMessage) {
-      await query(
-        `UPDATE sms_logs 
-         SET error_message = $1,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE external_id = $2 OR recipient = $3`,
-        [errorMessage, smsId, recipients?.[0]]
-      );
-    }
-
-    return {
-      processed: true,
-      action: 'message_failed',
-      message: `Message marked as failed: ${smsId}`
-    };
-  } catch (error: any) {
-    logger.error('Failed to handle message failed:', error);
-    return {
-      processed: false,
-      message: `Error updating failed status: ${error.message}`
-    };
-  }
-}
-
-export const processTextSmsWebhook = async (
-  body: any,
-  headers?: any,
-  rawBody?: string
-): Promise<{ processed: boolean; action?: string; message?: string }> => {
-  try {
-    const signature = headers?.['x-textbee-signature'] ||
-      headers?.['x-signature'] ||
-      headers?.['signature'];
-    const timestamp = headers?.['x-textbee-timestamp'] ||
-      headers?.['x-timestamp'] ||
-      headers?.['timestamp'];
-
-    if (rawBody && signature && timestamp) {
-      const isValid = verifyWebhookSignature(rawBody, signature, timestamp);
-      if (!isValid) {
-        logger.error('Invalid webhook signature', {
-          signature: signature?.substring(0, 20) + '...',
-          timestamp,
-          bodyKeys: Object.keys(body)
-        });
-        return {
-          processed: false,
-          action: 'signature_invalid',
-          message: 'Invalid webhook signature'
-        };
-      }
-    } else if (TEXTBEE_WEBHOOK_SECRET) {
-      logger.warn('Missing signature or timestamp headers, but secret is configured');
-    }
-
-    const {
-      smsId,
-      sender,
-      message,
-      receivedAt,
-      deviceId,
-      webhookSubscriptionId,
-      webhookEvent
-    } = body;
-
-    if (!webhookEvent) {
-      logger.warn('Missing webhookEvent in payload', body);
-      return {
-        processed: false,
-        message: 'Missing webhookEvent in payload'
-      };
-    }
-
-    logger.info(`📩 TextBee webhook received`, {
-      event: webhookEvent,
-      smsId,
-      sender,
-      deviceId,
-      webhookSubscriptionId
-    });
-
-    switch (webhookEvent) {
-      case 'MESSAGE_RECEIVED':
-        return await handleIncomingMessage(smsId, sender, message, receivedAt);
-
-      case 'MESSAGE_SENT':
-        return await handleMessageSent(smsId, body);
-
-      case 'MESSAGE_DELIVERED':
-        return await handleMessageDelivered(smsId, body);
-
-      case 'MESSAGE_FAILED':
-        return await handleMessageFailed(smsId, body);
-
-      default:
-        logger.warn(`Unknown webhook event: ${webhookEvent}`, body);
-        return {
-          processed: true,
-          action: 'unknown_event',
-          message: `Unknown event type: ${webhookEvent}`
-        };
-    }
-
-  } catch (error: any) {
-    logger.error('❌ Failed to process TextBee webhook', {
-      error: error.message,
-      stack: error.stack,
-      body: JSON.stringify(body).substring(0, 500)
-    });
-
-    return {
-      processed: false,
-      message: `Error: ${error.message}`
-    };
   }
 };
 
@@ -1448,67 +1861,157 @@ export const processSmsWebhook = async (
   }
 };
 
-// KEEP EXISTING processReplyMessage AS FALLBACK
-async function processReplyMessage(
-  phone: string,
-  message: string,
-  messageId: string
-): Promise<{ processed: boolean; action?: string; message?: string }> {
+// ==================== NEW TWO-WAY SMS FUNCTIONS ====================
+export const checkForIncomingSms = async (): Promise<{
+  success: boolean;
+  messages: ReceivedSms[];
+  stats: any;
+}> => {
   try {
-    const userText = message.trim();
-    const upperText = userText.toUpperCase();
-
-    logger.info(`📨 Reply received`, {
-      messageId,
-      phone,
-      text: userText
-    });
-
-    let action = 'processed';
-
-    switch (upperText) {
-      case 'STOP':
-        action = await handleUnsubscribe(phone);
-        break;
-
-      case 'JOIN':
-      case 'START':
-      case 'YES':
-        action = await handleSubscribe(phone);
-        break;
-
-      case 'HELP':
-      case 'INFO':
-        action = await sendHelpMessage(phone);
-        break;
-
-      default:
-        action = await handleLocationRequest(phone, upperText);
-        break;
-    }
-
-    logger.info(`✅ Reply processed`, {
-      action,
-      phone,
-      messageId
-    });
+    const smsClient = new TextBeeClient();
+    const result = await smsClient.getReceivedSms(20, 0);
 
     return {
-      processed: true,
-      action,
-      message: `Reply processed: ${action}`
+      success: result.success,
+      messages: result.messages,
+      stats: {
+        totalMessages: result.total,
+        receivedMessages: result.messages.length,
+        pollingStats: incomingSmsService.getStats()
+      }
+    };
+  } catch (error: any) {
+    logger.error('Failed to check incoming SMS:', error);
+    return {
+      success: false,
+      messages: [],
+      stats: { error: error.message }
+    };
+  }
+};
+
+export const startSmsPolling = (intervalMs: number = POLL_INTERVAL_MS): void => {
+  incomingSmsService.startPolling(intervalMs);
+};
+
+export const stopSmsPolling = (): void => {
+  incomingSmsService.stopPolling();
+};
+
+export const getPollingStats = () => {
+  return incomingSmsService.getStats();
+};
+
+export const testTwoWaySms = async (): Promise<{
+  success: boolean;
+  steps: Array<{ step: string; success: boolean; details: any }>;
+  recommendations: string[];
+}> => {
+  const steps = [];
+  const recommendations = [];
+
+  try {
+    // Step 1: Test TextBee connection
+    const smsClient = new TextBeeClient();
+    steps.push({
+      step: 'TextBee Client Initialization',
+      success: true,
+      details: { deviceId: TEXTBEE_DEVICE_ID, simNumber: SIM_PHONE_NUMBER }
+    });
+
+    // Step 2: Test getting received SMS
+    const receivedResult = await smsClient.getReceivedSms(5, 0);
+    steps.push({
+      step: 'Get Received SMS API',
+      success: receivedResult.success,
+      details: {
+        canAccess: receivedResult.success,
+        messageCount: receivedResult.messages.length,
+        sampleMessages: receivedResult.messages.slice(0, 2)
+      }
+    });
+
+    if (!receivedResult.success) {
+      recommendations.push('Check TextBee API permissions for reading received SMS');
+    }
+
+    // Step 3: Test sending SMS
+    try {
+      const testSend = await sendSmsMessage(
+        SIM_PHONE_NUMBER, // Send to yourself
+        'Test message for two-way SMS. Reply with NAIROBI.',
+        { smsType: 'test' }
+      );
+
+      steps.push({
+        step: 'Send SMS Test',
+        success: !!testSend.id,
+        details: {
+          messageId: testSend.id,
+          externalId: testSend.external_id,
+          status: testSend.status
+        }
+      });
+    } catch (sendError: any) {
+      steps.push({
+        step: 'Send SMS Test',
+        success: false,
+        details: { error: sendError.message }
+      });
+    }
+
+    // Step 4: Check polling service
+    steps.push({
+      step: 'Polling Service Status',
+      success: true,
+      details: incomingSmsService.getStats()
+    });
+
+    // Step 5: Check database connection
+    const dbTest = await testDatabaseConnection();
+    steps.push({
+      step: 'Database Connection',
+      success: dbTest.connected,
+      details: dbTest
+    });
+
+    // Generate recommendations
+    if (receivedResult.messages.length === 0) {
+      recommendations.push('No received messages found. Test by: 1. Send SMS to a farmer 2. Have farmer reply 3. Check logs');
+      recommendations.push('Make sure your SIM card is properly inserted in the TextBee device.');
+    }
+
+    if (!receivedResult.success) {
+      recommendations.push('TextBee incoming SMS API might require different permissions.');
+    }
+
+    recommendations.push(`To test auto-reply: Send SMS to ${SIM_PHONE_NUMBER} and reply with "NAIROBI"`);
+
+    return {
+      success: steps.every(s => s.success),
+      steps,
+      recommendations
     };
 
   } catch (error: any) {
-    logger.error('Failed to process reply message:', error);
+    logger.error('Two-way SMS test failed:', error);
+    steps.push({
+      step: 'Overall Test',
+      success: false,
+      details: { error: error.message }
+    });
+
     return {
-      processed: false,
-      message: `Error: ${error.message}`
+      success: false,
+      steps,
+      recommendations: ['Check TextBee API configuration', 'Verify device is online']
     };
   }
-}
+};
 
+// ==================== KEEP EXISTING FUNCTIONS ====================
 export const testReplySystem = async (reply: SmsReply) => {
+  // ... keep existing testReplySystem function exactly as it is ...
   try {
     const phone = formatPhoneNumber(reply.fromNumber);
     const message = reply.text.trim();
@@ -1530,7 +2033,7 @@ export const testReplySystem = async (reply: SmsReply) => {
           reply_timestamp = $2,
           status = COALESCE($3, status),
           delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-          updated_at = CURRENT_TIMESTAMP
+          created_at = CURRENT_TIMESTAMP
       WHERE external_id = $4
       RETURNING *
       `,
@@ -1546,7 +2049,7 @@ export const testReplySystem = async (reply: SmsReply) => {
             reply_timestamp = $2,
             status = COALESCE($3, status),
             delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-            updated_at = CURRENT_TIMESTAMP
+            created_at = CURRENT_TIMESTAMP
         WHERE recipient = $4
         ORDER BY sent_at DESC
         LIMIT 1
@@ -1582,7 +2085,7 @@ export const testReplySystem = async (reply: SmsReply) => {
               reply_timestamp = $2,
               status = COALESCE($3, status),
               delivered_at = CURRENT_TIMESTAMP,
-              updated_at = CURRENT_TIMESTAMP
+              created_at = CURRENT_TIMESTAMP
           WHERE id = $4
           `,
           [message, replyTime, reply.status || 'delivered', newLog.id]
@@ -1708,7 +2211,7 @@ async function sendHelpMessage(phone: string): Promise<string> {
 • Reply JOIN to subscribe/resubscribe
 • Reply HELP for this information
 
-📞 Support: contact@agriprice.com`;
+📞 Support: ${SUPPORT_PHONE}`;
 
   await sendSmsMessage(
     phone,
@@ -1920,7 +2423,7 @@ export const getTextSmsBalance = async (): Promise<number> => {
     logger.error('Failed to get TextBee balance:', error);
     return 0;
   }
-}; 
+};
 
 export const testDatabaseConnection = async (): Promise<{
   connected: boolean;
@@ -1990,7 +2493,7 @@ export const testDatabaseConnection = async (): Promise<{
       error: error.message
     };
   }
-}; 
+};
 
 export const sendPriceAlert = async (
   cropName: string,
@@ -2078,81 +2581,7 @@ export const sendDailyPriceUpdate = async (sentBy?: string): Promise<void> => {
   }
 };
 
-// ADD NEW FUNCTIONS FOR SIM-BASED SMS
-export const testSimBasedSms = async (): Promise<{
-  success: boolean;
-  simNumber?: string;
-  deviceId: string;
-  instructions: string;
-  testCommand: string;
-  activeConversations: Array<[string, ConversationContext]>;
-}> => {
-  try {
-    const testInstructions = `
-🎯 SIM-BASED SMS SETUP CONFIRMED
-
-YOUR SETUP:
-• Device ID: ${TEXTBEE_DEVICE_ID}
-• SIM Card: YOUR personal SIM in TextBee device
-• Farmers see: YOUR phone number when you send SMS
-• Replies come to: YOUR phone number (read by TextBee)
-
-✅ WHAT'S WORKING:
-1. You can send SMS to farmers via API ✓
-2. Farmers can reply to your SMS ✓
-3. TextBee reads replies from your SIM ✓
-4. Webhook sends to your server ✓
-
-🔧 TEST INSTRUCTIONS:
-
-STEP 1 - Send test SMS to yourself:
-await sendSmsMessage(
-  "${SIM_PHONE_NUMBER}",  // ← Your own number
-  "Test - Reply with NAIROBI",
-  { smsType: 'test' }
-);
-
-STEP 2 - Reply from your phone:
-• Wait for SMS on your phone
-• Reply with: "NAIROBI"
-• TextBee should forward to webhook
-• System should auto-reply
-
-STEP 3 - Test with farmer number:
-await sendSmsMessage(
-  "+254712345678",  // ← Farmer's number
-  "AgriPrice: Reply HELP for commands",
-  { smsType: 'update' }
-);
-
-📝 IMPORTANT NOTES:
-• Farmers MUST reply to the SMS from YOUR number
-• Each reply creates a new conversation thread
-• Use short codes like NAIROBI, HELP, STOP
-• System tracks conversations by phone number
-`;
-
-    return {
-      success: true,
-      simNumber: SIM_PHONE_NUMBER,
-      deviceId: TEXTBEE_DEVICE_ID || 'Not configured',
-      instructions: testInstructions,
-      testCommand: `curl -X POST ${process.env.APP_BASE_URL}/api/v1/sms/webhook -H "Content-Type: application/json" -d '{"smsId":"test","sender":"+254712345678","message":"NAIROBI","webhookEvent":"MESSAGE_RECEIVED"}'`,
-      activeConversations: Array.from(activeConversations.entries())
-    };
-
-  } catch (error: any) {
-    logger.error('SIM-based SMS test failed:', error);
-    return {
-      success: false,
-      deviceId: TEXTBEE_DEVICE_ID || 'Not configured',
-      instructions: `Error: ${error.message}`,
-      testCommand: '',
-      activeConversations: []
-    };
-  }
-};
-
+// ==================== CONVERSATION MANAGEMENT ====================
 export const getActiveConversations = (): Array<[string, ConversationContext]> => {
   return Array.from(activeConversations.entries());
 };
@@ -2173,6 +2602,7 @@ export const clearAllConversations = (): number => {
   return count;
 };
 
+// ==================== DEFAULT EXPORT ====================
 export default {
   // Core SMS functions
   sendSmsMessage,
@@ -2181,32 +2611,38 @@ export default {
   validatePhoneNumber,
   getValidSmsType,
   getValidSmsStatus,
-  
+
   // Webhook functions
   processTextSmsWebhook,
   processSmsWebhook,
   verifyWebhookSignature,
-  
+
   // Test functions
   testReplySystem,
-  testSimBasedSms, // NEW: SIM-based testing
+  testTwoWaySms, // NEW: Replaces testSimBasedSms
   simulateTextBeeWebhook,
   testTextSmsConnection,
   testDatabaseConnection,
-  
+
   // Subscription management
   subscribeUser,
   unsubscribeUser,
   getSubscribedNumbers,
-  
+
   // Balance function
   getTextSmsBalance,
-  
+
   // Alerts
   sendPriceAlert,
   sendDailyPriceUpdate,
-  
-  // Conversation tracking (NEW)
+
+  // Two-way SMS Management (NEW)
+  checkForIncomingSms,
+  startSmsPolling,
+  stopSmsPolling,
+  getPollingStats,
+
+  // Conversation tracking
   getActiveConversations,
   getConversationByPhone,
   clearConversation,

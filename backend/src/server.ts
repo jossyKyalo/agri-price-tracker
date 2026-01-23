@@ -78,6 +78,7 @@ app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
 app.use(`/api/${API_VERSION}/regions`, regionRoutes);
 app.use(`/api/${API_VERSION}/admin/alerts`, alertsRoutes)
 app.use(`/api/${API_VERSION}/stats`, statsRoutes)
+app.use('/api/sms', smsRoutes);
 
  
 app.use('*', (req, res) => {

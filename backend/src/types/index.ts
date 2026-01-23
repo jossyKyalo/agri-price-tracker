@@ -247,11 +247,12 @@ export interface PredictionResponse {
 }
 
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = any, S=string> {
   success: boolean;
   message: string;
   data?: T;
-  error?: string;
+  error?: string; 
+  summary?: S;
   pagination?: {
     page: number;
     limit: number;
