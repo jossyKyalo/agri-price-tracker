@@ -59,7 +59,7 @@ export const handleSmsWebhook = async (req: Request, res: Response, next: NextFu
     } else {
       logger.warn(`⚠️ SMS webhook not fully processed: ${result.message}`);
       
-      res.status(200).json({ // Still 200 to prevent retries
+      res.status(200).json({ 
         success: false,
         message: result.message,
         error: 'Webhook received but not fully processed'
