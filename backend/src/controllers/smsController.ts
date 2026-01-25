@@ -8,8 +8,7 @@ import {
   processSmsWebhook,
   processTextSmsWebhook, 
   testReplySystem,
-  formatPhoneNumber,
-  // NEW: Two-way SMS imports
+  formatPhoneNumber, 
   checkForIncomingSms,
   startSmsPolling,
   stopSmsPolling,
@@ -35,15 +34,14 @@ import type {
   ApiResponse,
   SendSmsWithReplyRequest 
 } from '../types/index';
-
-// ==================== WEBHOOK HANDLERS ====================
+ 
 
 export const handleSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try { 
     const result = await processTextSmsWebhook(req.body, req.headers, JSON.stringify(req.body));
     
     if (result.processed) {
-      logger.info(`📩 SMS webhook processed successfully: ${result.action}`, {
+      logger.info(`SMS webhook processed successfully: ${result.action}`, {
         action: result.action,
         message: result.message
       });
@@ -57,7 +55,7 @@ export const handleSmsWebhook = async (req: Request, res: Response, next: NextFu
         }
       });
     } else {
-      logger.warn(`⚠️ SMS webhook not fully processed: ${result.message}`);
+      logger.warn(`SMS webhook not fully processed: ${result.message}`);
       
       res.status(200).json({ 
         success: false,
@@ -66,9 +64,9 @@ export const handleSmsWebhook = async (req: Request, res: Response, next: NextFu
       });
     }
   } catch (error: any) {
-    logger.error('❌ Error processing SMS webhook:', error);
+    logger.error('Error processing SMS webhook:', error);
     
-    res.status(200).json({ // Always 200 for webhooks
+    res.status(200).json({  
       success: false,
       error: 'Internal server error',
       message: error.message
@@ -78,9 +76,9 @@ export const handleSmsWebhook = async (req: Request, res: Response, next: NextFu
 
 export const handleTextBeeWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    logger.info('📩 TextBee webhook received', {
+    logger.info('TextBee webhook received', {
       path: req.path,
-      event: req.body?.event || req.body?.webhookEvent, // Log both
+      event: req.body?.event || req.body?.webhookEvent,  
       sender: req.body?.sender || req.body?.data?.sender,
       messagePreview: (req.body?.message || req.body?.data?.message)?.substring(0, 50) 
     });
@@ -92,7 +90,7 @@ export const handleTextBeeWebhook = async (req: Request, res: Response, next: Ne
     );
     
     if (result.processed) {
-      logger.info(`✅ TextBee webhook processed: ${result.action}`, {
+      logger.info(`TextBee webhook processed: ${result.action}`, {
         action: result.action,
         message: result.message
       });
@@ -106,7 +104,7 @@ export const handleTextBeeWebhook = async (req: Request, res: Response, next: Ne
         }
       });
     } else {
-      logger.warn(`⚠️ TextBee webhook not fully processed: ${result.message}`);
+      logger.warn(`TextBee webhook not fully processed: ${result.message}`);
       
       res.status(200).json({
         success: false,
@@ -115,7 +113,7 @@ export const handleTextBeeWebhook = async (req: Request, res: Response, next: Ne
       });
     }
   } catch (error: any) {
-    logger.error('❌ Error processing TextBee webhook:', error);
+    logger.error('Error processing TextBee webhook:', error);
     
     res.status(200).json({
       success: false,
@@ -124,8 +122,7 @@ export const handleTextBeeWebhook = async (req: Request, res: Response, next: Ne
     });
   }
 };
-
-// ==================== TWO-WAY SMS MANAGEMENT ====================
+ 
 
 export const checkIncomingSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -162,7 +159,7 @@ export const startPollingSms = async (req: Request, res: Response, next: NextFun
     
     const response: ApiResponse = {
       success: true,
-      message: `✅ SMS polling started with ${interval}ms interval`,
+      message: `SMS polling started with ${interval}ms interval`,
       data: {
         interval: Number(interval),
         stats: getPollingStats(),
@@ -182,7 +179,7 @@ export const stopPollingSms = async (req: Request, res: Response, next: NextFunc
     
     const response: ApiResponse = {
       success: true,
-      message: '⏹️ SMS polling stopped',
+      message: 'SMS polling stopped',
       data: {
         stats: getPollingStats()
       }
@@ -200,7 +197,7 @@ export const getSmsPollingStats = async (req: Request, res: Response, next: Next
     
     const response: ApiResponse = {
       success: true,
-      message: '📊 SMS polling stats retrieved',
+      message: 'SMS polling stats retrieved',
       data: {
         ...stats,
         status: stats.isRunning ? 'active' : 'inactive',
@@ -220,7 +217,7 @@ export const testTwoWaySmsSystem = async (req: Request, res: Response, next: Nex
     
     const response: ApiResponse = {
       success: result.success,
-      message: result.success ? '✅ Two-way SMS test completed' : '❌ Two-way SMS test failed',
+      message: result.success ? 'Two-way SMS test completed' : 'Two-way SMS test failed',
       data: {
         steps: result.steps,
         recommendations: result.recommendations,
@@ -249,7 +246,7 @@ export const getSmsConversations = async (req: Request, res: Response, next: Nex
     
     const response: ApiResponse = {
       success: true,
-      message: '💬 Active conversations retrieved',
+      message: 'Active conversations retrieved',
       data: {
         conversations: conversations.map((item: any) => {
           const [phoneNumber, context] = item as [string, any];
@@ -290,7 +287,7 @@ export const clearSmsConversation = async (req: Request, res: Response, next: Ne
     
     const response: ApiResponse = {
       success: true,
-      message: cleared ? '🗑️ Conversation cleared' : '⚠️ Conversation not found',
+      message: cleared ? 'Conversation cleared' : 'Conversation not found',
       data: {
         phone,
         cleared,
@@ -348,8 +345,7 @@ export const pollSmsNow = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
-
-// ==================== SMS SENDING ====================
+ 
 
 export const sendSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -363,20 +359,17 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
 
     const sentBy = req.user!.id;
     let finalMessage = message;
-
-    // If template is used, process variables
+ 
     if (template_id && template_variables) {
       const templateResult = await query('SELECT template FROM sms_templates WHERE id = $1', [template_id]);
       if (templateResult.rows.length > 0) {
-        finalMessage = templateResult.rows[0].template;
-        // Replace variables in template
+        finalMessage = templateResult.rows[0].template; 
         Object.entries(template_variables).forEach(([key, value]) => {
           finalMessage = finalMessage.replace(new RegExp(`{${key}}`, 'g'), value);
         });
       }
     }
-
-    // Send SMS using TextBee
+ 
     const smsResults = await sendBulkSms(recipients, finalMessage, sms_type, sentBy);
 
     logger.info(`📤 SMS sent via TextBee to ${recipients.length} recipients by ${req.user!.email}`, {
@@ -386,11 +379,11 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
 
     const response: ApiResponse = {
       success: true,
-      message: `✅ SMS sent to ${smsResults.length} recipients`,
+      message: `SMS sent to ${smsResults.length} recipients`,
       data: {
         sent: smsResults.filter(r => r.status === 'sent').length,
         failed: smsResults.filter(r => r.status === 'failed').length,
-        results: smsResults.slice(0, 5), // Return first 5 for preview
+        results: smsResults.slice(0, 5),  
         total: smsResults.length
       }
     };
@@ -447,11 +440,11 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
       await new Promise(r => setTimeout(r, 200));
     }
 
-    logger.info(`📤 SMS with reply enabled sent to ${recipients.length} recipients by ${req.user!.email}`);
+    logger.info(`SMS with reply enabled sent to ${recipients.length} recipients by ${req.user!.email}`);
 
     const response: ApiResponse = {
       success: true,
-      message: `✅ SMS sent to ${smsResults.length} recipients with reply capability`,
+      message: `SMS sent to ${smsResults.length} recipients with reply capability`,
       data: {
         sent: smsResults.filter(r => r.status === 'sent').length,
         failed: smsResults.filter(r => r.status === 'failed').length,
@@ -467,8 +460,7 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
-
-// ==================== TESTING ====================
+ 
 
 export const testSmsReplySystem = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -496,7 +488,7 @@ export const testSmsReplySystem = async (req: Request, res: Response, next: Next
 
     const response: ApiResponse = {
       success: result.success,
-      message: result.success ? '✅ Test reply system is working' : '❌ Test reply system failed',
+      message: result.success ? 'Test reply system is working' : 'Test reply system failed',
       data: {
         ...result,
         test_details: {
@@ -522,7 +514,7 @@ export const testTextSmsConnectionHandler = async (req: Request, res: Response, 
 
     const response: ApiResponse = {
       success: connectionResult.isActive,
-      message: connectionResult.isActive ? '✅ TextBee connection is active' : '❌ TextBee connection failed',
+      message: connectionResult.isActive ? 'TextBee connection is active' : 'TextBee connection failed',
       data: {
         isActive: connectionResult.isActive,
         balance: balance,
@@ -555,7 +547,7 @@ export const sendTestSms = async (req: Request, res: Response, next: NextFunctio
 
     const response: ApiResponse = {
       success: result.status === 'sent',
-      message: result.status === 'sent' ? '✅ Test SMS sent successfully' : '❌ Failed to send test SMS',
+      message: result.status === 'sent' ? 'Test SMS sent successfully' : 'Failed to send test SMS',
       data: {
         recipient: result.recipient,
         message: result.message?.substring(0, 50) + '...',
@@ -571,8 +563,7 @@ export const sendTestSms = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
-
-// ==================== SMS LOGS & REPLIES ====================
+ 
 
 export const getSmsReplies = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -639,7 +630,7 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
 
     const response: ApiResponse = {
       success: true,
-      message: '💬 SMS replies retrieved successfully',
+      message: 'SMS replies retrieved successfully',
       data: result.rows.map(row => ({
         id: row.id,
         phone: row.recipient,
@@ -715,7 +706,7 @@ export const getSmsLogs = async (req: Request, res: Response, next: NextFunction
 
     const response: ApiResponse<SmsLog[]> = {
       success: true,
-      message: `📋 SMS logs retrieved successfully - Total: ${total}, With Replies: ${result.rows.filter(r => r.reply_received).length}, Two-way: ${total > 0 ? Math.round((result.rows.filter(r => r.reply_received).length / total) * 100) : 0}%`,
+      message: `SMS logs retrieved successfully - Total: ${total}, With Replies: ${result.rows.filter(r => r.reply_received).length}, Two-way: ${total > 0 ? Math.round((result.rows.filter(r => r.reply_received).length / total) * 100) : 0}%`,
       data: result.rows,
       pagination: {
         page: Number(page),
@@ -730,8 +721,7 @@ export const getSmsLogs = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
-
-// ==================== SMS TEMPLATES ====================
+ 
 
 export const createSmsTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -745,11 +735,11 @@ export const createSmsTemplate = async (req: Request, res: Response, next: NextF
       [name, template, JSON.stringify(variables || []), sms_type, createdBy]
     );
 
-    logger.info(`📝 SMS template created: ${name} by ${req.user!.email}`);
+    logger.info(`SMS template created: ${name} by ${req.user!.email}`);
 
     const response: ApiResponse<SmsTemplate> = {
       success: true,
-      message: '✅ SMS template created successfully',
+      message: 'SMS template created successfully',
       data: result.rows[0]
     };
 
@@ -774,7 +764,7 @@ export const getSmsTemplates = async (req: Request, res: Response, next: NextFun
 
     const response: ApiResponse<SmsTemplate[]> = {
       success: true,
-      message: '📋 SMS templates retrieved successfully',
+      message: 'SMS templates retrieved successfully',
       data: result.rows
     };
 
@@ -806,11 +796,11 @@ export const updateSmsTemplate = async (req: Request, res: Response, next: NextF
       throw new ApiError('SMS template not found', 404);
     }
 
-    logger.info(`📝 SMS template updated: ${id} by ${req.user!.email}`);
+    logger.info(`SMS template updated: ${id} by ${req.user!.email}`);
 
     const response: ApiResponse<SmsTemplate> = {
       success: true,
-      message: '✅ SMS template updated successfully',
+      message: 'SMS template updated successfully',
       data: result.rows[0]
     };
 
@@ -830,11 +820,11 @@ export const deleteSmsTemplate = async (req: Request, res: Response, next: NextF
       throw new ApiError('SMS template not found', 404);
     }
 
-    logger.info(`🗑️ SMS template deleted: ${id} by ${req.user!.email}`);
+    logger.info(`SMS template deleted: ${id} by ${req.user!.email}`);
 
     const response: ApiResponse = {
       success: true,
-      message: '✅ SMS template deleted successfully'
+      message: 'SMS template deleted successfully'
     };
 
     res.json(response);
@@ -842,25 +832,23 @@ export const deleteSmsTemplate = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
-
-// ==================== SUBSCRIPTIONS ====================
+ 
 
 export const subscribeSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { phone, crops, regions, alert_types } = req.body;
     const userId = req.user?.id;
-
-    // Use the new subscription function from smsService
+ 
     const result = await subscribeUser(phone, crops, userId);
 
-    logger.info(`✅ SMS subscription created/updated: ${phone}`, {
+    logger.info(`SMS subscription created/updated: ${phone}`, {
       userId,
       cropsCount: crops?.length || 0
     });
 
     const response: ApiResponse<SmsSubscription> = {
       success: true,
-      message: '✅ SMS subscription updated successfully',
+      message: 'SMS subscription updated successfully',
       data: result
     };
 
