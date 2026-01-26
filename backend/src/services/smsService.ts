@@ -660,37 +660,201 @@ class IncomingSmsService {
   private isValidFarmerMessage(msg: ReceivedSms): boolean {
     // Skip if no sender or message
     if (!msg.sender || !msg.message) {
+      logger.debug('Skipping: No sender or message', {
+        hasSender: !!msg.sender,
+        hasMessage: !!msg.message
+      });
       return false;
     }
 
-    // Should be a Kenyan mobile number
-    const cleanedSender = msg.sender.replace('+', '');
-    const isKenyanNumber = cleanedSender.startsWith('2547') ||
-      cleanedSender.startsWith('07');
+    try {
+      // 1. Format numbers for comparison
+      const formattedSender = formatPhoneNumber(msg.sender);
+      const ourSimNumber = formatPhoneNumber(SIM_PHONE_NUMBER);
 
-    if (!isKenyanNumber) {
-      logger.debug('Skipping non-Kenyan number:', { sender: msg.sender });
+      // 2. Skip messages from OUR OWN SIM
+      if (formattedSender === ourSimNumber) {
+        logger.debug('📱 Skipping message from our own SIM', {
+          sender: formattedSender,
+          messagePreview: msg.message.substring(0, 30),
+          reason: 'Self-message loop prevention'
+        });
+        return false;
+      }
+
+      // 3. Should be a Kenyan mobile number
+      const cleanedSender = msg.sender.replace(/\D/g, '');
+      const isKenyanNumber = cleanedSender.startsWith('2547') ||
+        cleanedSender.startsWith('07') ||
+        cleanedSender.startsWith('2541') ||
+        cleanedSender.startsWith('2540');
+
+      if (!isKenyanNumber) {
+        logger.debug('Skipping non-Kenyan number:', {
+          sender: msg.sender,
+          cleanedSender,
+          isKenyanNumber
+        });
+        return false;
+      }
+
+      // 4. Skip system/carrier messages by sender name
+      const systemSenders = [
+        'SAF', 'Safaricom', 'MPESA', 'Okoa', 'Airtel', 'Telkom', 'Telkom.',
+        'SMART', 'JTL', 'SERVICE', 'INFO', 'ALERT', 'NOTICE',
+        'SYSTEM', 'ADMIN', 'SERVER', 'NETWORK'
+      ];
+
+      const upperSender = msg.sender.toUpperCase();
+      const isSystemSender = systemSenders.some(sys =>
+        upperSender.includes(sys.toUpperCase())
+      );
+
+      if (isSystemSender) {
+        logger.debug('📱 Skipping system sender:', {
+          sender: msg.sender,
+          messagePreview: msg.message.substring(0, 30),
+          matchedSender: systemSenders.find(s => upperSender.includes(s.toUpperCase()))
+        });
+        return false;
+      }
+
+      // 5. Skip very short messages (likely errors)
+      const trimmedMessage = msg.message.trim();
+      if (trimmedMessage.length < 2) {
+        logger.debug('Skipping very short message:', {
+          sender: msg.sender,
+          message: trimmedMessage,
+          length: trimmedMessage.length
+        });
+        return false;
+      }
+
+      // 6. Skip messages that are just numbers (likely codes)
+      if (/^\d+$/.test(trimmedMessage)) {
+        logger.debug('Skipping numeric-only message:', {
+          sender: msg.sender,
+          message: trimmedMessage
+        });
+        return false;
+      }
+
+      // 7. Skip system messages by content
+      const systemKeywords = [
+        'DELIVERED', 'FAILED', 'SENT', 'ACCEPTED', 'REJECTED', 'QUEUED',
+        'BALANCE', 'CREDIT', 'YOUR BALANCE', 'DEAR CUSTOMER',
+        'SERVICE MESSAGE', 'PROMOTION', 'ADVERTISEMENT', 'MARKETING',
+        'MPESA', 'OKOA JAHIZI', 'AIRTIME', 'BUNDLE', 'DATA',
+        'CONFIRMED', 'TRANSACTION', 'DEPOSIT', 'WITHDRAWAL',
+        'THANK YOU FOR PURCHASING', 'YOUR SUBSCRIPTION',
+        'YOUR ACCOUNT', 'PASSWORD', 'OTP', 'VERIFICATION CODE',
+        'KIOSK', 'AGENT', 'MESSAGE', 'SMS'
+      ];
+
+      const upperMessage = trimmedMessage.toUpperCase();
+      const isSystemContent = systemKeywords.some(keyword =>
+        upperMessage.includes(keyword)
+      );
+
+      if (isSystemContent) {
+        logger.debug('📱 Skipping system content message:', {
+          sender: msg.sender,
+          messagePreview: trimmedMessage.substring(0, 50),
+          matchedKeyword: systemKeywords.find(k => upperMessage.includes(k))
+        });
+        return false;
+      }
+
+      // 8. Check if message looks like a delivery report
+      const deliveryReportPatterns = [
+        /id:.*status:/i,
+        /message.*delivered/i,
+        /message.*sent/i,
+        /message.*failed/i,
+        /status:.*success/i,
+        /status:.*failed/i
+      ];
+
+      const isDeliveryReport = deliveryReportPatterns.some(pattern =>
+        pattern.test(trimmedMessage)
+      );
+
+      if (isDeliveryReport) {
+        logger.debug('Skipping delivery report:', {
+          sender: msg.sender,
+          messagePreview: trimmedMessage.substring(0, 50)
+        });
+        return false;
+      }
+
+      // 9. Check if message is from a short code (likely system)
+      const isShortCode = /^\d{3,6}$/.test(cleanedSender) ||
+        /^[a-zA-Z]/.test(msg.sender); // Starts with letters
+
+      if (isShortCode) {
+        logger.debug('Skipping short code sender:', {
+          sender: msg.sender,
+          cleanedSender,
+          messagePreview: trimmedMessage.substring(0, 30)
+        });
+        return false;
+      }
+
+      // 10. Check for common spam patterns
+      const spamPatterns = [
+        /win.*cash/i,
+        /free.*offer/i,
+        /loan.*apply/i,
+        /gift.*card/i,
+        /click.*link/i,
+        /http:\/\//i,
+        /https:\/\//i,
+        /www\./i,
+        /\.com/i,
+        /\.co\.ke/i,
+        /please me thank you/i,
+        /send me airtime/i,
+        /send airtime/i,
+        /airtime.*please/i,
+        /god bless you/i,
+        /godbless/i,
+        /stranded.*please/i,
+        /kindly send/i,
+        /please send/i,
+        /send.*money/i,
+        /mpesa.*me/i,
+        /i need money/i,
+        /i am stranded/i,
+        /bob.*please/i,
+        /ksh.*please/i
+      ];
+
+      const isSpam = spamPatterns.some(pattern => pattern.test(trimmedMessage));
+      if (isSpam) {
+        logger.debug('Skipping potential spam:', {
+          sender: msg.sender,
+          messagePreview: trimmedMessage.substring(0, 50)
+        });
+        return false;
+      }
+
+      // ✅ VALID FARMER MESSAGE
+      logger.info('✅ Valid farmer message detected', {
+        sender: formattedSender,
+        messagePreview: trimmedMessage.substring(0, 80),
+        length: trimmedMessage.length
+      });
+
+      return true;
+
+    } catch (error: any) {
+      // If formatting fails, assume invalid
+      logger.debug('Error validating message, skipping:', {
+        sender: msg.sender,
+        error: error.message
+      });
       return false;
     }
-
-    // Skip very short messages (likely errors)
-    if (msg.message.trim().length < 2) {
-      return false;
-    }
-
-    // Skip system messages
-    const systemKeywords = [
-      'DELIVERED', 'FAILED', 'SENT', 'ACCEPTED',
-      'Balance', 'Credit', 'Your balance',
-      'Dear customer', 'Service message'
-    ];
-
-    const upperMessage = msg.message.toUpperCase();
-    if (systemKeywords.some(keyword => upperMessage.includes(keyword))) {
-      return false;
-    }
-
-    return true;
   }
 
   private async processIncomingMessage(msg: ReceivedSms): Promise<void> {
@@ -908,12 +1072,11 @@ async function saveIncomingMessageToDatabase(msg: {
 
     return logId;
   } catch (error: any) {
-    // If table doesn't exist yet or other error, fall back to sms_logs
     logger.warn('Could not save to incoming_sms, using sms_logs fallback:', {
       error: error.message,
       sender: msg.sender
     });
-    
+
     try {
       // FALLBACK: Save to sms_logs but with correct semantics
       const fallbackResult = await query(
@@ -942,7 +1105,7 @@ async function saveIncomingMessageToDatabase(msg: {
           new Date(msg.receivedAt)
         ]
       );
-      
+
       return fallbackResult.rows[0]?.id;
     } catch (fallbackError) {
       logger.error('Both database saves failed:', fallbackError);
@@ -987,7 +1150,6 @@ async function logFarmerInteraction(
   }
 }
 
-// ==================== MESSAGE PROCESSING ====================
 async function processFarmerMessage(
   phone: string,
   message: string,
@@ -999,22 +1161,39 @@ async function processFarmerMessage(
   let replyContent = '';
 
   try {
-    logger.info(`👨‍🌾 Processing farmer ${phone}: "${userText}"`);
+    logger.info('🎯 DEBUG: processFarmerMessage called with:', {
+      phone,
+      isOurSim: phone === formatPhoneNumber(SIM_PHONE_NUMBER),
+      messagePreview: message.substring(0, 50),
+      messageId
+    });
 
-    // Get farmer context
-    const farmerContext = await getFarmerContext(phone);
+    // 🚨 REMOVE THIS: Get farmer context is causing duplicate subscription logic
+    // const farmerContext = await getFarmerContext(phone);
 
     // Process based on message content
     if (userText === 'STOP') {
+      // Use the dedicated function
       action = await handleUnsubscribe(phone);
       replyContent = 'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe.';
+      // 🚨 handleUnsubscribe already sends a message, so we should NOT send another!
+      return {
+        processed: true,
+        action,
+        message: replyContent
+      };
 
     } else if (userText === 'JOIN' || userText === 'START' || userText === 'YES') {
+      // Use the dedicated function
       action = await handleSubscribe(phone);
-      replyContent = '✅ Welcome to AgriPrice! You are now subscribed.\n\n📍 Reply with location (e.g., NAIROBI) for prices\n📋 Reply HELP for commands\n❌ Reply STOP to unsubscribe';
+      return {
+        processed: true,
+        action,
+        message: 'Welcome message sent via handleSubscribe'
+      };
 
     } else if (userText === 'HELP' || userText === 'INFO') {
-      replyContent = `📱 AGRIHELP - Commands:\n\n📍 PRICE LOCATIONS:\n• NAIROBI\n• NAKURU\n• KISUMU\n• MOMBASA\n• ELDORET\n\n📋 OTHER COMMANDS:\n• JOIN - Subscribe\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
+      replyContent = `AGRIHELP - Commands:\nPRICE LOCATIONS:\n• NAIROBI\n• NAKURU\n• KISUMU\n• MOMBASA\n• ELDORET\n\nOTHER COMMANDS:\n• JOIN - Subscribe\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
       action = 'help_sent';
 
     } else if (isLocationQuery(userText)) {
@@ -1022,30 +1201,31 @@ async function processFarmerMessage(
       if (location) {
         const prices = await getCropPricesByLocation(location);
         if (prices) {
-          replyContent = `📊 ${location} MARKET PRICES:\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
+          replyContent = ` ${location} MARKET PRICES:\n\n${prices}\nReply another location\nReply HELP for commands`;
           action = 'prices_sent';
 
-          // If farmer is not subscribed, prompt them
-          if (!farmerContext.isSubscribed) {
+          // Check if subscribed for location queries
+          const isSubscribed = await isFarmerSubscribed(phone);
+          if (!isSubscribed) {
             replyContent += '\n\n💡 Want daily alerts? Reply JOIN';
           }
         } else {
-          replyContent = `❌ No data for ${location}.\n\nTry: NAIROBI, NAKURU, KISUMU\nOr reply HELP for commands`;
+          replyContent = `No data for ${location}.\n\nTry: NAIROBI, NAKURU, KISUMU\nOr reply HELP for commands`;
           action = 'location_not_found';
         }
       }
 
     } else if (userText.includes('THANK') || userText.includes('ASANTE')) {
-      replyContent = '🙏 Karibu! Happy to help.\n\nNeed more info? Reply HELP';
+      replyContent = 'Karibu! Happy to help.\n\nNeed more info? Reply HELP';
       action = 'thank_you';
 
     } else if (userText.includes('HABARI') || userText === 'HI' || userText === 'HELLO') {
-      replyContent = `👋 Habari! I'm AgriPrice Bot.\n\n📍 Reply with location for crop prices\n📋 Reply HELP for commands\n📞 Support: ${SUPPORT_PHONE}`;
+      replyContent = `👋 Habari! I'm AgriPrice SMS mode.\n Reply with location for crop prices\nReply HELP for commands\nSupport: ${SUPPORT_PHONE}`;
       action = 'greeting_reply';
 
     } else {
       // Unknown message - provide helpful response
-      replyContent = `❓ Sorry, I didn't understand: "${message}"\n\nTry:\n📍 NAIROBI (for prices)\n📋 HELP (for commands)\n📞 ${SUPPORT_PHONE}`;
+      replyContent = `Sorry, I didn't understand: "${message}"\nTry:\n NAIROBI (for prices)\nHELP (for commands)\n📞 ${SUPPORT_PHONE}`;
       action = 'unknown_message';
     }
 
@@ -1088,21 +1268,6 @@ async function processFarmerMessage(
 
   } catch (error: any) {
     logger.error(`❌ Error processing message from ${phone}:`, error);
-
-    // Try to send error message
-    try {
-      const errorMessage = '⚠️ System error. Please try again later or contact support.';
-      await sendSmsMessage(
-        phone,
-        errorMessage,
-        { smsType: 'update' }
-      );
-
-      updateConversation(phone, errorMessage, 'outgoing');
-    } catch (smsError) {
-      logger.error('Failed to send error message:', smsError);
-    }
-
     return {
       processed: false,
       action: 'error',
@@ -1214,8 +1379,6 @@ async function handleIncomingMessage(
       receivedAt
     });
 
-    // This is TextBee confirming YOUR outgoing message was received for sending
-    // Update the SMS log status
 
     const updateResult = await query(
       `UPDATE sms_logs 
@@ -1349,7 +1512,7 @@ async function handleMessageFailed(data: {
   error?: string;
 }): Promise<{ processed: boolean; action?: string; message?: string }> {
   const { smsId, smsBatchId, recipient, error } = data;
-  
+
   try {
     logger.error('❌ MESSAGE_FAILED webhook', {
       smsId,
@@ -1478,33 +1641,150 @@ async function handleIncomingFarmerMessage(data: any): Promise<{
       };
     }
 
-    logger.info('📨 FARMER MESSAGE RECEIVED VIA WEBHOOK', {
+    // 🚨🚨🚨 CRITICAL: FILTER OUT NON-FARMER MESSAGES 🚨🚨🚨
+
+    // 1. Format numbers for comparison
+    const formattedSender = formatPhoneNumber(sender);
+    const ourSimNumber = formatPhoneNumber(SIM_PHONE_NUMBER);
+
+    // 2. Skip messages from OUR OWN SIM (when we text ourselves)
+    if (formattedSender === ourSimNumber) {
+      logger.info('📱 SKIPPED: Message from our own SIM', {
+        sender: formattedSender,
+        messagePreview: message.substring(0, 50),
+        reason: 'Self-message loop prevention'
+      });
+      return {
+        processed: true,
+        action: 'self_message_ignored',
+        message: 'Ignored message from own SIM'
+      };
+    }
+
+    // 3. Skip carrier/system messages by sender name
+    const systemSenders = [
+      'SAF', 'Safaricom', 'MPESA', 'Okoa', 'Airtel', 'Telkom',
+      'SMART', 'JTL', 'SERVICE', 'INFO', 'ALERT', 'NOTICE'
+    ];
+
+    const isSystemSender = systemSenders.some(sys =>
+      sender.toUpperCase().includes(sys.toUpperCase())
+    );
+
+    if (isSystemSender) {
+      logger.info('📱 SKIPPED: System sender detected', {
+        sender,
+        messagePreview: message.substring(0, 50),
+        reason: 'System/carrier message'
+      });
+      return {
+        processed: true,
+        action: 'system_sender_ignored',
+        message: 'Ignored system sender message'
+      };
+    }
+
+    // 4. Skip messages containing system keywords
+    const systemKeywords = [
+      'DELIVERED', 'FAILED', 'SENT', 'ACCEPTED', 'REJECTED',
+      'BALANCE', 'CREDIT', 'YOUR BALANCE', 'DEAR CUSTOMER',
+      'SERVICE MESSAGE', 'PROMOTION', 'ADVERTISEMENT',
+      'MPESA', 'OKOA JAHIZI', 'AIRTIME', 'BUNDLE', 'DATA',
+      'PLEASE ME THANK YOU',
+      'PLEASE ME THANKYOU',
+      'Please call me thank you',
+      'SEND ME AIRTIME',
+      'SEND AIRTIME',
+      'AIRTIME PLEASE',
+      'STRANDED',
+      'NEED HELP',
+      'GOD BLESS YOU',
+      'GODBLESS',
+      'BLESS YOU',
+      'KINDLY SEND',
+      'PLEASE SEND',
+      'SEND ME MONEY',
+      'MPESA ME',
+      'I NEED MONEY',
+      'I AM STRANDED',
+      'I tried to call you'
+    ];
+
+    const upperMessage = message.toUpperCase();
+    const isSystemContent = systemKeywords.some(keyword =>
+      upperMessage.includes(keyword)
+    );
+
+    if (isSystemContent) {
+      logger.info('📱 SKIPPED: System content detected', {
+        sender: formattedSender,
+        messagePreview: message.substring(0, 50),
+        matchedKeyword: systemKeywords.find(k => upperMessage.includes(k))
+      });
+      return {
+        processed: true,
+        action: 'system_content_ignored',
+        message: 'Ignored system content message'
+      };
+    }
+
+    // 5. Skip very short messages (likely errors or codes)
+    const trimmedMessage = message.trim();
+    if (trimmedMessage.length < 2) {
+      logger.info('📱 SKIPPED: Message too short', {
+        sender: formattedSender,
+        message,
+        length: trimmedMessage.length
+      });
+      return {
+        processed: true,
+        action: 'short_message_ignored',
+        message: 'Ignored very short message'
+      };
+    }
+
+    // 6. Skip messages that are just numbers (likely codes)
+    if (/^\d+$/.test(trimmedMessage)) {
+      logger.info('📱 SKIPPED: Numeric-only message', {
+        sender: formattedSender,
+        message
+      });
+      return {
+        processed: true,
+        action: 'numeric_message_ignored',
+        message: 'Ignored numeric-only message'
+      };
+    }
+
+    // 7. Log the valid farmer message
+    logger.info('📨 ✅ VALID FARMER MESSAGE RECEIVED', {
       messageId,
-      sender,
-      messagePreview: message.substring(0, 50),
+      sender: formattedSender,
+      messagePreview: trimmedMessage.substring(0, 100),
+      length: trimmedMessage.length,
       timestamp,
       deviceId
     });
 
-    // 1. Save to incoming_sms table
+    // 8. Save to incoming_sms table
     const incomingId = await saveIncomingMessageToDatabase({
       id: messageId || `webhook_${Date.now()}`,
-      sender,
-      message,
+      sender: formattedSender, // Use formatted version
+      message: trimmedMessage,
       receivedAt: timestamp || new Date().toISOString(),
       deviceId: deviceId || TEXTBEE_DEVICE_ID,
       processed: false
     });
 
-    // 2. Process and auto-reply
+    // 9. Process and auto-reply
     const result = await processFarmerMessage(
-      sender,
-      message.trim(),
+      formattedSender, // Send to farmer's formatted number
+      trimmedMessage,
       messageId,
       incomingId || undefined
     );
 
-    // 3. Update incoming message as processed
+    // 10. Update incoming message as processed
     if (incomingId) {
       await query(
         `UPDATE incoming_sms SET processed = true WHERE id = $1`,
@@ -1515,11 +1795,15 @@ async function handleIncomingFarmerMessage(data: any): Promise<{
     return {
       processed: true,
       action: result.action || 'farmer_message_processed',
-      message: `Processed message from ${sender}`
+      message: `Processed message from ${formattedSender}`
     };
 
   } catch (error: any) {
-    logger.error('Failed to handle incoming farmer message:', error);
+    logger.error('❌ Failed to handle incoming farmer message:', {
+      error: error.message,
+      stack: error.stack,
+      data: JSON.stringify(data).substring(0, 200)
+    });
     return {
       processed: false,
       message: `Error processing farmer message: ${error.message}`
@@ -1527,8 +1811,6 @@ async function handleIncomingFarmerMessage(data: any): Promise<{
   }
 }
 
-
-// ==================== EXPORTED FUNCTIONS ====================
 export const sendSmsMessage = async (
   recipient: string,
   message: string,
@@ -1548,6 +1830,7 @@ export const sendSmsMessage = async (
   logger.debug('📤 Starting SMS send process', {
     recipient: formattedRecipient,
     messageLength: message.length,
+    isOurSim: formattedRecipient === formatPhoneNumber(SIM_PHONE_NUMBER),
     smsType,
     sentBy
   });
