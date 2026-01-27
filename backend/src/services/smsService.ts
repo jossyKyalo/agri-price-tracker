@@ -1150,6 +1150,395 @@ async function logFarmerInteraction(
   }
 }
 
+async function getMarketsByRegion(regionName: string): Promise<Array<{ id: string, name: string, location?: string }>> {
+  try {
+    const result = await query(`
+      SELECT 
+        m.id,
+        m.name,
+        m.location,
+        COALESCE(price_count, 0) as price_count
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      LEFT JOIN (
+        SELECT market_id, COUNT(*) as price_count
+        FROM price_entries 
+        WHERE is_verified = true
+        AND entry_date >= CURRENT_DATE - INTERVAL '7 days'
+        GROUP BY market_id
+      ) pe ON m.id = pe.market_id
+      WHERE UPPER(r.name) = UPPER($1)
+        AND m.is_active = true
+        AND r.is_active = true
+      ORDER BY 
+        price_count DESC NULLS LAST,
+        m.name
+      LIMIT 8
+    `, [regionName]);
+
+    logger.info('🔍 Markets found for region:', {
+      regionName,
+      count: result.rows.length,
+      markets: result.rows.map(m => ({ name: m.name, location: m.location, hasPrices: m.price_count > 0 }))
+    });
+
+    return result.rows;
+  } catch (error) {
+    logger.error('Error fetching markets by region:', error);
+    return [];
+  }
+}
+
+async function getMarketsWithPrices(regionName: string): Promise<Array<{ id: string, name: string }>> {
+  try {
+    const result = await query(`
+      SELECT DISTINCT 
+        m.id,
+        m.name,
+        COUNT(pe.id) as price_count
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      LEFT JOIN price_entries pe ON m.id = pe.market_id
+        AND pe.is_verified = true
+        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
+      WHERE UPPER(r.name) = UPPER($1)
+        AND m.is_active = true
+        AND r.is_active = true
+      GROUP BY m.id, m.name
+      HAVING COUNT(pe.id) > 0
+      ORDER BY price_count DESC, m.name
+      LIMIT 6
+    `, [regionName]);
+
+    logger.info('🔍 Markets with prices found:', {
+      regionName,
+      count: result.rows.length,
+      markets: result.rows.map(m => ({ name: m.name, priceCount: m.price_count }))
+    });
+
+    return result.rows;
+  } catch (error) {
+    logger.error('Error fetching markets with prices:', error);
+    return [];
+  }
+}
+
+async function searchMarketAndRegion(text: string): Promise<{ region: string | null, marketName: string | null }> {
+  const normalizedText = text.trim().toUpperCase();
+
+  try {
+    // Clean text (remove common suffixes)
+    const cleanText = normalizedText
+      .replace(/\s+MARKET\s*$/i, '')
+      .replace(/\s+TOWN\s*$/i, '')
+      .replace(/\s+CITY\s*$/i, '')
+      .trim();
+
+    // First, try exact match for market (case-insensitive)
+    const marketResult = await query(`
+      SELECT 
+        m.name as market_name,
+        r.name as region_name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE (
+        UPPER(m.name) = $1 OR 
+        UPPER(m.location) = $1 OR
+        UPPER(m.name) = $2 OR 
+        UPPER(m.location) = $2
+      )
+      AND m.is_active = true
+      AND r.is_active = true
+      LIMIT 1
+    `, [normalizedText, cleanText]);
+
+    if (marketResult.rows.length > 0) {
+      return {
+        region: marketResult.rows[0].region_name,
+        marketName: marketResult.rows[0].market_name
+      };
+    }
+
+    // Try partial market match
+    const partialMarketResult = await query(`
+      SELECT 
+        m.name as market_name,
+        r.name as region_name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE (
+        UPPER(m.name) LIKE $1 OR 
+        UPPER(m.location) LIKE $1
+      )
+      AND m.is_active = true
+      AND r.is_active = true
+      LIMIT 1
+    `, [`%${cleanText}%`]);
+
+    if (partialMarketResult.rows.length > 0) {
+      return {
+        region: partialMarketResult.rows[0].region_name,
+        marketName: partialMarketResult.rows[0].market_name
+      };
+    }
+
+    // Check if it's a region
+    const regionResult = await query(`
+      SELECT name as region_name FROM regions 
+      WHERE (
+        UPPER(name) = $1 OR
+        UPPER(name) = $2
+      )
+      AND is_active = true
+      LIMIT 1
+    `, [normalizedText, cleanText]);
+
+    if (regionResult.rows.length > 0) {
+      return {
+        region: regionResult.rows[0].region_name,
+        marketName: null
+      };
+    }
+
+    return { region: null, marketName: null };
+
+  } catch (error) {
+    logger.error('Error searching market and region:', error);
+    return { region: null, marketName: null };
+  }
+}
+
+// Create market selection message
+function createMarketSelectionMessage(region: string, markets: Array<{ id: string, name: string }>): string {
+  let message = `${region.toUpperCase()} REGION\n\n`;
+  message += `Select your market:\n\n`;
+
+  markets.forEach((market, index) => {
+    message += `${index + 1}) ${market.name}\n`;
+  });
+
+  message += `\nReply with market name`;
+  message += `Or reply "ALL" for region-wide prices\n`;
+  message += `Reply "BACK" for other regions`;
+
+  return message;
+}
+
+// Get market-specific prices
+async function getMarketPrices(marketId: string, regionName: string): Promise<string | null> {
+  try {
+    const result = await query(`
+      SELECT 
+        c.name as crop_name,
+        c.unit,
+        pe.price,
+        m.name as market_name,
+        pe.entry_date
+      FROM price_entries pe
+      JOIN crops c ON pe.crop_id = c.id
+      JOIN markets m ON pe.market_id = m.id
+      WHERE m.id = $1
+        AND pe.is_verified = true
+        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
+      ORDER BY 
+        pe.entry_date DESC,
+        c.name
+      LIMIT 10
+    `, [marketId]);
+
+    logger.info('🔍 Market prices query results:', {
+      marketId,
+      rowCount: result.rows.length,
+      hasData: result.rows.length > 0
+    });
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const priceList = result.rows
+      .map(row => `• ${row.crop_name}: KSh ${row.price.toLocaleString()}/${row.unit}`)
+      .join('\n');
+
+    return priceList;
+  } catch (error) {
+    logger.error('Error fetching market prices:', error);
+    return null;
+  }
+}
+
+// Get region-wide prices (all markets combined)
+async function getRegionPrices(regionName: string): Promise<string | null> {
+  try {
+    const result = await query(`
+      SELECT 
+        c.name as crop_name,
+        c.unit,
+        AVG(pe.price) as avg_price,
+        COUNT(DISTINCT pe.market_id) as market_count
+      FROM price_entries pe
+      JOIN crops c ON pe.crop_id = c.id
+      JOIN markets m ON pe.market_id = m.id
+      JOIN regions r ON m.region_id = r.id
+      WHERE UPPER(r.name) = UPPER($1)
+        AND pe.is_verified = true
+        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY c.id, c.name, c.unit
+      ORDER BY avg_price DESC
+      LIMIT 12
+    `, [regionName]);
+
+    logger.info('🔍 Region prices query results:', {
+      regionName,
+      rowCount: result.rows.length,
+      hasData: result.rows.length > 0
+    });
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const priceList = result.rows
+      .map(row => `• ${row.crop_name}: KSh ${Math.round(row.avg_price).toLocaleString()}/${row.unit} (${row.market_count} markets)`)
+      .join('\n');
+
+    return priceList;
+  } catch (error) {
+    logger.error('Error fetching region prices:', error);
+    return null;
+  }
+}
+
+// Handle market selection response
+async function handleMarketSelectionResponse(
+  phone: string,
+  region: string,
+  markets: Array<{ id: string, name: string }>,
+  userInput: string
+): Promise<{ processed: boolean; action?: string; message?: string }> {
+  try {
+    logger.info('🔄 Handling market selection response', {
+      phone,
+      region,
+      userInput,
+      marketCount: markets.length
+    });
+
+    // Handle special commands
+    if (userInput === 'ALL') {
+      // Show region-wide prices
+      const regionPrices = await getRegionPrices(region);
+
+      // Clear conversation context
+      activeConversations.delete(phone);
+
+      if (regionPrices) {
+        return {
+          processed: true,
+          action: 'region_prices_sent',
+          message: `📊 ${region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`
+        };
+      } else {
+        return {
+          processed: true,
+          action: 'region_no_data',
+          message: `❌ No price data for ${region}.\n\n📍 Reply another region\n📋 Reply HELP for commands`
+        };
+      }
+    }
+
+    if (userInput === 'BACK') {
+      // Clear context and show region list
+      activeConversations.delete(phone);
+      return {
+        processed: true,
+        action: 'market_selection_cancelled',
+        message: `📍 Select a region:\n\nNAIROBI, CENTRAL, COAST, EASTERN, NYANZA, WESTERN, RIFT VALLEY\n\n📋 Reply HELP for commands`
+      };
+    }
+
+    // Check if input is a number
+    const inputNumber = parseInt(userInput);
+    let selectedMarket: { id: string, name: string } | null = null;
+
+    if (!isNaN(inputNumber) && inputNumber >= 1 && inputNumber <= markets.length) {
+      selectedMarket = markets[inputNumber - 1] ?? null;
+      logger.info('Selected market by number:', {
+        userInput,
+        selectedMarket: selectedMarket?.name
+      });
+    } else {
+      // Try to match market name
+      selectedMarket = markets.find(m =>
+        m.name.toUpperCase().includes(userInput) ||
+        userInput.includes(m.name.toUpperCase())
+      ) || null;
+
+      if (selectedMarket) {
+        logger.info('✅ Selected market by name:', {
+          userInput,
+          selectedMarket: selectedMarket.name
+        });
+      }
+    }
+
+    if (selectedMarket) {
+      // Get market prices
+      const prices = await getMarketPrices(selectedMarket.id, region);
+
+      // Clear conversation context
+      activeConversations.delete(phone);
+
+      if (prices) {
+        return {
+          processed: true,
+          action: 'market_prices_sent',
+          message: `📊 ${selectedMarket.name.toUpperCase()} MARKET (${region.toUpperCase()})\n\n${prices}\n\n📍 Reply another region\n📋 Reply HELP for commands`
+        };
+      } else {
+        // Fallback to region prices
+        const regionPrices = await getRegionPrices(region);
+        if (regionPrices) {
+          return {
+            processed: true,
+            action: 'market_no_data_fallback',
+            message: `📊 ${region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`
+          };
+        } else {
+          return {
+            processed: true,
+            action: 'market_no_data',
+            message: `❌ No current price data available.\n\n📍 Reply another region\n📋 Reply HELP for commands`
+          };
+        }
+      }
+    }
+
+    // No match found - show market list again
+    logger.warn('❌ Market not found, showing list again', {
+      userInput,
+      availableMarkets: markets.map(m => m.name)
+    });
+
+    return {
+      processed: true,
+      action: 'market_not_found',
+      message: createMarketSelectionMessage(region, markets)
+    };
+
+  } catch (error: any) {
+    logger.error('❌ Error handling market selection:', error);
+    // Clear context on error
+    activeConversations.delete(phone);
+
+    return {
+      processed: false,
+      action: 'error',
+      message: `❌ Error processing selection. Please try again.\n\n📍 Reply with a region name`
+    };
+  }
+}
+
 async function processFarmerMessage(
   phone: string,
   message: string,
@@ -1163,20 +1552,60 @@ async function processFarmerMessage(
   try {
     logger.info('🎯 DEBUG: processFarmerMessage called with:', {
       phone,
-      isOurSim: phone === formatPhoneNumber(SIM_PHONE_NUMBER),
-      messagePreview: message.substring(0, 50),
+      userText,
+      originalMessage: message,
       messageId
     });
 
-    // 🚨 REMOVE THIS: Get farmer context is causing duplicate subscription logic
-    // const farmerContext = await getFarmerContext(phone);
+    // 🎯 STEP 1: CHECK FOR MARKET SELECTION RESPONSE (MUST BE FIRST!)
+    const conversation = activeConversations.get(phone);
+    if (conversation && conversation.lastMessage?.startsWith('REGION:')) {
+      logger.info('🔄 Processing market selection response', {
+        phone,
+        lastMessage: conversation.lastMessage,
+        userInput: userText
+      });
 
-    // Process based on message content
+      const parts = conversation.lastMessage.split(':');
+      if (parts.length >= 4) {
+        const region = parts[1];
+
+        if (!region) {
+          logger.error('❌ Region missing in conversation context');
+          activeConversations.delete(phone);
+          return {
+            processed: false,
+            action: 'invalid_context',
+            message: '❌ Session expired. Please reply with a region again.'
+          };
+        }
+
+        const marketsJson = parts.slice(3).join(':');
+        let markets: Array<{ id: string; name: string }> = [];
+        try {
+          markets = JSON.parse(marketsJson);
+        } catch (parseError) {
+          logger.error('Failed to parse markets JSON:', parseError);
+        }
+
+        return await handleMarketSelectionResponse(phone, region, markets, userText);
+      }
+    }
+
+    const farmerContext = await getFarmerContext(phone);
+    logger.debug('Farmer context:', farmerContext);
+
+    // 🎯 STEP 2: CHECK FOR SPECIAL COMMANDS
     if (userText === 'STOP') {
-      // Use the dedicated function
       action = await handleUnsubscribe(phone);
       replyContent = 'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe.';
-      // 🚨 handleUnsubscribe already sends a message, so we should NOT send another!
+      
+      const replyResult = await sendSmsMessage(
+        phone,
+        replyContent,
+        { smsType: 'update' }
+      );
+      
       return {
         processed: true,
         action,
@@ -1184,52 +1613,159 @@ async function processFarmerMessage(
       };
 
     } else if (userText === 'JOIN' || userText === 'START' || userText === 'YES') {
-      // Use the dedicated function
       action = await handleSubscribe(phone);
+      
+      const welcomeMsg = 'Welcome to AgriPrice! You are now subscribed to daily price alerts.\n\nCommands:\n• Reply with location (e.g., NAIROBI) for prices\n• Reply STOP to unsubscribe\n• Reply HELP for more info';
+      await sendSmsMessage(
+        phone,
+        welcomeMsg,
+        { smsType: 'update' }
+      );
+      
       return {
         processed: true,
         action,
-        message: 'Welcome message sent via handleSubscribe'
+        message: 'Welcome message sent'
       };
 
     } else if (userText === 'HELP' || userText === 'INFO') {
-      replyContent = `AGRIHELP - Commands:\nPRICE LOCATIONS:\n• NAIROBI\n• NAKURU\n• KISUMU\n• MOMBASA\n• ELDORET\n\nOTHER COMMANDS:\n• JOIN - Subscribe\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
+      replyContent = `📱 AGRIHELP - Commands:\n\n📍 PRICE LOCATIONS:\n• NAIROBI\n• CENTRAL\n• COAST\n• EASTERN\n• NYANZA\n• WESTERN\n• RIFT VALLEY\n\n📋 OTHER COMMANDS:\n• JOIN - Subscribe for daily alerts\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
       action = 'help_sent';
 
-    } else if (isLocationQuery(userText)) {
-      const location = extractLocationFromText(userText);
-      if (location) {
-        const prices = await getCropPricesByLocation(location);
-        if (prices) {
-          replyContent = ` ${location} MARKET PRICES:\n\n${prices}\nReply another location\nReply HELP for commands`;
-          action = 'prices_sent';
-
-          // Check if subscribed for location queries
-          const isSubscribed = await isFarmerSubscribed(phone);
-          if (!isSubscribed) {
-            replyContent += '\n\n💡 Want daily alerts? Reply JOIN';
-          }
-        } else {
-          replyContent = `No data for ${location}.\n\nTry: NAIROBI, NAKURU, KISUMU\nOr reply HELP for commands`;
-          action = 'location_not_found';
-        }
-      }
-
     } else if (userText.includes('THANK') || userText.includes('ASANTE')) {
-      replyContent = 'Karibu! Happy to help.\n\nNeed more info? Reply HELP';
+      replyContent = '🙏 Karibu! Happy to help.\n\nNeed more info? Reply HELP';
       action = 'thank_you';
 
     } else if (userText.includes('HABARI') || userText === 'HI' || userText === 'HELLO') {
-      replyContent = `👋 Habari! I'm AgriPrice SMS mode.\n Reply with location for crop prices\nReply HELP for commands\nSupport: ${SUPPORT_PHONE}`;
+      replyContent = `👋 Habari! I'm AgriPrice Bot.\n\n📍 Reply with region for crop prices\n📋 Reply HELP for commands\n📞 Support: ${SUPPORT_PHONE}`;
       action = 'greeting_reply';
 
     } else {
-      // Unknown message - provide helpful response
-      replyContent = `Sorry, I didn't understand: "${message}"\nTry:\n NAIROBI (for prices)\nHELP (for commands)\n📞 ${SUPPORT_PHONE}`;
-      action = 'unknown_message';
+      // 🎯 STEP 3: CHECK IF USER SENT A SPECIFIC MARKET NAME
+      logger.debug('🔄 Checking if input is a market or region:', { userText });
+      const marketSearchResult = await searchMarketAndRegion(userText);
+      logger.debug('Market search result:', marketSearchResult);
+      
+      if (marketSearchResult.marketName && marketSearchResult.region) {
+        // User sent a specific market name (e.g., "Gikomba", "Nkubu", "Maua")
+        logger.info('🎯 Direct market search detected:', {
+          userInput: userText,
+          market: marketSearchResult.marketName,
+          region: marketSearchResult.region
+        });
+
+        // Get the market details
+        const market = await getMarketByName(marketSearchResult.marketName, marketSearchResult.region);
+        logger.debug('Market found:', market);
+        
+        if (market) {
+          // Get prices for this specific market
+          const prices = await getMarketPrices(market.id, marketSearchResult.region);
+          logger.debug('Market prices:', prices ? 'Found' : 'Not found');
+          
+          if (prices) {
+            replyContent = `📊 ${market.name.toUpperCase()} MARKET (${marketSearchResult.region.toUpperCase()})\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
+            action = 'direct_market_prices_sent';
+          } else {
+            // No prices for this market, try region-wide prices
+            const regionPrices = await getRegionPrices(marketSearchResult.region);
+            if (regionPrices) {
+              replyContent = `📊 ${marketSearchResult.region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
+              action = 'market_no_data_fallback';
+            } else {
+              replyContent = `❌ No price data for ${market.name} in ${marketSearchResult.region}.\n\nTry another location or reply HELP`;
+              action = 'market_no_data';
+            }
+          }
+        } else {
+          // Market not found, check if it's a region instead
+          logger.debug('Market not found by name, checking if it\'s a region');
+          const regionName = await extractRegionFromText(userText);
+          if (regionName) {
+            // It's a region, show market selection
+            await handleRegionSelection(phone, regionName);
+            return {
+              processed: true,
+              action: 'region_selection_sent',
+              message: `Market selection sent for ${regionName}`
+            };
+          } else {
+            replyContent = `❌ Location "${message}" not found.\n\nTry: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
+            action = 'location_not_found';
+          }
+        }
+      } 
+      // 🎯 STEP 4: CHECK IF USER SENT A REGION NAME
+      else if (marketSearchResult.region && !marketSearchResult.marketName) {
+        // This is a region name (e.g., "EASTERN", "NAIROBI")
+        logger.info('📍 Region search detected:', {
+          userInput: userText,
+          region: marketSearchResult.region
+        });
+        
+        await handleRegionSelection(phone, marketSearchResult.region);
+        return {
+          processed: true,
+          action: 'region_selection_sent',
+          message: `Market selection sent for ${marketSearchResult.region}`
+        };
+      }
+      // 🎯 STEP 5: CHECK IF IT'S A REGION USING OLD METHOD (fallback)
+      else {
+        logger.debug('🔄 Checking if input is a region (fallback)');
+        const regionName = await extractRegionFromText(userText);
+        
+        if (regionName) {
+          logger.info('📍 Processing region query (fallback):', {
+            userInput: userText,
+            mappedRegion: regionName
+          });
+
+          await handleRegionSelection(phone, regionName);
+          return {
+            processed: true,
+            action: 'region_selection_sent',
+            message: `Market selection sent for ${regionName}`
+          };
+        } else {
+          // 🎯 STEP 6: TRY HARDER TO FIND THE LOCATION
+          logger.debug('🔄 Doing advanced location search');
+          const locationResult = await advancedLocationSearch(userText);
+          
+          if (locationResult.type === 'market' && locationResult.market && locationResult.region) {
+            // Found a market
+            const prices = await getMarketPrices(locationResult.market.id, locationResult.region);
+            if (prices) {
+              replyContent = `📊 ${locationResult.market.name.toUpperCase()} MARKET (${locationResult.region.toUpperCase()})\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
+              action = 'advanced_market_prices_sent';
+            } else {
+              const regionPrices = await getRegionPrices(locationResult.region);
+              if (regionPrices) {
+                replyContent = `📊 ${locationResult.region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
+                action = 'advanced_market_fallback';
+              } else {
+                replyContent = `❌ No price data for ${locationResult.market.name}.\n\nTry: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
+                action = 'no_data_found';
+              }
+            }
+          } else if (locationResult.type === 'region' && locationResult.region) {
+            // Found a region
+            await handleRegionSelection(phone, locationResult.region);
+            return {
+              processed: true,
+              action: 'region_selection_sent',
+              message: `Market selection sent for ${locationResult.region}`
+            };
+          } else {
+            // Unknown message - provide helpful response
+            replyContent = `❓ Sorry, I didn't understand: "${message}"\n\nTry:\n📍 NAIROBI or GIKOMBA (for prices)\n📋 HELP (for commands)\n📞 ${SUPPORT_PHONE}`;
+            action = 'unknown_message';
+          }
+        }
+      }
     }
 
-    // Send the reply if we have content
+    // 🎯 STEP 7: SEND THE REPLY IF WE HAVE CONTENT
     if (replyContent) {
       logger.info(`📤 Sending reply to ${phone}`, {
         action,
@@ -1241,7 +1777,7 @@ async function processFarmerMessage(
         replyContent,
         {
           smsType: 'update',
-          sentBy: 'auto_reply_system'
+          sentBy: undefined
         }
       );
 
@@ -1268,6 +1804,21 @@ async function processFarmerMessage(
 
   } catch (error: any) {
     logger.error(`❌ Error processing message from ${phone}:`, error);
+
+    // Try to send error message
+    try {
+      const errorMessage = '⚠️ System error. Please try again later or contact support.';
+      await sendSmsMessage(
+        phone,
+        errorMessage,
+        { smsType: 'update' }
+      );
+
+      updateConversation(phone, errorMessage, 'outgoing');
+    } catch (smsError) {
+      logger.error('Failed to send error message:', smsError);
+    }
+
     return {
       processed: false,
       action: 'error',
@@ -1276,6 +1827,223 @@ async function processFarmerMessage(
   }
 }
 
+async function advancedLocationSearch(text: string): Promise<{
+  type: 'market' | 'region' | 'none';
+  market?: { id: string; name: string };
+  region?: string;
+}> {
+  const normalizedText = text.trim().toUpperCase();
+  
+  try {
+    // Try to find market by name (case-insensitive, partial match)
+    const marketResult = await query(`
+      SELECT 
+        m.id,
+        m.name as market_name,
+        r.name as region_name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE UPPER(m.name) LIKE $1
+        AND m.is_active = true
+        AND r.is_active = true
+      LIMIT 1
+    `, [`%${normalizedText}%`]);
+
+    if (marketResult.rows.length > 0) {
+      return {
+        type: 'market',
+        market: {
+          id: marketResult.rows[0].id,
+          name: marketResult.rows[0].market_name
+        },
+        region: marketResult.rows[0].region_name
+      };
+    }
+
+    // Try to find region (case-insensitive, partial match)
+    const regionResult = await query(`
+      SELECT name as region_name FROM regions 
+      WHERE UPPER(name) LIKE $1 
+      AND is_active = true
+      LIMIT 1
+    `, [`%${normalizedText}%`]);
+
+    if (regionResult.rows.length > 0) {
+      return {
+        type: 'region',
+        region: regionResult.rows[0].region_name
+      };
+    }
+
+    // Try common location patterns
+    const commonMarkets = [
+      { pattern: 'GIKOMBA', region: 'NAIROBI' },
+      { pattern: 'WAKULIMA', region: 'NAIROBI' },
+      { pattern: 'KANGETA', region: 'EASTERN' },
+      { pattern: 'MAUA', region: 'EASTERN' },
+      { pattern: 'NKUBU', region: 'EASTERN' },
+      { pattern: 'MWINGI', region: 'EASTERN' },
+      { pattern: 'MAKUTANO', region: 'CENTRAL' },
+      { pattern: 'NGUNDUNE', region: 'EASTERN' }
+    ];
+
+    for (const commonMarket of commonMarkets) {
+      if (normalizedText.includes(commonMarket.pattern)) {
+        // Try to get the actual market from database
+        const actualMarket = await query(`
+          SELECT m.id, m.name
+          FROM markets m
+          JOIN regions r ON m.region_id = r.id
+          WHERE UPPER(r.name) = $1
+            AND UPPER(m.name) LIKE $2
+          LIMIT 1
+        `, [commonMarket.region, `%${commonMarket.pattern}%`]);
+
+        if (actualMarket.rows.length > 0) {
+          return {
+            type: 'market',
+            market: {
+              id: actualMarket.rows[0].id,
+              name: actualMarket.rows[0].name
+            },
+            region: commonMarket.region
+          };
+        }
+      }
+    }
+
+    return { type: 'none' };
+
+  } catch (error) {
+    logger.error('Error in advanced location search:', error);
+    return { type: 'none' };
+  }
+}
+
+async function extractRegionFromText(text: string): Promise<string | null> {
+  const normalizedText = text.trim().toUpperCase();
+
+  try {
+    // Check if it's a province/region name
+    const regionResult = await query(`
+      SELECT name FROM regions 
+      WHERE UPPER(name) = $1 
+      AND is_active = true
+      LIMIT 1
+    `, [normalizedText]);
+
+    if (regionResult.rows.length > 0) {
+      return regionResult.rows[0].name;
+    }
+
+    // Check for partial matches in region names
+    const partialResult = await query(`
+      SELECT name FROM regions 
+      WHERE UPPER(name) LIKE $1 
+      AND is_active = true
+      LIMIT 1
+    `, [`%${normalizedText}%`]);
+
+    if (partialResult.rows.length > 0) {
+      return partialResult.rows[0].name;
+    }
+
+    logger.debug('No region found for:', { text, normalizedText });
+    return null;
+
+  } catch (error) {
+    logger.error('Error extracting region from text:', error);
+    return null;
+  }
+}
+
+async function handleRegionSelection(phone: string, regionName: string): Promise<void> {
+  const availableMarkets = await getMarketsWithPrices(regionName);
+
+  if (availableMarkets.length > 1) {
+    // Multiple markets available - ask farmer to choose
+    const replyContent = createMarketSelectionMessage(regionName, availableMarkets);
+    
+    await sendSmsMessage(
+      phone,
+      replyContent,
+      { smsType: 'update' }
+    );
+
+    // Store region context for follow-up
+    updateConversation(phone, `REGION:${regionName}:MARKETS:${JSON.stringify(availableMarkets)}`, 'incoming');
+    
+  } else if (availableMarkets.length === 1) {
+    const [market] = availableMarkets;
+    if (market) {
+      const prices = await getMarketPrices(market.id, regionName);
+
+      if (prices) {
+        const replyContent = `📊 ${market.name.toUpperCase()} MARKET (${regionName.toUpperCase()})\n\n${prices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
+        await sendSmsMessage(
+          phone,
+          replyContent,
+          { smsType: 'update' }
+        );
+      } else {
+        // No market data - show region-wide prices if available
+        const regionPrices = await getRegionPrices(regionName);
+        if (regionPrices) {
+          const replyContent = `📊 ${regionName.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
+          await sendSmsMessage(
+            phone,
+            replyContent,
+            { smsType: 'update' }
+          );
+        } else {
+          const replyContent = `❌ No price data for ${regionName}.\n\nAvailable regions: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
+          await sendSmsMessage(
+            phone,
+            replyContent,
+            { smsType: 'update' }
+          );
+        }
+      }
+    }
+  } else {
+    // No markets with prices - try region-wide
+    const regionPrices = await getRegionPrices(regionName);
+    if (regionPrices) {
+      const replyContent = `📊 ${regionName.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
+      await sendSmsMessage(
+        phone,
+        replyContent,
+        { smsType: 'update' }
+      );
+    } else {
+      const replyContent = `❌ No price data for ${regionName}.\n\nAvailable regions: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
+      await sendSmsMessage(
+        phone,
+        replyContent,
+        { smsType: 'update' }
+      );
+    }
+  }
+}
+
+async function getMarketByName(marketName: string, regionName: string): Promise<{id: string, name: string} | null> {
+  try {
+    const result = await query(`
+      SELECT m.id, m.name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE UPPER(m.name) = UPPER($1)
+        AND UPPER(r.name) = UPPER($2)
+        AND m.is_active = true
+      LIMIT 1
+    `, [marketName, regionName]);
+    
+    return result.rows[0] || null;
+  } catch (error) {
+    logger.error('Error getting market by name:', error);
+    return null;
+  }
+}
 async function getFarmerContext(phone: string): Promise<{
   isSubscribed: boolean;
   lastInteraction: Date | null;
@@ -1308,22 +2076,99 @@ async function getFarmerContext(phone: string): Promise<{
   }
 }
 
-function isLocationQuery(text: string): boolean {
-  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
-  return locations.some(loc => text === loc || text.includes(loc));
-}
+async function isLocationQuery(text: string): Promise<boolean> {
+  const normalizedText = text.trim().toUpperCase();
 
-function extractLocationFromText(text: string): string | null {
-  const locations = ['NAIROBI', 'NAKURU', 'KISUMU', 'MOMBASA', 'ELDORET', 'KISII', 'THIKA'];
-  for (const loc of locations) {
-    if (text === loc || text.includes(loc)) {
-      return loc;
+  try {
+    // Check if it's a region
+    const regionResult = await query(`
+      SELECT COUNT(*) as count FROM regions 
+      WHERE (
+        UPPER(name) = $1 OR
+        UPPER(name) LIKE $1
+      )
+      AND is_active = true
+    `, [normalizedText]);
+
+    if (parseInt(regionResult.rows[0]?.count || '0') > 0) {
+      return true;
     }
+
+    // Check if it's a market
+    const marketResult = await query(`
+      SELECT COUNT(*) as count FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE (
+        UPPER(m.name) LIKE $1 OR
+        UPPER(m.location) LIKE $1
+      )
+      AND m.is_active = true
+      AND r.is_active = true
+    `, [`%${normalizedText}%`]);
+
+    return parseInt(marketResult.rows[0]?.count || '0') > 0;
+
+  } catch (error) {
+    logger.error('Error checking location query:', error);
+    return false;
   }
-  return null;
 }
 
-// ==================== WEBHOOK HANDLERS ====================
+async function extractLocationFromText(text: string): Promise<string | null> {
+  const normalizedText = text.trim().toUpperCase();
+
+  try {
+    // First, check if it's a province/region name
+    const regionResult = await query(`
+      SELECT name FROM regions 
+      WHERE UPPER(name) = $1 
+      AND is_active = true
+      LIMIT 1
+    `, [normalizedText]);
+
+    if (regionResult.rows.length > 0) {
+      return regionResult.rows[0].name; // Return exact database name
+    }
+
+    // Check if it's a market name that belongs to a region
+    const marketResult = await query(`
+      SELECT r.name as region_name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE (
+        UPPER(m.name) LIKE $1 OR
+        UPPER(m.location) LIKE $1
+      )
+      AND m.is_active = true
+      AND r.is_active = true
+      LIMIT 1
+    `, [`%${normalizedText}%`]);
+
+    if (marketResult.rows.length > 0) {
+      return marketResult.rows[0].region_name; // Return the region of this market
+    }
+
+    // Check for partial matches in region names
+    const partialResult = await query(`
+      SELECT name FROM regions 
+      WHERE UPPER(name) LIKE $1 
+      AND is_active = true
+      LIMIT 1
+    `, [`%${normalizedText}%`]);
+
+    if (partialResult.rows.length > 0) {
+      return partialResult.rows[0].name;
+    }
+
+    logger.debug('No region found for:', { text, normalizedText });
+    return null;
+
+  } catch (error) {
+    logger.error('Error extracting location from text:', error);
+    return null;
+  }
+}
+
 async function updateDeliveryStatus(
   externalId: string,
   status: string,
@@ -2542,12 +3387,10 @@ async function getCropPricesByLocation(location: string): Promise<string | null>
       JOIN crops c ON pe.crop_id = c.id
       JOIN regions r ON pe.region_id = r.id
       WHERE (
-        UPPER(r.name) LIKE $1 OR
-        UPPER(r.alias) LIKE $1 OR
-        UPPER(r.county) LIKE $1
+        UPPER(r.name) LIKE $1  
       )
       AND pe.is_verified = true
-      AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
+      AND pe.entry_date >= CURRENT_DATE - INTERVAL '30 days'
       ORDER BY pe.entry_date DESC, c.name
       LIMIT 8
     `, [`%${locationUpper}%`]);
