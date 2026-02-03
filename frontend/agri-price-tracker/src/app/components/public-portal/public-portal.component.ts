@@ -28,8 +28,8 @@ interface DisplayCrop {
   region_id: string;
   confidence: number;
   date: string | Date;
-  _historicalData?: any[]; // ✅ NEW: Store all historical entries
-  _historicalCount?: number; // ✅ NEW: Count of historical entries
+  _historicalData?: any[];
+  _historicalCount?: number;
 }
 
 @Component({
@@ -41,7 +41,7 @@ interface DisplayCrop {
 })
 export class PublicPortalComponent implements OnInit {
   private baseUrl = environment.apiUrl;
-  private readonly TREND_THRESHOLD_PERCENT = 2; // ✅ Unified threshold
+  private readonly TREND_THRESHOLD_PERCENT = 2;
 
   isLoggedIn = false;
   showLogin = false;
@@ -148,102 +148,89 @@ export class PublicPortalComponent implements OnInit {
       next: (response: any) => {
         let rawData = (response.data || response.prices || response) || [];
         const now = new Date();
+        const targetMarket = (crop.market || '').toLowerCase().trim();
 
-        // First, filter and map the data
         let filteredData = rawData
           .filter((p: any) => {
-            const entryMarket = (p.market_name || p.market || '').toLowerCase();
-            const cropMarket = (crop.market || '').toLowerCase();
+            // 1. Strict Market Match
+            const entryMarket = (p.market_name || p.market || '').toLowerCase().trim();
+            const marketMatch = !targetMarket || !entryMarket || entryMarket === targetMarket;
 
-            const marketMatch = !cropMarket ||
-              !entryMarket ||
-              entryMarket.includes(cropMarket) ||
-              cropMarket.includes(entryMarket) ||
-              entryMarket === 'unknown' ||
-              cropMarket === 'unknown';
+            // 2. Date Check (Using entry_date priority to match loadData)
+            const pDate = p.entry_date || p.created_at;
+            const entryDate = new Date(pDate);
 
-            const entryDate = new Date(p.entry_date || p.created_at);
-            const isPastOrPresent = entryDate <= now;
-
-            return marketMatch && isPastOrPresent;
+            return marketMatch && entryDate <= now;
           })
           .map((item: any) => ({
             ...item,
             price: parseFloat(item.price || item.current_price || 0),
-            entry_date: item.entry_date || item.created_at,
+            // 3. Consistent Field: Use entry_date as the "Truth" for the X-Axis
+            displayDate: item.entry_date || item.created_at,
             timestamp: new Date(item.entry_date || item.created_at).getTime()
           }))
-          .sort((a: any, b: any) => a.timestamp - b.timestamp); // Sort by date ascending
+          .sort((a: any, b: any) => a.timestamp - b.timestamp);
 
-        // ✅ CRITICAL FIX: Deduplicate by date (keep only one entry per day)
+        // 4. Deduplicate by Day (Using displayDate/entry_date)
         const dateMap = new Map<string, any>();
 
         filteredData.forEach((item: any) => {
-          const dateKey = new Date(item.entry_date).toDateString(); // "Mon Jan 08 2026"
+          const dateKey = new Date(item.displayDate).toDateString();
 
           if (!dateMap.has(dateKey)) {
             dateMap.set(dateKey, item);
           } else {
-            // If we already have an entry for this date, keep the one with the latest timestamp
+            // If multiple prices exist for the same day, take the one created last (update)
             const existing = dateMap.get(dateKey)!;
-            if (item.timestamp > existing.timestamp) {
+            const existingCreated = new Date(existing.created_at || 0).getTime();
+            const currentCreated = new Date(item.created_at || 0).getTime();
+
+            if (currentCreated > existingCreated) {
               dateMap.set(dateKey, item);
             }
           }
         });
 
-        // Convert map back to array and sort
         this.historyData = Array.from(dateMap.values())
           .sort((a: any, b: any) => a.timestamp - b.timestamp)
-          .map((item: any) => {
-            const { timestamp, ...rest } = item; // Remove timestamp property
-            return rest;
-          });
+          .map((item: any) => ({
+            ...item,
+            entry_date: item.displayDate
+          }));
 
-        console.log('History data loaded:', this.historyData.length, 'entries (deduplicated by date)');
-        console.log('Dates:', this.historyData.map(d =>
-          `${new Date(d.entry_date).toDateString()}: KSh ${d.price}`
-        ));
+        if (this.historyData.length > 0 && this.selectedHistoryCrop) {
+          const lastIndex = this.historyData.length - 1;
+
+          this.historyData[lastIndex] = {
+            ...this.historyData[lastIndex],
+            price: this.selectedHistoryCrop.currentPrice,
+            entry_date: this.selectedHistoryCrop.date
+          };
+        }
 
         if (this.historyData.length > 0) {
           this.generateChart();
         }
+
         this.historyLoading = false;
+
       },
       error: (err) => {
         console.error('History load error', err);
         this.historyLoading = false;
 
+
         if (crop._historicalData && crop._historicalData.length > 0) {
-          // Also deduplicate fallback data
-          const dateMap = new Map<string, any>();
-
-          crop._historicalData
-            .filter((p: any) => {
-              const entryDate = new Date(p.entry_date || p.created_at);
-              return entryDate <= new Date();
-            })
-            .forEach((item: any) => {
-              const dateKey = new Date(item.entry_date || item.created_at).toDateString();
-              if (!dateMap.has(dateKey)) {
-                dateMap.set(dateKey, item);
-              }
-            });
-
-          this.historyData = Array.from(dateMap.values())
-            .sort((a: any, b: any) => {
-              const dateA = new Date(a.entry_date || a.created_at).getTime();
-              const dateB = new Date(b.entry_date || b.created_at).getTime();
-              return dateA - dateB;
-            })
+          this.historyData = crop._historicalData
             .map((item: any) => ({
               ...item,
-              price: parseFloat(item.price || item.current_price || 0)
-            }));
-
-          if (this.historyData.length > 0) {
-            this.generateChart();
-          }
+              price: parseFloat(item.price || item.current_price || 0),
+              entry_date: item.entry_date || item.created_at
+            }))
+            .sort((a: any, b: any) =>
+              new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()
+            );
+          if (this.historyData.length > 0) this.generateChart();
         }
       }
     });
@@ -293,25 +280,29 @@ export class PublicPortalComponent implements OnInit {
   }
 
   getCurrentTrend(): 'up' | 'down' | 'stable' {
-    if (this.historyData.length < 2) return 'stable';
+    if (!this.selectedHistoryCrop || this.historyData.length < 2) return 'stable';
 
-    // Get the FIRST and LAST entries (to match table logic)
-    const firstPrice = parseFloat(this.historyData[0]?.price || '0');
-    const lastPrice = parseFloat(this.historyData[this.historyData.length - 1]?.price || '0');
+    const firstPrice = this.selectedHistoryCrop.previousPrice;
+    const lastPrice = parseFloat(
+      this.historyData[this.historyData.length - 1]?.price || '0'
+    );
 
     return this.calculateTrend(lastPrice, firstPrice);
   }
 
-  getTotalChange(): number {
-    if (this.historyData.length < 2) return 0;
 
-    // Compare last vs first (to match table logic)
-    const firstPrice = parseFloat(this.historyData[0]?.price || '0');
-    const lastPrice = parseFloat(this.historyData[this.historyData.length - 1]?.price || '0');
+  getTotalChange(): number {
+    if (!this.selectedHistoryCrop || this.historyData.length < 2) return 0;
+
+    const firstPrice = this.selectedHistoryCrop.previousPrice;
+    const lastPrice = parseFloat(
+      this.historyData[this.historyData.length - 1]?.price || '0'
+    );
 
     if (!firstPrice || firstPrice === 0) return 0;
     return Math.round(((lastPrice - firstPrice) / firstPrice) * 100);
   }
+
 
   getMinPrice(): number {
     if (this.historyData.length === 0) return 0;
@@ -434,33 +425,33 @@ export class PublicPortalComponent implements OnInit {
   }
 
   getSellingAdvice(): string {
-  if (this.historyData.length < 2) return 'Not enough data for advice';
+    if (this.historyData.length < 2) return 'Not enough data for advice';
 
-  const trend = this.getCurrentTrend();
-  const totalChange = this.getTotalChange();
-  const currentPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
-  const firstPrice = parseFloat(this.historyData[0].price);
-  const avgPrice = this.getAveragePrice();
+    const trend = this.getCurrentTrend();
+    const totalChange = this.getTotalChange();
+    const currentPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
+    const firstPrice = parseFloat(this.historyData[0].price);
+    const avgPrice = this.getAveragePrice();
 
-  const vsAverage = ((currentPrice - avgPrice) / avgPrice) * 100;
-  const timeSpan = this.getHistoricalTimeSpan();
+    const vsAverage = ((currentPrice - avgPrice) / avgPrice) * 100;
+    const timeSpan = this.getHistoricalTimeSpan();
 
-  if (trend === 'up') {
-    if (vsAverage > 10) {
-      return `Over ${timeSpan}, prices rose ${totalChange}% and are ${Math.abs(Math.round(vsAverage))}% above average. Good time to sell!`;
+    if (trend === 'up') {
+      if (vsAverage > 10) {
+        return `Over ${timeSpan}, prices rose ${totalChange}% and are ${Math.abs(Math.round(vsAverage))}% above average. Good time to sell!`;
+      } else {
+        return `Prices increased ${totalChange}% over ${timeSpan}. Monitor for further increases.`;
+      }
+    } else if (trend === 'down') {
+      if (currentPrice < avgPrice * 0.9) {
+        return `Over ${timeSpan}, prices fell ${Math.abs(totalChange)}% and are ${Math.abs(Math.round(vsAverage))}% below average. Consider holding.`;
+      } else {
+        return `Prices decreased ${Math.abs(totalChange)}% over ${timeSpan}. Sell if urgent, otherwise wait.`;
+      }
     } else {
-      return `Prices increased ${totalChange}% over ${timeSpan}. Monitor for further increases.`;
+      return `Prices stable (${totalChange > 0 ? '+' : ''}${totalChange}% change over ${timeSpan}). Consistent market conditions.`;
     }
-  } else if (trend === 'down') {
-    if (currentPrice < avgPrice * 0.9) {
-      return `Over ${timeSpan}, prices fell ${Math.abs(totalChange)}% and are ${Math.abs(Math.round(vsAverage))}% below average. Consider holding.`;
-    } else {
-      return `Prices decreased ${Math.abs(totalChange)}% over ${timeSpan}. Sell if urgent, otherwise wait.`;
-    }
-  } else {
-    return `Prices stable (${totalChange > 0 ? '+' : ''}${totalChange}% change over ${timeSpan}). Consistent market conditions.`;
   }
-}
 
   get paginatedCrops() {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -485,9 +476,6 @@ export class PublicPortalComponent implements OnInit {
     }
   }
 
-  // ============================================================================
-  // ✅ UPDATED: loadData - Now uses historical comparison for trends
-  // ============================================================================
 
   loadData(): void {
     this.isLoading = true;
@@ -524,12 +512,11 @@ export class PublicPortalComponent implements OnInit {
         pricesData = pricesData.filter((p: any) => new Date(p.entry_date || p.created_at) <= now);
 
         pricesData.sort((a: any, b: any) => {
-          const timeA = new Date(a.created_at || a.entry_date).getTime();
-          const timeB = new Date(b.created_at || b.entry_date).getTime();
+          const timeA = new Date(a.entry_date || a.created_at).getTime();
+          const timeB = new Date(b.entry_date || b.created_at).getTime();
           return timeB - timeA;
         });
 
-        // ✅ NEW: Group prices by crop_id + region_id + market for historical calculation
         const priceGroups = new Map<string, any[]>();
 
         for (const item of pricesData) {
@@ -545,18 +532,20 @@ export class PublicPortalComponent implements OnInit {
         const uniquePrices: any[] = [];
         const cats = new Set<string>();
 
-        // ✅ NEW: Process each group to get latest entry with historical context
         for (const [groupKey, groupItems] of priceGroups.entries()) {
-          // Sort by date ascending (oldest first)
+
           groupItems.sort((a: any, b: any) =>
-            new Date(a.created_at || a.entry_date).getTime() -
-            new Date(b.created_at || b.entry_date).getTime()
+            new Date(a.entry_date || a.created_at).getTime() -
+            new Date(b.entry_date || b.created_at).getTime()
           );
 
           const latestItem = groupItems[groupItems.length - 1];
-          const firstItem = groupItems[0];
+          const previousItem = groupItems.length > 1
+            ? groupItems[groupItems.length - 2]
+            : groupItems[groupItems.length - 1];
 
-          latestItem._historicalFirst = parseFloat(firstItem.price || firstItem.current_price || 0);
+          latestItem._historicalFirst = parseFloat(previousItem.price || previousItem.current_price || 0);
+
           latestItem._historicalCount = groupItems.length;
           latestItem._historicalData = groupItems;
 
@@ -585,7 +574,7 @@ export class PublicPortalComponent implements OnInit {
             trend: this.calculateTrend(currentPrice, firstHistoricalPrice),
             region: item.region_name || item.region || 'Unknown',
             market: item.market_name || item.market || 'Unknown',
-            lastUpdated: this.formatDate(item.created_at || item.entry_date),
+            lastUpdated: this.formatDate(item.entry_date),
             date: item.created_at || item.entry_date,
             prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
             confidence: realPrediction ? realPrediction.confidence_score : 0,
@@ -598,7 +587,14 @@ export class PublicPortalComponent implements OnInit {
 
         this.filteredCrops = this.allCrops;
         this.isLoading = false;
-        if (this.allCrops.length > 0) this.lastUpdated = this.allCrops[0].lastUpdated;
+        const latestMarketDate = Math.max(
+          ...this.allCrops
+            .map(c => new Date(c.date).getTime())
+            .filter(t => !isNaN(t))
+        );
+
+        this.lastUpdated = this.formatDate(new Date(latestMarketDate));
+
       },
       error: (error) => {
         console.error('Data load error', error);
