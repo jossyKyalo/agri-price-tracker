@@ -5,18 +5,49 @@
       <p class="text-muted">Real-time agricultural products prices, AI predictions, and price input for farmers</p>
     </div>
 
+    <!-- Updated Chart Modal - Matches table's trend calculation -->
     <div class="auth-overlay" *ngIf="showHistory">
-      <div class="auth-card bg-white p-4 rounded shadow" style="max-width: 700px;">
+      <div class="auth-card bg-white p-4 rounded shadow chart-modal">
         <button class="close-btn btn btn-sm btn-light" (click)="closeHistoryModal()">&times;</button>
 
         <div class="text-center mb-4">
-          <h3 class="mb-1">
+          <h3 class="mb-2">
             <i class="fas fa-chart-line text-primary"></i>
-            {{ selectedHistoryCrop?.name }} Trends
+            {{ selectedHistoryCrop?.name }} Price Trends
           </h3>
           <span class="badge bg-light text-dark border">
-            <i class="fas fa-map-marker-alt"></i> {{ selectedHistoryCrop?.market }}
+            <i class="fas fa-map-marker-alt"></i> {{ selectedHistoryCrop?.market }}, {{ selectedHistoryCrop?.region }}
           </span>
+        </div>
+
+        <div class="alert alert-primary mb-3" *ngIf="historyData.length > 1">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong><i class="fas fa-exchange-alt"></i> Overall Price Change</strong>
+              <div class="small mt-1">
+                <span class="text-muted">Starting:</span> {{ (historyData[0]?.entry_date | date:'mediumDate') || 'N/A'
+                }}
+                (KSh {{ historyData[0]?.price }})
+                <i class="fas fa-arrow-right mx-2"></i>
+                <span class="text-muted">Current:</span> {{ (historyData[historyData.length-1]?.entry_date |
+                date:'mediumDate') || 'N/A' }}
+                (KSh {{ historyData[historyData.length-1]?.price }})
+              </div>
+            </div>
+            <span class="badge badge-lg" [ngClass]="{
+      'bg-success': getCurrentTrend() === 'up',
+      'bg-danger': getCurrentTrend() === 'down',
+      'bg-warning text-dark': getCurrentTrend() === 'stable'
+    }">
+              <i class="fas" [ngClass]="{
+        'fa-arrow-trend-up': getCurrentTrend() === 'up',
+        'fa-arrow-trend-down': getCurrentTrend() === 'down',
+        'fa-equals': getCurrentTrend() === 'stable'
+      }"></i>
+              {{ getCurrentTrend() | titlecase }}
+              {{ getTotalChange() > 0 ? '+' : '' }}{{ getTotalChange() }}%
+            </span>
+          </div>
         </div>
 
         <div *ngIf="historyLoading" class="text-center py-5">
@@ -25,30 +56,274 @@
         </div>
 
         <div *ngIf="!historyLoading && historyData.length > 1" class="chart-container">
-          <svg viewBox="0 0 600 200" class="w-100" style="height: 200px; background: #f8f9fa; border-radius: 8px;">
-            <line x1="0" y1="50" x2="600" y2="50" stroke="#e9ecef" stroke-width="1"></line>
-            <line x1="0" y1="100" x2="600" y2="100" stroke="#e9ecef" stroke-width="1"></line>
-            <line x1="0" y1="150" x2="600" y2="150" stroke="#e9ecef" stroke-width="1"></line>
 
-            <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
+          <!-- Updated Summary Cards -->
+          <div class="price-summary-grid mb-4">
+            <div class="summary-card">
+              <div class="summary-icon bg-info">
+                <i class="fas fa-calendar-day"></i> <!-- Changed back to original -->
+              </div>
+              <div class="summary-details">
+                <small class="text-muted">Starting Price</small> <!-- Changed back -->
+                <h4 class="mb-0">KSh {{ historyData[0]?.price || 'N/A' }}</h4>
+                <small class="text-muted">{{ (historyData[0]?.entry_date | date:'mediumDate') || 'N/A' }}</small>
+              </div>
+            </div>
 
-          <div class="d-flex justify-content-between mt-2 text-muted small">
-            <span>{{ historyData[0].entry_date | date }}</span>
-            <span>Today</span>
+            <div class="summary-card">
+              <div class="summary-icon" [ngClass]="{
+    'bg-success': getCurrentTrend() === 'up',
+    'bg-danger': getCurrentTrend() === 'down',
+    'bg-warning': getCurrentTrend() === 'stable'
+  }">
+                <i class="fas" [ngClass]="{
+      'fa-arrow-trend-up': getCurrentTrend() === 'up',
+      'fa-arrow-trend-down': getCurrentTrend() === 'down',
+      'fa-minus': getCurrentTrend() === 'stable'
+    }"></i>
+              </div>
+              <div class="summary-details">
+                <small class="text-muted">Current Price</small>
+                <h4 class="mb-0">KSh {{ historyData[historyData.length-1].price }}</h4>
+                <small [ngClass]="{
+      'text-success': getTotalChange() > 0,
+      'text-danger': getTotalChange() < 0,
+      'text-warning': getTotalChange() === 0
+    }">
+                  <i class="fas" [ngClass]="{
+        'fa-arrow-up': getTotalChange() > 0,
+        'fa-arrow-down': getTotalChange() < 0,
+        'fa-equals': getTotalChange() === 0
+      }"></i>
+                  {{ getTotalChange() > 0 ? '+' : '' }}{{ getTotalChange() }}% overall
+                </small>
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-icon bg-primary">
+                <i class="fas fa-chart-simple"></i>
+              </div>
+              <div class="summary-details">
+                <small class="text-muted">Price Range</small>
+                <h4 class="mb-0">KSh {{ getMinPrice() }} - {{ getMaxPrice() }}</h4>
+                <small class="text-muted">Variation: KSh {{ getMaxPrice() - getMinPrice() }}</small>
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-icon bg-secondary">
+                <i class="fas fa-calculator"></i>
+              </div>
+              <div class="summary-details">
+                <small class="text-muted">Average Price</small>
+                <h4 class="mb-0">KSh {{ getAveragePrice() }}</h4>
+                <small class="text-muted">Over {{ historyData.length }} data points</small>
+              </div>
+            </div>
           </div>
 
-          <div class="alert alert-info mt-3 mb-0 py-2 small">
-            <i class="fas fa-info-circle"></i>
-            Price started at <strong>KSh {{ historyData[0].price }}</strong> and is now <strong>KSh {{
-              historyData[historyData.length-1].price }}</strong>.
+          <!-- Enhanced SVG Chart -->
+          <div class="chart-wrapper">
+            <svg viewBox="0 0 600 280" class="w-100 price-chart">
+              <defs>
+                <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#0d6efd;stop-opacity:0.3" />
+                  <stop offset="100%" style="stop-color:#0d6efd;stop-opacity:0.05" />
+                </linearGradient>
+              </defs>
+
+              <!-- Grid lines -->
+              <line x1="50" y1="40" x2="580" y2="40" stroke="#e9ecef" stroke-width="1"></line>
+              <line x1="50" y1="90" x2="580" y2="90" stroke="#e9ecef" stroke-width="1"></line>
+              <line x1="50" y1="140" x2="580" y2="140" stroke="#dee2e6" stroke-width="2" stroke-dasharray="5,5"></line>
+              <line x1="50" y1="190" x2="580" y2="190" stroke="#e9ecef" stroke-width="1"></line>
+              <line x1="50" y1="240" x2="580" y2="240" stroke="#e9ecef" stroke-width="1"></line>
+
+              <!-- Y-axis labels -->
+              <text x="45" y="45" text-anchor="end" font-size="11" fill="#6c757d">{{ getMaxPrice() }}</text>
+              <text x="45" y="95" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.75 +
+                getMinPrice() * 0.25) | number:'1.0-0' }}</text>
+              <text x="45" y="145" text-anchor="end" font-size="12" fill="#495057" font-weight="600">{{
+                getAveragePrice() }}</text>
+              <text x="45" y="195" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.25 +
+                getMinPrice() * 0.75) | number:'1.0-0' }}</text>
+              <text x="45" y="245" text-anchor="end" font-size="11" fill="#6c757d">{{ getMinPrice() }}</text>
+
+              <!-- Area under the line -->
+              <path [attr.d]="getAreaPath()" fill="url(#priceGradient)"></path>
+
+              <!-- Main price line -->
+              <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round"></path>
+
+              <!-- Data points -->
+              <g *ngFor="let point of getChartPoints(); let i = index">
+                <circle [attr.cx]="point.x" [attr.cy]="point.y" r="5" fill="#fff" stroke="#0d6efd" stroke-width="2"
+                  class="chart-point">
+                  <title>{{ historyData[i].entry_date | date:'mediumDate' }}: KSh {{ historyData[i].price }}</title>
+                </circle>
+              </g>
+
+              <!-- Update the Previous Point highlight in your SVG -->
+              <circle *ngIf="getPreviousPoint()" [attr.cx]="getPreviousPoint()!.x" [attr.cy]="getPreviousPoint()!.y"
+                r="8" fill="#17a2b8" stroke="#fff" stroke-width="2" class="highlight-point">
+                <title>Previous: KSh {{ historyData[historyData.length-2]?.price }}</title>
+              </circle>
+              <text *ngIf="getPreviousPoint()" [attr.x]="getPreviousPoint()!.x" [attr.y]="getPreviousPoint()!.y - 15"
+                text-anchor="middle" font-size="11" fill="#17a2b8" font-weight="600">
+                Previous
+              </text>
+
+              <circle [attr.cx]="getChartPoints()[0].x" [attr.cy]="getChartPoints()[0].y" r="8" fill="#17a2b8"
+                stroke="#fff" stroke-width="2" class="highlight-point">
+                <title>Starting: KSh {{ historyData[0]?.price }}</title>
+              </circle>
+              <text [attr.x]="getChartPoints()[0].x" [attr.y]="getChartPoints()[0].y - 15" text-anchor="middle"
+                font-size="11" fill="#17a2b8" font-weight="600">
+                Start
+              </text>
+
+              <!-- Also mark Peak and Low -->
+              <circle [attr.cx]="getHighestPoint().x" [attr.cy]="getHighestPoint().y" r="7" fill="#28a745" stroke="#fff"
+                stroke-width="2" class="highlight-point">
+                <title>Highest: KSh {{ getMaxPrice() }}</title>
+              </circle>
+              <text [attr.x]="getHighestPoint().x" [attr.y]="getHighestPoint().y - 15" text-anchor="middle"
+                font-size="11" fill="#28a745" font-weight="600">
+                Peak
+              </text>
+
+              <circle [attr.cx]="getLowestPoint().x" [attr.cy]="getLowestPoint().y" r="7" fill="#dc3545" stroke="#fff"
+                stroke-width="2" class="highlight-point">
+                <title>Lowest: KSh {{ getMinPrice() }}</title>
+              </circle>
+              <text [attr.x]="getLowestPoint().x" [attr.y]="getLowestPoint().y + 20" text-anchor="middle" font-size="11"
+                fill="#dc3545" font-weight="600">
+                Low
+              </text>
+            </svg>
+
+            <!-- Date range labels -->
+            <div class="d-flex justify-content-between mt-3 px-3">
+              <div class="date-label">
+                <i class="fas fa-calendar-alt text-muted"></i>
+                <span class="ms-1">{{ historyData[0].entry_date | date:'mediumDate' }}</span>
+              </div>
+              <div class="date-label text-end">
+                <span class="me-1">{{ historyData[historyData.length-1].entry_date | date:'mediumDate' }}</span>
+                <i class="fas fa-calendar-check text-primary"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insights Section -->
+          <div class="insights-section mt-4">
+            <h5 class="mb-3">
+              <i class="fas fa-lightbulb text-warning"></i>
+              What This Means For You
+            </h5>
+
+            <div class="insight-card" *ngIf="getTotalChange() > 5">
+              <div class="insight-icon bg-success-light">
+                <i class="fas fa-arrow-trend-up text-success"></i>
+              </div>
+              <div class="insight-content">
+                <h6 class="mb-1">Prices Are Rising</h6>
+                <p class="mb-0 small">
+                  Prices increased by <strong>{{ getTotalChange() }}%</strong> from the previous period.
+                  {{ getSellingAdvice() }}
+                </p>
+              </div>
+            </div>
+
+            <div class="insight-card" *ngIf="getTotalChange() < -5">
+              <div class="insight-icon bg-danger-light">
+                <i class="fas fa-arrow-trend-down text-danger"></i>
+              </div>
+              <div class="insight-content">
+                <h6 class="mb-1">Prices Are Falling</h6>
+                <p class="mb-0 small">
+                  Prices decreased by <strong>{{ Math.abs(getTotalChange()) }}%</strong> from the previous period.
+                  {{ getSellingAdvice() }}
+                </p>
+              </div>
+            </div>
+
+            <div class="insight-card" *ngIf="getTotalChange() >= -5 && getTotalChange() <= 5">
+              <div class="insight-icon bg-warning-light">
+                <i class="fas fa-equals text-warning"></i>
+              </div>
+              <div class="insight-content">
+                <h6 class="mb-1">Stable Market</h6>
+                <p class="mb-0 small">
+                  Prices changed by <strong>{{ getTotalChange() > 0 ? '+' : '' }}{{ getTotalChange() }}%</strong> from
+                  the previous period.
+                  {{ getSellingAdvice() }}
+                </p>
+              </div>
+            </div>
+
+            <div class="insight-card" *ngIf="getPriceVolatility() > 20">
+              <div class="insight-icon bg-info-light">
+                <i class="fas fa-chart-line text-info"></i>
+              </div>
+              <div class="insight-content">
+                <h6 class="mb-1">High Price Swings</h6>
+                <p class="mb-0 small">
+                  Prices vary by <strong>KSh {{ getMaxPrice() - getMinPrice() }}</strong> ({{ getPriceVolatility() }}%
+                  volatility).
+                  Watch the market closely for best selling opportunities.
+                </p>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="insight-icon bg-primary-light">
+                <i class="fas fa-hand-holding-dollar text-primary"></i>
+              </div>
+              <div class="insight-content">
+                <h6 class="mb-1">Market Position</h6>
+                <p class="mb-0 small">
+                  Current price (KSh {{ historyData[historyData.length-1].price }}) is
+                  <strong>
+                    {{ ((historyData[historyData.length-1].price - getAveragePrice()) / getAveragePrice() * 100) |
+                    number:'1.0-0' }}%
+                    {{ historyData[historyData.length-1].price > getAveragePrice() ? 'above' : 'below' }}
+                  </strong>
+                  the historical average (KSh {{ getAveragePrice() }}).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Updated Legend -->
+          <div class="chart-legend mt-4">
+            <div class="legend-item">
+              <div class="legend-color" style="background: #17a2b8;"></div>
+              <span>Starting Price ({{ (historyData[0]?.entry_date | date:'shortDate') || 'N/A' }})</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color"
+                [style.background]="getCurrentTrend() === 'up' ? '#28a745' : getCurrentTrend() === 'down' ? '#dc3545' : '#ffc107'">
+              </div>
+              <span>Current Price ({{ historyData[historyData.length-1].entry_date | date:'shortDate' }})</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #0d6efd;"></div>
+              <span>Price Trend Line</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #dee2e6; border: 2px dashed #6c757d;"></div>
+              <span>Average (KSh {{ getAveragePrice() }})</span>
+            </div>
           </div>
         </div>
 
-        <div *ngIf="!historyLoading && historyData.length <= 1" class="text-center py-4">
+        <div *ngIf="!historyLoading && historyData.length <= 1" class="text-center py-5">
           <i class="fas fa-history fa-3x text-muted mb-3"></i>
-          <p>Not enough historical data to show a chart yet.</p>
+          <h5>Not Enough Data Yet</h5>
+          <p class="text-muted">We need at least 2 price entries to show trends. Check back soon!</p>
         </div>
 
       </div>
@@ -314,7 +589,7 @@
                   <div class="location-badge mt-2">
                     <i class="fas fa-map-marker-alt"></i>
                     {{ crop.market }} <span class="text-muted">({{ crop.region }})</span>
-                  </div> 
+                  </div>
                   <div class="current-price mt-2">
                     Current: <strong>KSh {{ crop.currentPrice }} / {{ crop.unit }}</strong>
                   </div>
@@ -326,7 +601,8 @@
                   </div>
                   <div class="confidence">
                     <i class="fas fa-shield-alt text-muted"></i>
-                    {{ (crop.confidence * 100) | number:'1.0-0' }}% confidence</div>
+                    {{ (crop.confidence * 100) | number:'1.0-0' }}% confidence
+                  </div>
                 </div>
                 <div class="prediction-trend"
                   [class]="(crop.currentPrice !== undefined && crop.prediction !== null) ? getPredictionTrend(crop.currentPrice, crop.prediction) : ''">
@@ -334,19 +610,21 @@
                     [class.fa-arrow-up]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction > crop.currentPrice"
                     [class.fa-arrow-down]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction < crop.currentPrice"
                     [class.fa-minus]="crop.prediction !== null && crop.currentPrice !== undefined && crop.prediction === crop.currentPrice"></i>
-                   <span class="ms-1">
+                  <span class="ms-1">
                     {{ getPredictionChange(crop.currentPrice, crop.prediction! ) }}%
-                    {{ crop.prediction! > crop.currentPrice ? 'Increase' : (crop.prediction! < crop.currentPrice ? 'Decrease' : 'Stable') }}
-                  </span>
+                    {{ crop.prediction! > crop.currentPrice ? 'Increase' : (crop.prediction! < crop.currentPrice
+                      ? 'Decrease' : 'Stable' ) }} </span>
                 </div>
               </div>
             </div>
-            <div class="pagination-footer d-flex justify-content-center align-items-center mt-4" *ngIf="totalPages > 1 && !isLoading">
+            <div class="pagination-footer d-flex justify-content-center align-items-center mt-4"
+              *ngIf="totalPages > 1 && !isLoading">
               <button class="btn btn-outline-secondary btn-sm me-3" [disabled]="currentPage === 1" (click)="prevPage()">
                 <i class="fas fa-chevron-left"></i> Previous
               </button>
               <span class="fw-bold text-muted small">Page {{ currentPage }} of {{ totalPages }}</span>
-              <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages" (click)="nextPage()">
+              <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages"
+                (click)="nextPage()">
                 Next <i class="fas fa-chevron-right"></i>
               </button>
             </div>
