@@ -165,7 +165,6 @@
                 </circle>
               </g>
 
-              <!-- Update the Previous Point highlight in your SVG -->
               <circle *ngIf="getPreviousPoint()" [attr.cx]="getPreviousPoint()!.x" [attr.cy]="getPreviousPoint()!.y"
                 r="8" fill="#17a2b8" stroke="#fff" stroke-width="2" class="highlight-point">
                 <title>Previous: KSh {{ historyData[historyData.length-2]?.price }}</title>
@@ -179,29 +178,37 @@
                 stroke="#fff" stroke-width="2" class="highlight-point">
                 <title>Starting: KSh {{ historyData[0]?.price }}</title>
               </circle>
-              <text [attr.x]="getChartPoints()[0].x" [attr.y]="getChartPoints()[0].y - 15" text-anchor="middle"
-                font-size="11" fill="#17a2b8" font-weight="600">
+
+              <text [attr.x]="getChartPoints()[0].x + 10"
+                [attr.y]="getChartPoints()[0].y < 50 ? getChartPoints()[0].y + 20 : getChartPoints()[0].y - 10"
+                text-anchor="start" font-size="11" fill="#17a2b8" font-weight="600">
                 Start
               </text>
 
-              <!-- Also mark Peak and Low -->
-              <circle [attr.cx]="getHighestPoint().x" [attr.cy]="getHighestPoint().y" r="7" fill="#28a745" stroke="#fff"
-                stroke-width="2" class="highlight-point">
-                <title>Highest: KSh {{ getMaxPrice() }}</title>
-              </circle>
-              <text [attr.x]="getHighestPoint().x" [attr.y]="getHighestPoint().y - 15" text-anchor="middle"
-                font-size="11" fill="#28a745" font-weight="600">
-                Peak
-              </text>
+              <ng-container
+                *ngIf="getHighestPoint().x !== getChartPoints()[0].x && getHighestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
+                <circle [attr.cx]="getHighestPoint().x" [attr.cy]="getHighestPoint().y" r="7" fill="#28a745"
+                  stroke="#fff" stroke-width="2" class="highlight-point">
+                  <title>Highest: KSh {{ getMaxPrice() }}</title>
+                </circle>
+                <text [attr.x]="getHighestPoint().x"
+                  [attr.y]="getHighestPoint().y < 50 ? getHighestPoint().y + 25 : getHighestPoint().y - 15"
+                  text-anchor="middle" font-size="11" fill="#28a745" font-weight="600">
+                  Peak
+                </text>
+              </ng-container>
 
-              <circle [attr.cx]="getLowestPoint().x" [attr.cy]="getLowestPoint().y" r="7" fill="#dc3545" stroke="#fff"
-                stroke-width="2" class="highlight-point">
-                <title>Lowest: KSh {{ getMinPrice() }}</title>
-              </circle>
-              <text [attr.x]="getLowestPoint().x" [attr.y]="getLowestPoint().y + 20" text-anchor="middle" font-size="11"
-                fill="#dc3545" font-weight="600">
-                Low
-              </text>
+              <ng-container
+                *ngIf="getLowestPoint().x !== getChartPoints()[0].x && getLowestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
+                <circle [attr.cx]="getLowestPoint().x" [attr.cy]="getLowestPoint().y" r="7" fill="#dc3545" stroke="#fff"
+                  stroke-width="2" class="highlight-point">
+                  <title>Lowest: KSh {{ getMinPrice() }}</title>
+                </circle>
+                <text [attr.x]="getLowestPoint().x" [attr.y]="getLowestPoint().y + 25" text-anchor="middle"
+                  font-size="11" fill="#dc3545" font-weight="600">
+                  Low
+                </text>
+              </ng-container>
             </svg>
 
             <!-- Date range labels -->
@@ -354,7 +361,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ lastUpdated }}</h3>
-          <p>Last Update</p>
+          <p>Last Market Update</p>
         </div>
       </div>
       <div class="stat-card">
@@ -440,7 +447,7 @@
                   <th>Region</th>
                   <th>Market</th>
                   <th>Last Updated</th>
-                  <th>Action</th>
+                  <th>History</th>
                 </tr>
               </thead>
               <tbody>
@@ -494,7 +501,7 @@
                   </td>
                   <td>
                     <button class="btn btn-outline-primary btn-sm" (click)="openHistoryModal(crop)">
-                      <i class="fas fa-chart-line"></i> Trend
+                      <i class="fas fa-chart-line"></i> View History
                     </button>
                   </td>
                 </tr>
