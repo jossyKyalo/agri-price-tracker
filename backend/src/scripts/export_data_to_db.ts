@@ -7,7 +7,7 @@ import pool from '../database/connection';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
  
-const DATA_FILE = path.join(__dirname, '../ml-model-service/data/raw/kamis_latest.csv');
+const DATA_FILE = path.join(__dirname, '../ml-model-service/data/raw/kamis_data.csv');
 
 interface KamisRecord {
   Commodity: string;
