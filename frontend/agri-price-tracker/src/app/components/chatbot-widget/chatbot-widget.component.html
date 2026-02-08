@@ -1,111 +1,115 @@
 <div class="chatbot-widget">
-      <!-- Chatbot Toggle Button -->
-      <button 
-        class="chatbot-toggle" 
-        (click)="toggleChat()"
-        [class.active]="isOpen">
-        <i class="fas" [class.fa-comment]="!isOpen" [class.fa-times]="isOpen"></i>
-      </button>
-      
-      <!-- Chat Window -->
-      <div class="chat-window" [class.open]="isOpen">
-        <div class="chat-header">
-          <div class="chat-title">
-            <i class="fas fa-robot"></i>
-            <span>AgriBot Assistant</span>
-          </div>
-          <div class="chat-status">
-            <span class="status-indicator online"></span>
-            <small>Price Expert</small>
-          </div>
+  <!-- Chatbot Toggle Button -->
+  <button 
+    class="chatbot-toggle" 
+    (click)="toggleChat()"
+    [class.active]="isOpen">
+    <i class="fas" [class.fa-comment]="!isOpen" [class.fa-times]="isOpen"></i>
+  </button>
+  
+  <!-- Chat Window -->
+  <div class="chat-window" [class.open]="isOpen">
+    <div class="chat-header">
+      <div class="chat-title">
+        <i class="fas fa-robot"></i>
+        <span>AgriBot Assistant</span>
+      </div>
+      <div class="chat-status">
+        <span class="status-indicator online"></span>
+        <small>Price Expert</small>
+      </div>
+    </div>
+    
+    <div class="chat-body" #chatBody>
+      <div class="welcome-message" *ngIf="messages.length === 0">
+        <div class="bot-avatar">
+          <i class="fas fa-robot"></i>
         </div>
-        
-        <div class="chat-body" #chatBody>
-          <div class="welcome-message" *ngIf="messages.length === 0">
-            <div class="bot-avatar">
-              <i class="fas fa-robot"></i>
-            </div>
-            <div class="welcome-content">
-              <h4>Welcome to AgriBot! 🌾</h4>
-              <p>I specialize in agricultural pricing information. Ask me about:</p>
-              <ul>
-                <li>Current crop prices</li>
-                <li>Price predictions</li>
-                <li>Market comparisons</li>
-                <li>Best selling times</li>
-              </ul>
-              <div class="quick-actions">
-                <button class="quick-btn" (click)="sendQuickMessage('What are today\'s maize prices?')">
-                  📊 Maize Prices
-                </button>
-                <button class="quick-btn" (click)="sendQuickMessage('Show me tomato price predictions')">
-                  🔮 Price Predictions
-                </button>
-                <button class="quick-btn" (click)="sendQuickMessage('Compare bean prices across regions')">
-                  📈 Price Comparison
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="messages-container">
-            <div *ngFor="let message of messages" class="message" [class]="message.sender">
-              <div class="message-content" [class]="message.type">
-                <div *ngIf="message.sender === 'bot'" class="bot-avatar">
-                  <i class="fas fa-robot"></i>
-                </div>
-                <div class="message-bubble">
-                  <div [innerHTML]="formatMessage(message.content)"></div>
-                  <span class="message-time">{{ formatTime(message.timestamp) }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div *ngIf="isTyping" class="message bot">
-              <div class="message-content">
-                <div class="bot-avatar">
-                  <i class="fas fa-robot"></i>
-                </div>
-                <div class="message-bubble typing">
-                  <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="chat-footer">
-          <div class="suggested-questions" *ngIf="suggestedQuestions.length > 0">
-            <small>Try asking:</small>
-            <div class="suggestions">
-              <button 
-                *ngFor="let suggestion of suggestedQuestions" 
-                class="suggestion-btn"
-                (click)="sendQuickMessage(suggestion)">
-                {{ suggestion }}
-              </button>
-            </div>
-          </div>
-          
-          <div class="chat-input">
-            <input 
-              type="text" 
-              [(ngModel)]="currentMessage" 
-              (keyup.enter)="sendMessage()"
-              placeholder="Ask about crop prices..."
-              class="message-input"
-              [disabled]="isTyping">
-            <button 
-              class="send-btn" 
-              (click)="sendMessage()"
-              [disabled]="!currentMessage.trim() || isTyping">
-              <i class="fas fa-paper-plane"></i>
+        <div class="welcome-content">
+          <h4>Welcome to AgriBot! 🌾</h4>
+          <p>I specialize in agricultural pricing information. Ask me about:</p>
+          <ul>
+            <li>Current crop prices</li>
+            <li>Price predictions</li>
+            <li>Market comparisons</li>
+            <li>Best selling times</li>
+          </ul>
+          <div class="quick-actions">
+            <button class="quick-btn" (click)="sendQuickMessage('What are today\'s maize prices?')">
+              📊 Maize Prices
+            </button>
+            <button class="quick-btn" (click)="sendQuickMessage('Show me tomato price predictions')">
+              🔮 Price Predictions
+            </button>
+            <button class="quick-btn" (click)="sendQuickMessage('Compare bean prices across regions')">
+              📈 Price Comparison
             </button>
           </div>
         </div>
       </div>
+      
+      <div class="messages-container">
+        <div *ngFor="let message of messages" class="message" [class]="message.sender">
+          <div class="message-content" [class]="message.type">
+            <div *ngIf="message.sender === 'bot'" class="bot-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-bubble">
+               
+              <div [innerHTML]="formatMessage(message.content)"></div>
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="isTyping" class="message bot">
+          <div class="message-content">
+            <div class="bot-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-bubble typing">
+              <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <div class="chat-footer">
+      <div class="suggested-questions" *ngIf="suggestedQuestions.length > 0">
+        <small>Try asking:</small>
+        <div class="suggestions">
+          <button 
+            *ngFor="let suggestion of suggestedQuestions" 
+            class="suggestion-btn"
+            (click)="sendQuickMessage(suggestion)">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+      
+      <div class="chat-input"> 
+        <input 
+          #chatInput
+          type="text" 
+          [value]="currentMessage"
+          (input)="currentMessage = chatInput.value"
+          (keyup.enter)="sendMessage()"
+          placeholder="Ask about crop prices..."
+          class="message-input"
+          [disabled]="isTyping">
+          
+        <button 
+          class="send-btn" 
+          (click)="sendMessage()"
+          [disabled]="!currentMessage.trim() || isTyping">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

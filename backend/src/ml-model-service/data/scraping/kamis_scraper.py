@@ -9,24 +9,26 @@ from datetime import datetime, timedelta
 import sys
 import warnings
 import io
- 
+
+# --- FIX: Force UTF-8 Output ---
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
- 
+
+# --- FIX: Suppress Warnings ---
 warnings.filterwarnings("ignore", message="Parsing dates in %Y-%m-%d format")
 
- 
+# Configuration
 BASE_URL = "https://kamis.kilimo.go.ke/site/market" 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "../../data/raw")
 MASTER_FILE = os.path.join(OUTPUT_DIR, "kamis_data.csv")
 LATEST_FILE = os.path.join(OUTPUT_DIR, "kamis_latest.csv")
 
 PER_PAGE = 10000 
- 
 days_back = 30
 CUTOFF_DATE = datetime.now() - timedelta(days=days_back) 
 
+# Range of product IDs to scrape
 PRODUCT_IDS = range(1, 274) 
 
 HEADERS = {
@@ -37,7 +39,7 @@ HEADERS = {
 
 def scrape_market_data():
     new_data = []
-     
+    
     print(f"[INFO] Starting scrape for {len(PRODUCT_IDS)} products...")
     print(f"[INFO] Fetching data from: {CUTOFF_DATE.strftime('%Y-%m-%d')} to TODAY")
      
@@ -73,8 +75,34 @@ def scrape_market_data():
             
             date_col = next((col for col in df.columns if 'date' in col.lower()), None)
             
-            if date_col: 
-                df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True) 
+            if date_col:
+                # --- FIX: Date Parsing Logic ---
+                # 1. Try standard DD/MM/YYYY (Kenya standard)
+                try:
+                    df[date_col] = pd.to_datetime(df[date_col], dayfirst=True, errors='raise')
+                except Exception:
+                    # 2. Fallback to MM/DD/YYYY if the above fails
+                    try:
+                        df[date_col] = pd.to_datetime(df[date_col], dayfirst=False, errors='coerce')
+                    except:
+                        continue
+
+                # 3. SAFETY CHECK: If parsed date is > Tomorrow, assume Day/Month were swapped
+                # This fixes the "Feb 8th -> Aug 2nd" issue automatically
+                now = pd.Timestamp.now()
+                tomorrow = now + pd.Timedelta(days=1)
+                
+                # Identify rows where date is impossibly far in the future
+                # (e.g. we are in Feb, but date says Aug)
+                future_mask = df[date_col] > tomorrow
+                if future_mask.any():
+                    # For these specific rows, try swapping day/month back
+                    # This is a bit of a hack but solves the specific "Aug vs Feb" issue
+                    df.loc[future_mask, date_col] = df.loc[future_mask, date_col].apply(
+                        lambda d: d.replace(month=d.day, day=d.month) if d.day <= 12 else d
+                    )
+
+                # Filter by cutoff
                 df = df[df[date_col] >= CUTOFF_DATE]
                 
                 if not df.empty:
@@ -85,6 +113,7 @@ def scrape_market_data():
                     print(f"[OK] {product_name}: {len(df)} rows")
             
         except Exception as e:
+            # print(f"[ERR] {e}") # Uncomment for verbose debugging
             continue
 
     print("\n\n[INFO] Saving Data...")

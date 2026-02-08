@@ -138,6 +138,56 @@ export const getPrices = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+export const getLatestPrices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const sql = `
+      SELECT DISTINCT ON (pe.crop_id, pe.region_id, pe.market_id)
+        pe.id,
+        pe.crop_id,
+        c.name AS crop_name,
+        pe.region_id,
+        r.name AS region_name,
+        pe.market_id,
+        m.name AS market_name,
+        pe.price,
+        pe.unit,
+        pe.source,
+        pe.entry_date,
+        pe.created_at
+      FROM price_entries pe
+      JOIN crops c ON pe.crop_id = c.id
+      JOIN regions r ON pe.region_id = r.id
+      LEFT JOIN markets m ON pe.market_id = m.id
+      WHERE pe.is_verified = true
+        AND pe.price > 20
+      ORDER BY
+        pe.crop_id,
+        pe.region_id,
+        pe.market_id,
+        pe.entry_date DESC,
+        pe.created_at DESC
+    `;
+
+    const result = await query(sql);
+
+    const response: ApiResponse<any[]> = {
+      success: true,
+      message: 'Latest prices retrieved successfully',
+      data: result.rows
+    };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching latest prices', error);
+    next(error);
+  }
+};
+
+
 export const createPriceEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
