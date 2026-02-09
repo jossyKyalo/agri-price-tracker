@@ -3,6 +3,7 @@ import { query, transaction } from '../database/connection';
 import { ApiError } from '../utils/apiError';
 import { logger } from '../utils/logger';
 import type { PriceEntry, CreatePriceEntry, PriceQueryParams, ApiResponse } from '../types/index';
+import jwt from 'jsonwebtoken'; 
 
 export const getPrices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -202,7 +203,38 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
       entry_date
     }: CreatePriceEntry = req.body;
 
-    const enteredBy = req.user?.id;
+    
+    let enteredBy = req.user?.id;
+     
+    if (!enteredBy) { 
+      const authHeader = req.headers.authorization || (req.headers as any).Authorization;
+      
+      if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+        try {
+          const token = authHeader.split(' ')[1];
+          if (token) {
+            const decoded: any = jwt.decode(token); 
+            enteredBy = decoded?.id || 
+                        decoded?.userId || 
+                        decoded?.user_id || 
+                        decoded?.sub ||
+                        decoded?.user?.id ||  
+                        decoded?.data?.id;    
+            
+            if (enteredBy) {
+               logger.info(`Manually extracted User ID from token: ${enteredBy}`);
+            } else {
+               logger.warn(`Token decoded but no ID found. Keys: ${Object.keys(decoded || {}).join(', ')}`);
+            }
+          }
+        } catch (e) {
+          logger.warn('Failed to decode token in createPriceEntry', e);
+        }
+      } else {
+         logger.info('No Bearer token found in headers for price submission');
+      }
+    } 
+
     let resolvedMarketId = market_id; 
     if (!resolvedMarketId && market) {
       const existingMarket = await query(
@@ -221,17 +253,26 @@ export const createPriceEntry = async (req: Request, res: Response, next: NextFu
         logger.info(`New market added to DB: ${market} (Region: ${region_id})`);
       }
     }
-
-    //Insert into price_entries
+ 
     const result = await query(
       `INSERT INTO price_entries (
           crop_id, region_id, market_id, price, unit, source, entered_by, notes, entry_date
        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING id, crop_id, region_id, market_id, price, unit, source, notes, entry_date, created_at`,
-      [crop_id, region_id, resolvedMarketId, price, unit, source, enteredBy, notes, entry_date || new Date()]
+      [
+        crop_id, 
+        region_id, 
+        resolvedMarketId, 
+        price, 
+        unit, 
+        source, 
+        enteredBy || null, 
+        notes, 
+        entry_date || new Date()
+      ]
     );
 
-    logger.info(` Price entry added for crop ${crop_id} at market ${resolvedMarketId} by ${req.user?.email || 'system'}`);
+    logger.info(`Price entry added for crop ${crop_id} by ${enteredBy ? 'User ' + enteredBy : 'Unknown'}`);
 
     const response: ApiResponse<PriceEntry> = {
       success: true,
@@ -315,7 +356,8 @@ export const getPendingVerifications = async (req: Request, res: Response, next:
               c.name as crop_name,
               r.name as region_name,
               m.name as market_name,
-              u.full_name as entered_by_name
+              u.full_name as entered_by_name,
+              u.email as entered_by_email
        FROM price_entries pe
        JOIN crops c ON pe.crop_id = c.id
        JOIN regions r ON pe.region_id = r.id
