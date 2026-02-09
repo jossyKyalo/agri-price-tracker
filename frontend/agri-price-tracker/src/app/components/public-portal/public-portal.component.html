@@ -358,9 +358,12 @@
         <div class="card-body">
           <div class="search-filters">
             <div class="search-group">
-              <label class="form-label">Search Crop/Product</label>
-              <!-- FIX: Decoupled binding to resolve ngtsc(2339) -->
-              <input type="text" class="form-control" placeholder="Search for crops..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+              <label class="form-label">Search Crop/Product</label> 
+              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+            </div>
+            <div class="search-group">
+              <label class="form-label">Search Market</label> 
+              <input type="text" class="form-control" placeholder="e.g Kalundu..." [ngModel]="marketSearchTerm" (ngModelChange)="marketSearchTerm = $event; filterCrops()">
             </div>
             <div class="filter-group">
               <label class="form-label">Category</label>
@@ -516,9 +519,12 @@
         <div class="card-body">
           <div class="search-filters">
             <div class="search-group">
-              <label class="form-label">Search Crop/Product</label>
-              <!-- FIX: Decoupled binding to resolve ngtsc(2339) -->
-              <input type="text" class="form-control" placeholder="Search for crops..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+              <label class="form-label">Search Crop/Product</label> 
+              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+            </div>
+            <div class="search-group">
+              <label class="form-label">Search Market</label> 
+              <input type="text" class="form-control" placeholder="e.g Nakuru..." [ngModel]="marketSearchTerm" (ngModelChange)="marketSearchTerm = $event; filterCrops()">
             </div>
             <div class="filter-group">
               <label class="form-label">Category</label>

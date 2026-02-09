@@ -39,12 +39,10 @@ interface DisplayCrop {
   styleUrls: ['./public-portal.component.css']
 })
 export class PublicPortalComponent implements OnInit, OnDestroy {
-  private baseUrl = environment.apiUrl;
-  // REMOVED: private readonly TREND_THRESHOLD_PERCENT = 2; // No longer needed
+  private baseUrl = environment.apiUrl; 
   private readonly CACHE_DURATION = 10 * 60 * 1000; 
   private dataLoadSubscription?: Subscription;
-
-  // Cache implementation
+ 
   private cacheTime = 0;
   private cache: DisplayCrop[] | null = null;
 
@@ -68,6 +66,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   activeTab = 'prices';
   searchTerm = '';
   selectedCategory = '';
+  marketSearchTerm = '';
   selectedRegion = '';
   selectedSource = '';
 
@@ -300,8 +299,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     this.filterCrops(); 
     this.cdr.markForCheck();
   }
-
-  // ===================== HISTORY MODAL =====================
+ 
 
   openHistoryModal(crop: DisplayCrop) {
     this.showHistory = true;
@@ -415,8 +413,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     }
     this.cdr.markForCheck();
   }
-
-  // ===================== HISTORY ANALYSIS METHODS =====================
+ 
 
   getCurrentTrend(): 'up' | 'down' | 'stable' {
     if (!this.selectedHistoryCrop || this.historyData.length < 2) return 'stable';
@@ -465,8 +462,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     if (avg === 0) return 0;
     return Math.round((range / avg) * 100);
   }
-
-  // Chart helpers...
+ 
   getChartPoints(): Array<{ x: number, y: number }> {
     if (this.historyData.length < 2) return [];
     const prices = this.historyData.map(d => {
@@ -541,7 +537,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   getSellingAdvice(): string {
     if (this.historyData.length < 2) return 'Not enough data for advice';
 
-    const trend = this.getOverallTrend(); // Using overall trend
+    const trend = this.getOverallTrend();  
     const totalChange = this.getTotalChange();
     const currentPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
     const avgPrice = this.getAveragePrice();
@@ -565,14 +561,14 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ... (UI, Pagination methods) ...
+   
   setActiveTab(tab: string) { this.activeTab = tab; this.filterCrops(); this.cdr.markForCheck(); }
   get paginatedCrops() { const startIndex = (this.currentPage - 1) * this.itemsPerPage; return this.filteredCrops.slice(startIndex, startIndex + this.itemsPerPage); }
   get totalPages() { return Math.ceil(this.filteredCrops.length / this.itemsPerPage) || 1; }
   nextPage() { if (this.currentPage < this.totalPages) { this.currentPage++; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
   prevPage() { if (this.currentPage > 1) { this.currentPage--; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
 
-  // --- UPDATED CALCULATIONS: FORCE STABLE ON 0 ---
+   
   calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
     if (!previous || previous === 0) return 'stable';
     const percentChange = ((current - previous) / previous) * 100;
@@ -623,17 +619,17 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     if (diffDays < 7) return `${diffDays} days ago`;
     return d.toLocaleDateString();
   }
-
-  // ... (Filtering, Auth methods unchanged) ...
+ 
   filterCrops() {
     this.filteredCrops = this.allCrops.filter(crop => {
       const matchesSearch = !this.searchTerm || crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesMarket = !this.marketSearchTerm || crop.market.toLowerCase().includes(this.marketSearchTerm.toLowerCase());
       const matchesCategory = !this.selectedCategory || crop.category === this.selectedCategory;
       const matchesRegion = !this.selectedRegion || crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
       let matchesSource = true;
       if (this.selectedSource === 'official') matchesSource = crop.source === 'kamis' || crop.source === 'admin';
       else if (this.selectedSource === 'farmer') matchesSource = crop.source === 'farmer';
-      return matchesSearch && matchesCategory && matchesRegion && matchesSource;
+      return matchesSearch && matchesMarket && matchesCategory && matchesRegion && matchesSource;
     });
     if (this.activeTab === 'predictions') {
       this.filteredCrops.sort((a, b) => {
