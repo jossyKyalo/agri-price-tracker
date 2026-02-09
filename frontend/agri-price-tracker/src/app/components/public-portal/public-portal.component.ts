@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PriceService, CropPrice, CreatePriceEntry, PricePrediction } from '../../services/price.service';
+import { PriceService, CreatePriceEntry, PricePrediction } from '../../services/price.service';
 import { CropService, Crop, Region } from '../../services/crop.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { LoginRequest } from '../../services/auth.service';
 import { SmsService, SmsSubscription } from '../../services/sms.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of, Subscription } from 'rxjs';
+import { catchError, timeout, finalize, retry } from 'rxjs/operators';
 
 interface DisplayCrop {
   id: string;
@@ -29,7 +29,6 @@ interface DisplayCrop {
   confidence: number;
   date: string | Date;
   _historicalData?: any[];
-  _historicalCount?: number;
 }
 
 @Component({
@@ -39,31 +38,33 @@ interface DisplayCrop {
   templateUrl: './public-portal.component.html',
   styleUrls: ['./public-portal.component.css']
 })
-export class PublicPortalComponent implements OnInit {
+export class PublicPortalComponent implements OnInit, OnDestroy {
   private baseUrl = environment.apiUrl;
-  private readonly TREND_THRESHOLD_PERCENT = 2;
+  // REMOVED: private readonly TREND_THRESHOLD_PERCENT = 2; // No longer needed
+  private readonly CACHE_DURATION = 10 * 60 * 1000; 
+  private dataLoadSubscription?: Subscription;
 
+  // Cache implementation
+  private cacheTime = 0;
+  private cache: DisplayCrop[] | null = null;
+
+  // Auth states
   isLoggedIn = false;
   showLogin = false;
   farmerName = '';
   showPassword = false;
   isAdmin = false;
 
+  // Password reset
   isForgotPasswordMode = false;
   resetPhone = '';
   resetMessage = '';
 
-  registration = {
-    name: '',
-    phone: '',
-    region: ''
-  };
+  // Registration
+  registration = { name: '', phone: '', region: '' };
+  login = { phone: '', password: '' };
 
-  login = {
-    phone: '',
-    password: ''
-  };
-
+  // UI states
   activeTab = 'prices';
   searchTerm = '';
   selectedCategory = '';
@@ -84,19 +85,15 @@ export class PublicPortalComponent implements OnInit {
   itemsPerPage: number = 12;
 
   // Price input form
-  priceInput = {
-    crop: '',
-    price: 0,
-    market: '',
-    region: '',
-    notes: ''
-  };
+  priceInput = { crop: '', price: 0, market: '', region: '', notes: '' };
 
+  // SMS
   smsSubPhone: string = '';
   smsSubCrops: { [cropName: string]: boolean } = {};
   smsSubMessage: string = '';
   smsSubIsError: boolean = false;
 
+  // Data
   allCrops: DisplayCrop[] = [];
   crops: Crop[] = [];
   regions: Region[] = [];
@@ -106,12 +103,22 @@ export class PublicPortalComponent implements OnInit {
   // HISTORY MODAL STATE 
   showHistory = false;
   historyLoading = false;
-  selectedHistoryCrop: any = null;
+  selectedHistoryCrop: DisplayCrop | null = null;
   historyData: any[] = [];
   chartPath: string = '';
   chartPoints: string = '';
 
-  Math = Math; // ✅ Expose Math to template
+  // Loading states
+  dataLoadInProgress = false;
+  loadingStates = {
+    prices: false,
+    crops: false,
+    regions: false,
+    predictions: false,
+    mlStats: false
+  };
+
+  Math = Math;
 
   constructor(
     private http: HttpClient,
@@ -119,126 +126,265 @@ export class PublicPortalComponent implements OnInit {
     private cropService: CropService,
     private apiService: ApiService,
     private authService: AuthService,
-    private smsService: SmsService
+    private smsService: SmsService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.checkAuth();
-    this.loadData();
+    this.loadCriticalData();
   }
 
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-    this.filterCrops();
+  ngOnDestroy(): void {
+    if (this.dataLoadSubscription) {
+      this.dataLoadSubscription.unsubscribe();
+    }
   }
+
+  loadCriticalData(): void {
+    // Check cache first
+    if (this.cache && Date.now() - this.cacheTime < this.CACHE_DURATION) {
+      console.log('Using cached data');
+      this.allCrops = [...this.cache];
+      this.filteredCrops = [...this.cache];
+      this.loadMetadata();
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.dataLoadInProgress = true;
+
+    if (this.dataLoadSubscription) {
+      this.dataLoadSubscription.unsubscribe();
+    }
+
+    console.log('Starting full data load...');
+
+    this.dataLoadSubscription = forkJoin({
+        crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
+        regions: this.cropService.getRegions().pipe(catchError(() => of([]))),
+        prices: this.priceService.getPrices({ limit: 2000 }).pipe(catchError(() => of([]))),
+        predictions: this.priceService.getPredictions().pipe(catchError(() => of([]))),
+        mlStats: this.apiService.get<any>('/ml/').pipe(catchError(() => of(null)))
+    }).pipe(
+      timeout(600000), 
+      finalize(() => {
+        this.isLoading = false;
+        this.dataLoadInProgress = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (data: any) => {
+        this.crops = (data.crops?.data || data.crops) || [];
+        this.regions = (data.regions?.data || data.regions) || [];
+        this.totalCrops = this.crops.length;
+        this.totalRegions = this.regions.length;
+
+        if (data.mlStats?.data?.performance?.r2) {
+            this.aiAccuracy = Math.round(data.mlStats.data.performance.r2 * 100);
+        }
+
+        this.processLatestPrices(data.prices, data.predictions);
+      },
+      error: (err) => {
+          console.error('Critical load error', err);
+          this.errorMessage = 'Failed to load data. Please refresh.';
+      }
+    });
+  }
+
+  private loadMetadata() {
+      forkJoin({
+        crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
+        regions: this.cropService.getRegions().pipe(catchError(() => of([])))
+      }).subscribe(data => {
+          this.crops = (data.crops as any)?.data || data.crops || [];
+          this.regions = (data.regions as any)?.data || data.regions || [];
+          this.totalCrops = this.crops.length;
+          this.totalRegions = this.regions.length;
+      });
+  }
+
+  private processLatestPrices(pricesResponse: any, predictionsResponse: any): void {
+    const cats = new Set<string>();
+    
+    let pricesArray = Array.isArray(pricesResponse) ? pricesResponse : 
+                      (pricesResponse as any)?.data || (pricesResponse as any)?.prices || [];
+
+    const filteredPrices = pricesArray;
+
+    // Group prices
+    const priceGroups = new Map<string, any[]>();
+    for (const p of filteredPrices) {
+        const key = `${p.crop_id}_${p.market_id}`;
+        if (!priceGroups.has(key)) priceGroups.set(key, []);
+        priceGroups.get(key)?.push(p);
+    }
+
+    const predictions = (predictionsResponse as any)?.data || predictionsResponse || [];
+    const predictionMap = new Map<string, PricePrediction>();
+    if (Array.isArray(predictions)) {
+        for (const pred of predictions) {
+            predictionMap.set(`${pred.crop_id}_${pred.region_id}`, pred);
+        }
+    }
+
+    console.log(`Processing ${filteredPrices.length} price entries`);
+
+    const displayCrops: DisplayCrop[] = [];
+
+    priceGroups.forEach((group) => {
+        group.sort((a: any, b: any) => 
+            new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime()
+        );
+
+        const latest = group[0];
+        const previous = group[1];
+
+        const currentPrice = +latest.current_price || +latest.price || 0;
+        const previousPrice = previous ? (+previous.current_price || +previous.price || currentPrice) : currentPrice;
+
+        const category = latest.crop_category || latest.category || 'General';
+        const source = latest.source || 'kamis';
+        cats.add(category);
+
+        let regionName = latest.region_name || latest.region || 'Unknown';
+        if (regionName === 'Unknown' && latest.region_id) {
+            const foundRegion = this.regions.find(r => r.id === latest.region_id);
+            if (foundRegion) regionName = foundRegion.name;
+        }
+
+        let cropName = latest.crop_name || latest.name || 'Unknown';
+        if (cropName === 'Unknown' && latest.crop_id) {
+            const foundCrop = this.crops.find(c => c.id === latest.crop_id);
+            if (foundCrop) cropName = foundCrop.name;
+        }
+
+        const predKey = `${latest.crop_id}_${latest.region_id}`;
+        const realPrediction = predictionMap.get(predKey);
+
+        displayCrops.push({
+            id: latest.id || latest.crop_id,
+            name: cropName,
+            category: category,
+            unit: latest.crop_unit || latest.unit || 'kg',
+            source: source,
+            currentPrice: currentPrice,
+            previousPrice: previousPrice,
+            trend: this.calculateTrend(currentPrice, previousPrice),
+            region: regionName,
+            market: latest.market_name || latest.market || 'Unknown',
+            lastUpdated: this.formatDate(latest.entry_date || latest.created_at),
+            prediction: realPrediction ? realPrediction.predicted_price : null,
+            confidence: realPrediction ? realPrediction.confidence_score : 0,
+            crop_id: latest.crop_id,
+            region_id: latest.region_id,
+            date: latest.entry_date || latest.created_at
+        });
+    });
+
+    this.allCrops = displayCrops;
+    this.categories = Array.from(cats).sort();
+    
+    const validDates = this.allCrops.map(c => new Date(c.date).getTime()).filter(t => !isNaN(t));
+    if (validDates.length > 0) {
+        this.lastUpdated = this.formatDate(new Date(Math.max(...validDates)));
+    } else {
+        this.lastUpdated = 'Unknown';
+    }
+
+    this.cache = [...this.allCrops];
+    this.cacheTime = Date.now();
+
+    this.filterCrops(); 
+    this.cdr.markForCheck();
+  }
+
+  // ===================== HISTORY MODAL =====================
 
   openHistoryModal(crop: DisplayCrop) {
-    console.log('Opening history modal for:', crop.name);
-
     this.showHistory = true;
     this.historyLoading = true;
     this.selectedHistoryCrop = crop;
     this.historyData = [];
+    this.fetchFreshHistoricalData(crop);
+    this.cdr.markForCheck();
+  }
 
+  private fetchFreshHistoricalData(crop: DisplayCrop): void {
     this.priceService.getPrices({
       crop_id: crop.crop_id,
       region_id: crop.region_id,
-      limit: 100
-    }).subscribe({
+      limit: 50
+    }).pipe(
+      timeout(600000),  
+      catchError((err) => of(null))
+    ).subscribe({
       next: (response: any) => {
-        let rawData = (response.data || response.prices || response) || [];
-        const now = new Date();
-        const targetMarket = (crop.market || '').toLowerCase().trim();
-
-        let filteredData = rawData
-          .filter((p: any) => {
-            // 1. Strict Market Match
-            const entryMarket = (p.market_name || p.market || '').toLowerCase().trim();
-            const marketMatch = !targetMarket || !entryMarket || entryMarket === targetMarket;
-
-            // 2. Date Check (Using entry_date priority to match loadData)
-            const pDate = p.entry_date || p.created_at;
-            const entryDate = new Date(pDate);
-
-            return marketMatch && entryDate <= now;
-          })
-          .map((item: any) => ({
-            ...item,
-            price: parseFloat(item.price || item.current_price || 0),
-            // 3. Consistent Field: Use entry_date as the "Truth" for the X-Axis
-            displayDate: item.entry_date || item.created_at,
-            timestamp: new Date(item.entry_date || item.created_at).getTime()
-          }))
-          .sort((a: any, b: any) => a.timestamp - b.timestamp);
-
-        // 4. Deduplicate by Day (Using displayDate/entry_date)
-        const dateMap = new Map<string, any>();
-
-        filteredData.forEach((item: any) => {
-          const dateKey = new Date(item.displayDate).toDateString();
-
-          if (!dateMap.has(dateKey)) {
-            dateMap.set(dateKey, item);
-          } else {
-            // If multiple prices exist for the same day, take the one created last (update)
-            const existing = dateMap.get(dateKey)!;
-            const existingCreated = new Date(existing.created_at || 0).getTime();
-            const currentCreated = new Date(item.created_at || 0).getTime();
-
-            if (currentCreated > existingCreated) {
-              dateMap.set(dateKey, item);
-            }
-          }
-        });
-
-        this.historyData = Array.from(dateMap.values())
-          .sort((a: any, b: any) => a.timestamp - b.timestamp)
-          .map((item: any) => ({
-            ...item,
-            entry_date: item.displayDate
-          }));
-
-        if (this.historyData.length > 0 && this.selectedHistoryCrop) {
-          const lastIndex = this.historyData.length - 1;
-
-          this.historyData[lastIndex] = {
-            ...this.historyData[lastIndex],
-            price: this.selectedHistoryCrop.currentPrice,
-            entry_date: this.selectedHistoryCrop.date
-          };
+        if (response) {
+          const data = response.data || response.prices || response;
+          this.processHistoricalData(data, crop);
+        } else {
+            this.historyLoading = false;
         }
-
-        if (this.historyData.length > 0) {
-          this.generateChart();
-        }
-
-        this.historyLoading = false;
-
-      },
-      error: (err) => {
-        console.error('History load error', err);
-        this.historyLoading = false;
-
-
-        if (crop._historicalData && crop._historicalData.length > 0) {
-          this.historyData = crop._historicalData
-            .map((item: any) => ({
-              ...item,
-              price: parseFloat(item.price || item.current_price || 0),
-              entry_date: item.entry_date || item.created_at
-            }))
-            .sort((a: any, b: any) =>
-              new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()
-            );
-          if (this.historyData.length > 0) this.generateChart();
-        }
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  private processHistoricalData(rawData: any[], crop: DisplayCrop): void {
+    if (!Array.isArray(rawData)) {
+        this.historyData = [];
+        this.historyLoading = false;
+        return;
+    }
+
+    const targetMarket = (crop.market || '').toLowerCase().trim();
+    const isUnknownMarket = targetMarket === 'unknown' || !targetMarket;
+
+    let filteredData = rawData
+      .filter((p: any) => {
+        if (isUnknownMarket) return true;
+        const entryMarket = (p.market_name || p.market || '').toLowerCase().trim();
+        return !entryMarket || entryMarket === 'unknown' || entryMarket.includes(targetMarket) || targetMarket.includes(entryMarket);
+      })
+      .map((item: any) => ({
+        ...item,
+        price: parseFloat(item.price || item.current_price || 0),
+        displayDate: item.entry_date || item.created_at,
+        timestamp: new Date(item.entry_date || item.created_at).getTime()
+      }))
+      .sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+    const dateMap = new Map<string, any>();
+    filteredData.forEach((item: any) => {
+      const dateKey = new Date(item.displayDate).toDateString();
+      if (!dateMap.has(dateKey) || item.timestamp > dateMap.get(dateKey).timestamp) {
+        dateMap.set(dateKey, item);
+      }
+    });
+
+    this.historyData = Array.from(dateMap.values())
+      .sort((a: any, b: any) => a.timestamp - b.timestamp)
+      .map((item: any) => ({
+        ...item,
+        price: item.price,
+        entry_date: item.displayDate
+      }));
+
+    this.historyLoading = false;
+    
+    if (this.historyData.length > 0) {
+      this.generateChart();
+    }
+    this.cdr.markForCheck();
   }
 
   closeHistoryModal() {
     this.showHistory = false;
     this.selectedHistoryCrop = null;
+    this.cdr.markForCheck();
   }
 
   generateChart() {
@@ -247,62 +393,52 @@ export class PublicPortalComponent implements OnInit {
       return;
     }
 
-    // Ensure all prices are numbers
-    const prices = this.historyData.map(d => {
-      const price = typeof d.price === 'number' ? d.price : parseFloat(d.price);
-      return isNaN(price) ? 0 : price;
-    });
-
-    // Add some padding to the chart
+    const prices = this.historyData.map(d => parseFloat(d.price));
     const minPrice = Math.min(...prices) * 0.95;
     const maxPrice = Math.max(...prices) * 1.05;
     const priceRange = maxPrice - minPrice;
+    const safeRange = priceRange === 0 ? 1 : priceRange;
 
-    // Chart dimensions
     const width = 600;
-    const height = 280;
-    const padding = { top: 30, right: 20, bottom: 30, left: 50 };
+    const height = 200; 
+    const padding = 20;
 
-    // Generate path points
     const points = this.historyData.map((d, i) => {
-      const x = padding.left + (i / (this.historyData.length - 1)) * (width - padding.left - padding.right);
-      const price = typeof d.price === 'number' ? d.price : parseFloat(d.price);
-      const y = height - padding.bottom - ((price - minPrice) / priceRange) * (height - padding.top - padding.bottom);
+      const x = padding + (i / (this.historyData.length - 1)) * (width - 2 * padding);
+      const price = parseFloat(d.price);
+      const y = height - padding - ((price - minPrice) / safeRange) * (height - 2 * padding);
       return `${x},${y}`;
     });
 
-    // Create the SVG path
     if (points.length > 0) {
       this.chartPath = `M ${points.join(' L ')}`;
-    } else {
-      this.chartPath = '';
     }
+    this.cdr.markForCheck();
   }
+
+  // ===================== HISTORY ANALYSIS METHODS =====================
 
   getCurrentTrend(): 'up' | 'down' | 'stable' {
     if (!this.selectedHistoryCrop || this.historyData.length < 2) return 'stable';
+    const lastPrice = parseFloat(this.historyData[this.historyData.length - 1]?.price || '0');
+    const prevPrice = parseFloat(this.historyData[this.historyData.length - 2]?.price || '0');
+    return this.calculateTrend(lastPrice, prevPrice);
+  }
 
-    const firstPrice = this.selectedHistoryCrop.previousPrice;
-    const lastPrice = parseFloat(
-      this.historyData[this.historyData.length - 1]?.price || '0'
-    );
-
+  getOverallTrend(): 'up' | 'down' | 'stable' {
+    if (!this.historyData || this.historyData.length < 2) return 'stable';
+    const firstPrice = parseFloat(this.historyData[0]?.price || '0');
+    const lastPrice = parseFloat(this.historyData[this.historyData.length - 1]?.price || '0');
     return this.calculateTrend(lastPrice, firstPrice);
   }
 
-
   getTotalChange(): number {
     if (!this.selectedHistoryCrop || this.historyData.length < 2) return 0;
-
-    const firstPrice = this.selectedHistoryCrop.previousPrice;
-    const lastPrice = parseFloat(
-      this.historyData[this.historyData.length - 1]?.price || '0'
-    );
-
+    const firstPrice = parseFloat(this.historyData[0].price);
+    const lastPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
     if (!firstPrice || firstPrice === 0) return 0;
     return Math.round(((lastPrice - firstPrice) / firstPrice) * 100);
   }
-
 
   getMinPrice(): number {
     if (this.historyData.length === 0) return 0;
@@ -330,109 +466,85 @@ export class PublicPortalComponent implements OnInit {
     return Math.round((range / avg) * 100);
   }
 
-  getPreviousPoint(): { x: number, y: number } | null {
-    const points = this.getChartPoints();
-    if (points.length >= 2) {
-      return points[points.length - 2];
-    }
-    return null;
-  }
-
+  // Chart helpers...
   getChartPoints(): Array<{ x: number, y: number }> {
     if (this.historyData.length < 2) return [];
-
     const prices = this.historyData.map(d => {
       const price = typeof d.price === 'number' ? d.price : parseFloat(d.price);
       return isNaN(price) ? 0 : price;
     });
-
     const minPrice = Math.min(...prices) * 0.95;
     const maxPrice = Math.max(...prices) * 1.05;
     const priceRange = maxPrice - minPrice;
-
-    const width = 600;
-    const height = 280;
-    const padding = 50;
-    const chartHeight = height - 2 * 30;
-    const chartWidth = width - 2 * padding;
+    const safeRange = priceRange === 0 ? 1 : priceRange;
+    const width = 600; const height = 280; const padding = 50;
+    const chartHeight = height - 2 * 30; const chartWidth = width - 2 * padding;
 
     return this.historyData.map((d, i) => {
       const price = typeof d.price === 'number' ? d.price : parseFloat(d.price);
       const validPrice = isNaN(price) ? 0 : price;
-
       const x = padding + (i / (this.historyData.length - 1)) * chartWidth;
-      const y = 30 + chartHeight - ((validPrice - minPrice) / priceRange) * chartHeight;
+      const y = 30 + chartHeight - ((validPrice - minPrice) / safeRange) * chartHeight;
       return { x, y };
     });
+  }
+
+  getPreviousPoint(): { x: number, y: number } | null {
+    const points = this.getChartPoints();
+    if (points.length >= 2) return points[points.length - 2];
+    return null;
   }
 
   getAreaPath(): string {
     const points = this.getChartPoints();
     if (points.length < 2) return '';
-
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
-
     let path = `M ${firstPoint.x},260`;
     path += ` L ${firstPoint.x},${firstPoint.y}`;
-
-    points.slice(1).forEach(point => {
-      path += ` L ${point.x},${point.y}`;
-    });
-
+    points.slice(1).forEach(point => { path += ` L ${point.x},${point.y}`; });
     path += ` L ${lastPoint.x},260 Z`;
-
     return path;
   }
 
   getHighestPoint(): { x: number, y: number } {
     const points = this.getChartPoints();
     if (points.length === 0) return { x: 0, y: 0 };
-
     const prices = this.historyData.map(d => parseFloat(d.price));
     const maxPrice = Math.max(...prices);
     const maxIndex = prices.indexOf(maxPrice);
-
     return points[maxIndex];
   }
 
   getLowestPoint(): { x: number, y: number } {
     const points = this.getChartPoints();
     if (points.length === 0) return { x: 0, y: 0 };
-
     const prices = this.historyData.map(d => parseFloat(d.price));
     const minPrice = Math.min(...prices);
     const minIndex = prices.indexOf(minPrice);
-
     return points[minIndex];
   }
 
-  // ✅ NEW: Get time span description for historical data
   getHistoricalTimeSpan(): string {
     if (this.historyData.length < 2) return 'available period';
-
     const first = new Date(this.historyData[0].entry_date || this.historyData[0].created_at);
     const last = new Date(this.historyData[this.historyData.length - 1].entry_date || this.historyData[this.historyData.length - 1].created_at);
-
     const diffMs = last.getTime() - first.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
     if (diffDays < 1) return '1 day';
     if (diffDays < 7) return `${diffDays} days`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} ${Math.floor(diffDays / 7) === 1 ? 'week' : 'weeks'}`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} ${Math.floor(diffDays / 30) === 1 ? 'month' : 'months'}`;
-    return `${Math.floor(diffDays / 365)} ${Math.floor(diffDays / 365) === 1 ? 'year' : 'years'}`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
+    return `${Math.floor(diffDays / 365)} years`;
   }
 
   getSellingAdvice(): string {
     if (this.historyData.length < 2) return 'Not enough data for advice';
 
-    const trend = this.getCurrentTrend();
+    const trend = this.getOverallTrend(); // Using overall trend
     const totalChange = this.getTotalChange();
     const currentPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
-    const firstPrice = parseFloat(this.historyData[0].price);
     const avgPrice = this.getAveragePrice();
-
     const vsAverage = ((currentPrice - avgPrice) / avgPrice) * 100;
     const timeSpan = this.getHistoricalTimeSpan();
 
@@ -453,520 +565,169 @@ export class PublicPortalComponent implements OnInit {
     }
   }
 
-  get paginatedCrops() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredCrops.slice(startIndex, startIndex + this.itemsPerPage);
-  }
+  // ... (UI, Pagination methods) ...
+  setActiveTab(tab: string) { this.activeTab = tab; this.filterCrops(); this.cdr.markForCheck(); }
+  get paginatedCrops() { const startIndex = (this.currentPage - 1) * this.itemsPerPage; return this.filteredCrops.slice(startIndex, startIndex + this.itemsPerPage); }
+  get totalPages() { return Math.ceil(this.filteredCrops.length / this.itemsPerPage) || 1; }
+  nextPage() { if (this.currentPage < this.totalPages) { this.currentPage++; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
+  prevPage() { if (this.currentPage > 1) { this.currentPage--; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
 
-  get totalPages() {
-    return Math.ceil(this.filteredCrops.length / this.itemsPerPage) || 1;
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-
-  loadData(): void {
-    this.isLoading = true;
-    const crops$ = this.cropService.getCrops();
-    const regions$ = this.cropService.getRegions();
-    const prices$ = this.priceService.getPrices({ limit: 20000 });
-    const predictions$ = this.priceService.getPredictions();
-    const mlStats$ = this.apiService.get<any>('/ml/');
-
-    forkJoin({
-      crops: crops$,
-      regions: regions$,
-      prices: prices$,
-      predictions: predictions$,
-      mlStats: mlStats$
-    }).subscribe({
-      next: ({ crops, regions, prices, predictions, mlStats }) => {
-        this.crops = ((crops as any).data || crops) || [];
-        this.regions = ((regions as any).data || regions) || [];
-        this.totalCrops = this.crops.length;
-        this.totalRegions = this.regions.length;
-
-        if (mlStats?.data?.performance?.r2) {
-          this.aiAccuracy = Math.round(mlStats.data.performance.r2 * 100);
-        }
-
-        const predictionMap = new Map<string, PricePrediction>();
-        for (const pred of predictions) {
-          predictionMap.set(`${pred.crop_id}_${pred.region_id}`, pred);
-        }
-
-        let pricesData = ((prices as any).data || (prices as any).prices || prices) || [];
-        const now = new Date();
-        pricesData = pricesData.filter((p: any) => new Date(p.entry_date || p.created_at) <= now);
-
-        pricesData.sort((a: any, b: any) => {
-          const timeA = new Date(a.entry_date || a.created_at).getTime();
-          const timeB = new Date(b.entry_date || b.created_at).getTime();
-          return timeB - timeA;
-        });
-
-        const priceGroups = new Map<string, any[]>();
-
-        for (const item of pricesData) {
-          const marketName = (item.market_name || item.market || 'unknown').toLowerCase().trim();
-          const groupKey = `${item.crop_id}_${item.region_id}_${marketName}`;
-
-          if (!priceGroups.has(groupKey)) {
-            priceGroups.set(groupKey, []);
-          }
-          priceGroups.get(groupKey)!.push(item);
-        }
-
-        const uniquePrices: any[] = [];
-        const cats = new Set<string>();
-
-        for (const [groupKey, groupItems] of priceGroups.entries()) {
-
-          groupItems.sort((a: any, b: any) =>
-            new Date(a.entry_date || a.created_at).getTime() -
-            new Date(b.entry_date || b.created_at).getTime()
-          );
-
-          const latestItem = groupItems[groupItems.length - 1];
-          const previousItem = groupItems.length > 1
-            ? groupItems[groupItems.length - 2]
-            : groupItems[groupItems.length - 1];
-
-          latestItem._historicalFirst = parseFloat(previousItem.price || previousItem.current_price || 0);
-
-          latestItem._historicalCount = groupItems.length;
-          latestItem._historicalData = groupItems;
-
-          uniquePrices.push(latestItem);
-          const cat = latestItem.crop_category || latestItem.category || 'General';
-          cats.add(cat);
-        }
-
-        this.categories = Array.from(cats).sort();
-
-        this.allCrops = uniquePrices.map((item: any) => {
-          const currentPrice = parseFloat(item.price || item.current_price || 0);
-          const firstHistoricalPrice = item._historicalFirst || currentPrice;
-
-          const predKey = `${item.crop_id}_${item.region_id}`;
-          const realPrediction = predictionMap.get(predKey);
-
-          return {
-            id: item.id || item.crop_id,
-            name: item.crop_name || item.name || 'Unknown',
-            category: item.crop_category || item.category || 'General',
-            unit: item.crop_unit || item.unit || 'kg',
-            source: item.source || 'kamis',
-            currentPrice: currentPrice,
-            previousPrice: firstHistoricalPrice,
-            trend: this.calculateTrend(currentPrice, firstHistoricalPrice),
-            region: item.region_name || item.region || 'Unknown',
-            market: item.market_name || item.market || 'Unknown',
-            lastUpdated: this.formatDate(item.entry_date),
-            date: item.created_at || item.entry_date,
-            prediction: realPrediction ? realPrediction.predicted_price : currentPrice,
-            confidence: realPrediction ? realPrediction.confidence_score : 0,
-            crop_id: item.crop_id,
-            region_id: item.region_id,
-            _historicalData: item._historicalData,
-            _historicalCount: item._historicalCount
-          } as DisplayCrop;
-        });
-
-        this.filteredCrops = this.allCrops;
-        this.isLoading = false;
-        const latestMarketDate = Math.max(
-          ...this.allCrops
-            .map(c => new Date(c.date).getTime())
-            .filter(t => !isNaN(t))
-        );
-
-        this.lastUpdated = this.formatDate(new Date(latestMarketDate));
-
-      },
-      error: (error) => {
-        console.error('Data load error', error);
-        this.isLoading = false;
-        this.errorMessage = "Failed to load market data.";
-      }
-    });
-  }
-
-
+  // --- UPDATED CALCULATIONS: FORCE STABLE ON 0 ---
   calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
     if (!previous || previous === 0) return 'stable';
-
     const percentChange = ((current - previous) / previous) * 100;
-
-    if (percentChange > this.TREND_THRESHOLD_PERCENT) return 'up';
-    if (percentChange < -this.TREND_THRESHOLD_PERCENT) return 'down';
-    return 'stable';
+    const rounded = Math.round(percentChange);
+    
+    // Strict 0 check
+    if (rounded === 0) return 'stable';
+    if (rounded > 0) return 'up';
+    return 'down';
   }
 
   getPriceChange(current: number, previous: number): number {
     if (!previous || previous <= 0) return 0;
-
     const percentage = ((current - previous) / previous) * 100;
-
-    if (percentage > 300 || percentage < -80) {
-      return 0;
-    }
-    return Math.round(percentage);
+    if (percentage > 500 || percentage < -90) return 0;
+    return Math.round(percentage); // Integer
   }
 
   getPredictionTrend(current: number, predicted: number): string {
     if (!current || current === 0) return 'stable';
-
     const percentChange = ((predicted - current) / current) * 100;
-
-    if (percentChange > this.TREND_THRESHOLD_PERCENT) return 'up';
-    if (percentChange < -this.TREND_THRESHOLD_PERCENT) return 'down';
-    return 'stable';
+    const rounded = Math.round(percentChange);
+    
+    if (rounded === 0) return 'stable';
+    if (rounded > 0) return 'up';
+    return 'down';
   }
 
   getPredictionChange(current: number, predicted: number): number {
     if (!current || !predicted || current === 0) return 0;
-
     const percentage = ((predicted - current) / current) * 100;
-
-    if (percentage > 300 || percentage < -80) {
-      return 0;
-    }
-
-    return Math.round(percentage);
+    return Math.round(percentage); // Integer
   }
-
 
   formatDate(date: string | Date): string {
     if (!date) return '';
     const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Unknown';
     const now = new Date();
-
     const diffMs = now.getTime() - d.getTime();
-    if (diffMs < 0) {
-      return 'Just now';
-    }
-
+    if (diffMs < -60000) return d.toLocaleDateString(); 
+    if (diffMs < 60000 && diffMs > -60000) return 'Just now';
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} mins ago`;
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 7) return `${diffDays} days ago`;
-
     return d.toLocaleDateString();
   }
 
+  // ... (Filtering, Auth methods unchanged) ...
   filterCrops() {
     this.filteredCrops = this.allCrops.filter(crop => {
-      const matchesSearch = !this.searchTerm ||
-        crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-
-      const matchesCategory = !this.selectedCategory ||
-        crop.category === this.selectedCategory;
-
-      const matchesRegion = !this.selectedRegion ||
-        crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
-
+      const matchesSearch = !this.searchTerm || crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesCategory = !this.selectedCategory || crop.category === this.selectedCategory;
+      const matchesRegion = !this.selectedRegion || crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
       let matchesSource = true;
-      if (this.selectedSource === 'official') {
-        matchesSource = crop.source === 'kamis' || crop.source === 'admin';
-      } else if (this.selectedSource === 'farmer') {
-        matchesSource = crop.source === 'farmer';
-      }
-
+      if (this.selectedSource === 'official') matchesSource = crop.source === 'kamis' || crop.source === 'admin';
+      else if (this.selectedSource === 'farmer') matchesSource = crop.source === 'farmer';
       return matchesSearch && matchesCategory && matchesRegion && matchesSource;
     });
-
     if (this.activeTab === 'predictions') {
       this.filteredCrops.sort((a, b) => {
         const getChange = (c: DisplayCrop) => {
           if (!c.currentPrice || c.prediction == null) return -1;
           return Math.abs((c.prediction - c.currentPrice) / c.currentPrice);
         };
-        return getChange(b) - getChange(a);
+        return getChange(b) - getChange(a); 
       });
     } else {
       this.filteredCrops.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
-
     this.currentPage = 1;
+    this.cdr.markForCheck();
   }
-
 
   checkAuth() {
     const adminUser = this.authService.getCurrentUser();
     if (adminUser && (adminUser.role === 'admin' || adminUser.role === 'super_admin')) {
-      this.isLoggedIn = true;
-      this.isAdmin = true;
-      this.farmerName = adminUser.full_name || 'Admin';
-      return;
+      this.isLoggedIn = true; this.isAdmin = true; this.farmerName = adminUser.full_name || 'Admin'; this.cdr.markForCheck(); return;
     }
-
     const farmerToken = localStorage.getItem('farmer_token');
     const farmerName = localStorage.getItem('farmer_name');
     if (farmerToken && farmerName) {
-      this.isLoggedIn = true;
-      this.isAdmin = false;
-      this.farmerName = farmerName;
-      return;
+      this.isLoggedIn = true; this.isAdmin = false; this.farmerName = farmerName; this.cdr.markForCheck(); return;
     }
-
-    this.isLoggedIn = false;
-    this.isAdmin = false;
-    this.farmerName = '';
+    this.isLoggedIn = false; this.isAdmin = false; this.farmerName = ''; this.cdr.markForCheck();
   }
 
-  showForgotPassword() {
-    this.isForgotPasswordMode = true;
-    this.showLogin = false;
-    this.errorMessage = '';
-    this.resetMessage = '';
-  }
-
-  backToLogin() {
-    this.isForgotPasswordMode = false;
-    this.showLogin = true;
-    this.resetMessage = '';
-  }
-
+  showForgotPassword() { this.isForgotPasswordMode = true; this.showLogin = false; this.errorMessage = ''; this.resetMessage = ''; this.cdr.markForCheck(); }
+  backToLogin() { this.isForgotPasswordMode = false; this.showLogin = true; this.resetMessage = ''; this.cdr.markForCheck(); }
   requestPasswordReset() {
-    if (!this.resetPhone) {
-      this.resetMessage = 'Please enter your phone number.';
-      return;
-    }
-
-    this.isLoading = true;
-    this.resetMessage = '';
-
+    if (!this.resetPhone) { this.resetMessage = 'Please enter your phone number.'; this.cdr.markForCheck(); return; }
+    this.isLoading = true; this.resetMessage = '';
     const farmerEmail = `farmer${this.resetPhone.replace(/[^\d]/g, '')}@agriprice.local`;
-
-    this.authService.requestPasswordReset(farmerEmail).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.resetMessage = `If an account with phone ${this.resetPhone} exists, a reset link has been processed.`;
-        this.resetPhone = '';
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.resetMessage = error.error?.message || 'Failed to process request. Please try again later.';
-      }
+    this.authService.requestPasswordReset(farmerEmail).pipe(timeout(15000), finalize(() => { this.isLoading = false; this.cdr.markForCheck(); })).subscribe({
+      next: () => { this.resetMessage = `If an account with phone ${this.resetPhone} exists, a reset link has been processed.`; this.resetPhone = ''; },
+      error: (error) => { this.resetMessage = error.error?.message || 'Failed to process request. Please try again later.'; }
     });
   }
-
   quickRegister() {
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.isForgotPasswordMode = false;
-
-    this.http.post(`${this.baseUrl}/auth/register/farmer`, {
-      full_name: this.registration.name,
-      phone: this.registration.phone,
-      region: this.registration.region || null
-    }).subscribe({
+    this.isLoading = true; this.errorMessage = ''; this.isForgotPasswordMode = false;
+    this.http.post(`${this.baseUrl}/auth/register/farmer`, { full_name: this.registration.name, phone: this.registration.phone, region: this.registration.region || null }).pipe(timeout(15000), finalize(() => { this.isLoading = false; this.cdr.markForCheck(); })).subscribe({
       next: (response: any) => {
-        this.isLoading = false;
-        localStorage.setItem('farmer_token', response.data.token);
-        localStorage.setItem('farmer_name', response.data.user.full_name);
-        this.isLoggedIn = true;
-        this.farmerName = response.data.user.full_name;
-
-        alert(
-          `Registration Successful!\n\n` +
-          `Welcome ${response.data.user.full_name}!\n\n` +
-          `═══════════════════════════════\n` +
-          `Phone: ${response.data.user.phone}\n` +
-          `Password: ${response.data.tempPassword}\n` +
-          `═══════════════════════════════\n\n` +
-          `SAVE THIS PASSWORD!\n` +
-          `You'll need it to login next time.`
-        );
-
-        this.registration = { name: '', phone: '', region: '' };
+        localStorage.setItem('farmer_token', response.data.token); localStorage.setItem('farmer_name', response.data.user.full_name);
+        this.isLoggedIn = true; this.farmerName = response.data.user.full_name;
+        alert(`Registration Successful!\n\nWelcome ${response.data.user.full_name}!\n\nPhone: ${response.data.user.phone}\nPassword: ${response.data.tempPassword}\n\nSAVE THIS PASSWORD!\nYou'll need it to login next time.`);
+        this.registration = { name: '', phone: '', region: '' }; this.checkAuth();
       },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Registration failed. Please try again.';
-      }
+      error: (error) => { this.errorMessage = error.error?.error || 'Registration failed. Please try again.'; }
     });
   }
-
   farmerLogin() {
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.isForgotPasswordMode = false;
-
-    const loginRequest: LoginRequest = {
-      email: `farmer${this.login.phone.replace(/[^\d]/g, '')}@agriprice.local`,
-      password: this.login.password
-    };
-
-    this.http.post(`${this.baseUrl}/auth/login/farmer`, {
-      phone: this.login.phone,
-      password: this.login.password
-    }).subscribe({
+    this.isLoading = true; this.errorMessage = ''; this.isForgotPasswordMode = false;
+    this.http.post(`${this.baseUrl}/auth/login/farmer`, { phone: this.login.phone, password: this.login.password }).pipe(timeout(15000), finalize(() => { this.isLoading = false; this.cdr.markForCheck(); })).subscribe({
       next: (response: any) => {
-        this.isLoading = false;
-
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-        localStorage.setItem('farmer_token', response.data.token);
-        localStorage.setItem('farmer_name', response.data.user.full_name);
-
-        this.isLoggedIn = true;
-        this.farmerName = response.data.user.full_name;
-
-        alert(`✅ Welcome back, ${response.data.user.full_name}!`);
-
-        this.login = { phone: '', password: '' };
+        localStorage.setItem('authToken', response.data.token); localStorage.setItem('currentUser', JSON.stringify(response.data.user)); localStorage.setItem('farmer_token', response.data.token); localStorage.setItem('farmer_name', response.data.user.full_name);
+        this.isLoggedIn = true; this.farmerName = response.data.user.full_name; alert(`✅ Welcome back, ${response.data.user.full_name}!`); this.login = { phone: '', password: '' }; this.checkAuth();
       },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.';
-      }
+      error: (error) => { this.errorMessage = error.error?.error || 'Login failed. Please check your credentials.'; }
     });
   }
-
   logoutPortal() {
-    alert('Logging out now.');
-
-    if (this.isAdmin) {
-      alert('To fully logout as admin, use the logout button in the header.');
-      return;
-    } else {
-      localStorage.removeItem('farmer_token');
-      localStorage.removeItem('farmer_name');
-      this.isLoggedIn = false;
-      this.isAdmin = false;
-      this.farmerName = '';
-      alert('You have been logged out successfully');
-    }
+    if (this.isAdmin) { alert('To fully logout as admin, use the logout button in the header.'); return; }
+    else { localStorage.removeItem('farmer_token'); localStorage.removeItem('farmer_name'); this.isLoggedIn = false; this.isAdmin = false; this.farmerName = ''; alert('You have been logged out successfully'); }
+    this.checkAuth();
   }
-
-  logout() {
-    this.logoutPortal()
-  }
-
-
+  logout() { this.logoutPortal(); }
   submitPrice() {
-    if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) {
-      this.errorMessage = 'Please fill in all required fields';
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
+    if (!this.priceInput.crop || !this.priceInput.price || !this.priceInput.region) { this.errorMessage = 'Please fill in all required fields'; this.cdr.markForCheck(); return; }
+    this.isLoading = true; this.errorMessage = '';
     const crop = this.crops.find(c => c.name.toLowerCase() === this.priceInput.crop.toLowerCase());
     const region = this.regions.find(r => r.name.toLowerCase() === this.priceInput.region.toLowerCase());
-
-    if (!crop || !region) {
-      this.errorMessage = 'Invalid crop or region selected';
-      this.isLoading = false;
-      return;
-    }
-
-    const priceData: CreatePriceEntry = {
-      crop_id: crop.id,
-      region_id: region.id,
-      price: this.priceInput.price,
-      notes: this.priceInput.notes,
-      market: this.priceInput.market
-    };
-
-    const token = this.isAdmin
-      ? localStorage.getItem('authToken')
-      : localStorage.getItem('farmer_token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    this.http.post(`${this.baseUrl}/prices/submit`, priceData, { headers }).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        alert('Price submitted successfully! It will be verified by our admin team.');
-        this.priceInput = { crop: '', price: 0, market: '', region: '', notes: '' };
-
-        this.loadData();
-      },
-      error: (error) => {
-        console.error('Error submitting price:', error);
-        this.isLoading = false;
-        this.errorMessage = error.error?.error || 'Failed to submit price. Please try again.';
-      }
+    if (!crop || !region) { this.errorMessage = 'Invalid crop or region selected'; this.isLoading = false; this.cdr.markForCheck(); return; }
+    const priceData: CreatePriceEntry = { crop_id: crop.id, region_id: region.id, price: this.priceInput.price, notes: this.priceInput.notes, market: this.priceInput.market };
+    const token = this.isAdmin ? localStorage.getItem('authToken') : localStorage.getItem('farmer_token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' });
+    this.http.post(`${this.baseUrl}/prices/submit`, priceData, { headers }).pipe(timeout(15000), finalize(() => { this.isLoading = false; this.cdr.markForCheck(); })).subscribe({
+      next: (response) => { alert('Price submitted successfully! It will be verified by our admin team.'); this.priceInput = { crop: '', price: 0, market: '', region: '', notes: '' }; this.loadCriticalData(); },
+      error: (error) => { console.error('Error submitting price:', error); this.errorMessage = error.error?.error || 'Failed to submit price. Please try again.'; }
     });
   }
-
-
   subscribeToSms() {
-    this.isLoading = true;
-    this.smsSubMessage = '';
-    this.smsSubIsError = false;
-
-    const selectedCropNames = Object.keys(this.smsSubCrops).filter(
-      cropName => this.smsSubCrops[cropName]
-    );
-
-    if (selectedCropNames.length === 0) {
-      this.smsSubMessage = 'Please select at least one crop to subscribe.';
-      this.smsSubIsError = true;
-      this.isLoading = false;
-      return;
-    }
-
-    if (!this.smsSubPhone) {
-      this.smsSubMessage = 'Please enter your phone number.';
-      this.smsSubIsError = true;
-      this.isLoading = false;
-      return;
-    }
-
-    const selectedCropIDs = selectedCropNames.map(cropName => {
-      const crop = this.crops.find(c => c.name === cropName);
-      return crop ? crop.id : null;
-    }).filter(id => id !== null);
-
-    if (selectedCropIDs.length !== selectedCropNames.length) {
-      this.smsSubMessage = 'An error occurred matching crop names to IDs.';
-      this.smsSubIsError = true;
-      this.isLoading = false;
-      return;
-    }
-
-    const subscriptionData: SmsSubscription = {
-      phone: this.smsSubPhone,
-      crops: selectedCropIDs,
-      alert_types: ['price-alert', 'price-update']
-    };
-
-    this.smsService.subscribeSms(subscriptionData).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        this.smsSubMessage = '✅ Success! You are now subscribed to SMS alerts.';
-        this.smsSubIsError = false;
-        this.smsSubPhone = '';
-        this.smsSubCrops = {};
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.smsSubMessage = error.error?.error || 'Subscription failed. Please try again.';
-        this.smsSubIsError = true;
-      }
+    this.isLoading = true; this.smsSubMessage = ''; this.smsSubIsError = false;
+    const selectedCropNames = Object.keys(this.smsSubCrops).filter(cropName => this.smsSubCrops[cropName]);
+    if (selectedCropNames.length === 0) { this.smsSubMessage = 'Please select at least one crop to subscribe.'; this.smsSubIsError = true; this.isLoading = false; this.cdr.markForCheck(); return; }
+    if (!this.smsSubPhone) { this.smsSubMessage = 'Please enter your phone number.'; this.smsSubIsError = true; this.isLoading = false; this.cdr.markForCheck(); return; }
+    const selectedCropIDs = selectedCropNames.map(cropName => { const crop = this.crops.find(c => c.name === cropName); return crop ? crop.id : null; }).filter(id => id !== null);
+    if (selectedCropIDs.length !== selectedCropNames.length) { this.smsSubMessage = 'An error occurred matching crop names to IDs.'; this.smsSubIsError = true; this.isLoading = false; this.cdr.markForCheck(); return; }
+    const subscriptionData: SmsSubscription = { phone: this.smsSubPhone, crops: selectedCropIDs as string[], alert_types: ['price-alert', 'price-update'] };
+    this.smsService.subscribeSms(subscriptionData).pipe(timeout(15000), finalize(() => { this.isLoading = false; this.cdr.markForCheck(); })).subscribe({
+      next: (response) => { this.smsSubMessage = '✅ Success! You are now subscribed to SMS alerts.'; this.smsSubIsError = false; this.smsSubPhone = ''; this.smsSubCrops = {}; },
+      error: (error) => { this.smsSubMessage = error.error?.error || 'Subscription failed. Please try again.'; this.smsSubIsError = true; }
     });
   }
+  refreshData(): void { console.log('Manual refresh requested'); this.cache = null; this.cacheTime = 0; this.errorMessage = ''; this.loadCriticalData(); }
 }

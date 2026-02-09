@@ -3,7 +3,6 @@ import { query } from '../database/connection';
 import { logger } from '../utils/logger';
 import type { ChatMessage } from '../types/index';
 
- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -13,66 +12,45 @@ export const generateChatResponse = async (
   context?: any
 ): Promise<string> => {
   try { 
-    const priceData = await getCurrentPriceContext();
- 
+    // 1. Fetch Data in Parallel (Current Prices + Future Predictions)
+    const [currentPrices, predictions] = await Promise.all([
+        getDetailedMarketData(),
+        getPredictionContext()
+    ]);
+
     const systemPrompt = `
 You are AgriBot — an intelligent digital farming assistant designed for Kenyan farmers. 
-You specialize in providing *accurate, friendly, and locally relevant* agricultural pricing information, 
-market analysis, and basic farming advice. 
+You specialize in providing accurate, friendly, and locally relevant agricultural pricing information AND general farming advice.
 
-Your goal is to help farmers make informed market decisions using real data.
-
-==========================
-🌾 CONTEXT AND RULES
-==========================
-1. Always focus on Kenyan agriculture — crop prices, market trends, and farming tips.
-2. Use data from the provided CURRENT PRICE DATA section when available.
-3. Respond using the Kenyan Shilling (KSh) as the currency.
-4. Keep explanations short, clear, and conversational (2–4 sentences max).
-5. Avoid giving unrelated or political answers.
-6. Encourage farmers positively (e.g., “That’s a great question!” or “Here’s how you can benefit…”).
-7. If data is missing, give general guidance (e.g., “Data for that region isn’t available this week, but here’s an average price…”).
-8. Do NOT provide general or estimated prices if data is available in CURRENT PRICE DATA.
-9. If the user asks for a crop/region not in the data, clearly say it's unavailable and provide a safe alternative estimate + reason.
-10. NEVER say “prices generally range between…” — always rely on the database when possible.
-
+Your goal is to help farmers make informed decisions.
 
 ==========================
-📊 CURRENT PRICE DATA
+🌾 CONTEXT AND RULES (STRICT)
 ==========================
-${priceData}
+1. **Currency:** Always use Kenyan Shilling (KSh).
+2. **Prioritize Data:** ALWAYS check the "CURRENT MARKET PRICES" section first. If data exists for the asked crop, USE IT.
+3. **Smart Fallback (CRITICAL):** If the user asks about a crop (e.g., Tomatoes, Avocados) that is NOT in the database below:
+   - Do NOT just say "I don't have data."
+   - INSTEAD, use your general agricultural knowledge about Kenyan seasons, demand, and planting cycles to give helpful advice.
+   - You MUST preface this advice by clearly stating: "While I don't have *today's* live price for [crop] in my system, generally speaking..."
+4. **Predictions:** When discussing future prices based on the "AI PRICE PREDICTIONS" section, explicitly state they are "forecasts."
+5. **Location:** If a user asks about a specific market (e.g., "Kibuye"), look for it in the data. If missing, give the regional average.
+6. **Tone:** Professional, encouraging, and concise (2-4 sentences).
+7. **FORMATTING (CRITICAL):** - Return your response in **HTML format**.
+   - Use **<ul>** and **<li>** tags for lists of prices to make them readable.
+   - Use **<b>** tags to highlight Crop Names and Prices (e.g., <b>Maize</b>: <b>KSh 50</b>).
+   - Use **<br>** for line breaks between sections.
+   - Do NOT use Markdown syntax (like * or #).
 
 ==========================
-🧩 FEW-SHOT EXAMPLES
+📊 CURRENT MARKET PRICES (Verified Data)
 ==========================
-Example 1:
-User: What’s the price of maize in Nakuru?
-AgriBot: The current maize price in Nakuru is around KSh 50 per kilogram. Prices have gone up slightly due to reduced supply from Western Kenya.
+${currentPrices}
 
-Example 2:
-User: Why are tomato prices dropping in Mombasa?
-AgriBot: Tomato prices in Mombasa have decreased because of oversupply during the harvest season. Farmers in nearby counties are bringing in large quantities.
-
-Example 3:
-User: How can I store maize after harvest?
-AgriBot: To store maize safely, dry it to below 13% moisture and keep it in airtight bags or granaries. Avoid damp areas to prevent mold and aflatoxin.
-
-Example 4:
-User: Predict bean prices for next week.
-AgriBot: Based on recent data trends, bean prices may rise slightly next week due to increasing demand from urban markets.
-
-Example 5:
-User: What can I do about pests affecting my kale?
-AgriBot: Try using neem-based organic sprays or rotate crops regularly to reduce pest buildup. Avoid using strong chemicals unless recommended by experts.
-
-Example 6:
-User: How much is beans in Eldoret?
-AgriBot: According to last week's verified entry, beans in Eldoret are going for KSh 140/kg (recorded on 17 Feb 2025).
-
-Example 7:
-User: And in Kisumu?
-AgriBot: I don’t have recent verified data for Kisumu this week. However, nearby Western Kenya markets are averaging KSh 138–142/kg. Prices may be similar.
-
+==========================
+🔮 AI PRICE PREDICTIONS (7-Day Forecast)
+==========================
+${predictions}
 
 ==========================
 💬 CONVERSATION HISTORY
@@ -84,9 +62,10 @@ ${conversationHistory.slice(-5).map(msg => `${msg.role}: ${msg.content}`).join('
 ==========================
 ${userMessage}
 
-Now, as AgriBot, respond helpfully using the Kenyan context and available data.
+Respond as AgriBot. 
+- If the answer is in the data, quote the data using the HTML formatting rules above.
+- If the data is missing, give excellent general advice based on Kenyan farming seasons.
 `;
-
 
     const result = await model.generateContent(systemPrompt);
     const response = result.response;
@@ -97,91 +76,115 @@ Now, as AgriBot, respond helpfully using the Kenyan context and available data.
 
   } catch (error: any) {
     logger.error('Failed to generate Gemini AI response:', error);
-
-    
     return generateFallbackResponse(userMessage);
   }
 };
 
-const getCurrentPriceContext = async (): Promise<string> => {
+// --- HELPER 1: Get Current Prices with Market Granularity ---
+const getDetailedMarketData = async (): Promise<string> => {
   try {
+    // We limit to the latest 60 records to fit in context window, 
+    // prioritizing the most recently verified data across different markets.
     const result = await query(`
-      SELECT c.name AS crop_name, pe.price, r.name AS region_name, pe.entry_date
+      SELECT 
+        c.name AS crop_name, 
+        pe.price, 
+        m.name AS market_name, 
+        r.name AS region_name, 
+        pe.entry_date
       FROM price_entries pe
       JOIN crops c ON pe.crop_id = c.id
+      JOIN markets m ON pe.market_id = m.id
       JOIN regions r ON pe.region_id = r.id
       WHERE pe.is_verified = true
-      AND (c.name, r.name, pe.entry_date) IN (
-        SELECT c2.name, r2.name, MAX(pe2.entry_date)
-        FROM price_entries pe2
-        JOIN crops c2 ON pe2.crop_id = c2.id
-        JOIN regions r2 ON pe2.region_id = r2.id
-        WHERE pe2.is_verified = true
-        GROUP BY c2.name, r2.name
-      )
-      ORDER BY pe.entry_date DESC;
-
+      AND pe.entry_date >= (CURRENT_DATE - INTERVAL '14 days') -- Only recent data
+      ORDER BY pe.entry_date DESC, r.name ASC
+      LIMIT 60; 
     `);
 
     if (result.rows.length === 0) {
-      return 'No recent price data available.';
+      return 'No verified market data available for the last 14 days.';
     }
 
-    const priceContext = result.rows.map(row =>
-      `${row.crop_name}: KSh ${row.price}/kg in ${row.region_name} (${row.entry_date})`
+    // Format: "- Dry Maize: KSh 4500 at Nakuru Market (Rift Valley) on Sun Feb 08 2026"
+    return result.rows.map(row => 
+      `- ${row.crop_name}: KSh ${row.price} at ${row.market_name} (${row.region_name}) on ${new Date(row.entry_date).toDateString()}`
     ).join('\n');
 
-    return priceContext;
   } catch (error) {
-    logger.error('Failed to get price context:', error);
-    return 'Price data temporarily unavailable.';
+    logger.error('Failed to get market context:', error);
+    return 'Current market data temporarily unavailable.';
   }
 };
 
+// --- HELPER 2: Get AI Predictions ---
+const getPredictionContext = async (): Promise<string> => {
+  try {
+    const result = await query(`
+      SELECT 
+        c.name AS crop_name, 
+        r.name AS region_name, 
+        pp.predicted_price, 
+        pp.confidence_score, 
+        pp.prediction_date
+      FROM price_predictions pp
+      JOIN crops c ON pp.crop_id = c.id
+      JOIN regions r ON pp.region_id = r.id
+      WHERE pp.prediction_date >= CURRENT_DATE
+      ORDER BY pp.prediction_date ASC
+      LIMIT 30;
+    `);
+
+    if (result.rows.length === 0) {
+      return 'No AI predictions generated yet.';
+    }
+
+    return result.rows.map(row => {
+      const confidence = Math.round(row.confidence_score * 100);
+      return `- ${row.crop_name} (${row.region_name}): Forecasted to be KSh ${row.predicted_price} by ${new Date(row.prediction_date).toDateString()} (${confidence}% confidence)`;
+    }).join('\n');
+
+  } catch (error) {
+    logger.error('Failed to get prediction context:', error);
+    return 'Prediction data temporarily unavailable.';
+  }
+};
+
+// --- IMPROVED FALLBACK: Returns HTML for consistency ---
 const generateFallbackResponse = (userMessage: string): string => {
   const lowerMessage = userMessage.toLowerCase();
 
-  if (lowerMessage.includes('price') || lowerMessage.includes('cost')) {
-    return `I'd be happy to help with crop pricing information! However, I'm currently experiencing technical difficulties accessing the latest price data. 
-
-For the most current prices, you can:
-- Check the Public Portal on our website
-- Subscribe to SMS alerts for daily updates
-- Contact your local agricultural extension officer
-
-Is there a specific crop or region you're interested in? I can try to provide general pricing guidance.`;
+  // 1. Prediction Requests
+  if (lowerMessage.includes('predict') || lowerMessage.includes('future') || lowerMessage.includes('trend')) {
+      return `I'm having trouble running the forecast analysis right now.<br><br>
+      
+      However, strictly based on <b>general Kenyan seasonality</b>:
+      <ul>
+        <li><b>Maize/Beans:</b> Prices often rise ~2 months after harvest (Jan-Mar and July-Aug).</li>
+        <li><b>Tomatoes/Onions:</b> Prices typically peak during the wet seasons when supply drops due to spoilage.</li>
+        <li><b>Potatoes:</b> Prices dip during harvest (Jan/July) and rise significantly in April/Oct.</li>
+      </ul>
+      Check the <b>AI Predictions</b> tab later when I'm back online!`;
   }
 
-  if (lowerMessage.includes('weather') || lowerMessage.includes('rain')) {
-    return `Weather is crucial for farming success! While I don't have current weather data, I recommend:
+  // 2. Current Price Requests
+  if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('sell')) {
+    return `I can't access the live database at this exact moment to check that specific price.<br><br>
 
-- Check Kenya Meteorological Department forecasts
-- Subscribe to weather alerts via SMS
-- Plan your planting and harvesting around seasonal patterns
-- Consider drought-resistant crops during dry seasons
+    <b>General Market Tip:</b> In Kenya, wholesale markets (like Nairobi or Mombasa) usually offer 20-30% higher prices than farm-gate prices, but always calculate your transport costs first.<br><br>
 
-What crops are you planning to grow? I can provide advice on weather-appropriate varieties.`;
+    Please check the <b>Current Prices</b> tab on the dashboard for the verified list while I reconnect.`;
   }
 
-  if (lowerMessage.includes('farming') || lowerMessage.includes('crop')) {
-    return `I'm here to help with your farming questions! I specialize in:
+  // 3. General/Other Requests
+  return `I'm currently reconnecting to the agricultural database.<br><br>
 
-- Crop pricing and market trends
-- Best times to plant and harvest
-- Market opportunities
-- Price predictions and analysis
-
-What specific farming challenge can I help you with today?`;
-  }
-
-  return `Hello! I'm AgriBot, your agricultural pricing assistant. I'm here to help with:
-
-🌾 Current crop prices across Kenya
-📈 Price trends and predictions  
-🏪 Best markets for selling
-📱 SMS alerts for price updates
-
-What would you like to know about agricultural pricing today?`;
+  While I'm offline, keep in mind:
+  <ul>
+    <li><b>Selling?</b> Dry seasons usually offer better prices for perishables.</li>
+    <li><b>Buying?</b> Harvest season (now) is usually cheapest for grains.</li>
+  </ul>
+  Try asking again in a few minutes!`;
 };
 
 export const analyzePriceTrends = async (cropId: string, regionId: string): Promise<string> => {

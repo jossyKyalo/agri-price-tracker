@@ -29,6 +29,22 @@ export interface CropPrice {
   prediction?: number;
 }
 
+export interface LatestPrice {
+  id: string;
+  crop_id: string;
+  crop_name: string;
+  region_id: string;
+  region_name: string;
+  market_id?: string;
+  market_name?: string;
+  price: number;
+  unit: string;
+  source: 'kamis' | 'farmer' | 'admin';
+  entry_date: string;
+  created_at: string;
+}
+
+
 export interface PriceQueryParams {
   page?: number;
   limit?: number;
@@ -82,6 +98,13 @@ export class PriceService {
       }))
     );
   }
+
+  getLatestPrices(): Observable<LatestPrice[]> {
+    return this.apiService.get<LatestPrice[]>('/prices/latest').pipe(
+      map(response => response.data || [])
+    );
+  }
+
 
   createPriceEntry(priceData: CreatePriceEntry): Observable<CropPrice> {
     return this.apiService.post<CropPrice>('/prices', priceData).pipe(

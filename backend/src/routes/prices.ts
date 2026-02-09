@@ -4,6 +4,7 @@ import { authenticate, requireAdmin, optionalAuth } from '../middleware/auth';
 import { priceSubmissionRateLimiter } from '../middleware/rateLimiter';
 import {
   getPrices,
+  getLatestPrices,
   createPriceEntry,
   updatePriceEntry,
   deletePriceEntry,
@@ -15,6 +16,7 @@ import {
 const router = Router();
 
 // Public routes (with optional auth)
+router.get('/latest', optionalAuth, getLatestPrices);
 router.get('/', optionalAuth, validateQuery(querySchemas.priceQuery), getPrices);
 
 router.post('/submit', createPriceEntry); 
