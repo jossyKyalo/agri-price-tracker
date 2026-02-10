@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { query } from '../database/connection';
 import { logger } from '../utils/logger';
+import { exec } from 'child_process';
+import path from 'path';
+import util from 'util';
 import type { PredictionResponse } from '../types/index';
 
  
@@ -11,7 +14,9 @@ export interface MLPredictionRequest {
   prediction_days: number;
 }
 
- 
+
+const  ML_MODEL_URL= process.env.ML_MODEL_URL;
+
 const storePrediction = async (prediction: PredictionResponse): Promise<void> => {
   try { 
     const mainPrediction = prediction.predicted_prices[0];
@@ -112,6 +117,33 @@ const generateSimplePrediction = async (
     logger.error('Simple prediction failed:', error);
     return null;
   }
+};
+
+export const runModelTraining = async (): Promise<boolean> => {
+    try {
+        const scriptPath = path.join(__dirname, '../ml-model-service/train-model.py');
+        logger.info(`Starting Model Retraining (${scriptPath})...`);
+         
+        const { stdout, stderr } = await execPromise(`python "${scriptPath}"`);
+        
+        logger.info('Training Output:', stdout);
+        if (stderr) logger.warn('Training Warnings:', stderr);
+        
+        return true;
+    } catch (error: any) {
+        logger.error('Model training failed:', error.message);
+        return false;
+    }
+};
+
+export const reloadPredictionApi = async (): Promise<void> => {
+    try {
+        logger.info('🔄 Sending reload signal to Python API...');
+        await axios.post(`${ML_MODEL_URL}/reload`);
+        logger.info('Python API reloaded successfully.');
+    } catch (error) {
+        logger.error('❌ Failed to reload Python API (Is it running?):', error);
+    }
 };
 
  
@@ -280,3 +312,7 @@ export const getPredictions = async (
     return [];
   }
 };
+
+function execPromise(arg0: string): { stdout: any; stderr: any; } | PromiseLike<{ stdout: any; stderr: any; }> {
+  throw new Error('Function not implemented.');
+}

@@ -109,6 +109,12 @@ export interface ReceivedSms {
   processed: boolean;
 }
 
+interface LocationResult {
+  type: 'market' | 'region' | 'none';
+  data: any;  
+  matchQuality: 'exact' | 'fuzzy' | 'alias';
+}
+
 const TEXTBEE_API_KEY = process.env.TEXTBEE_API_KEY;
 const TEXTBEE_DEVICE_ID = process.env.TEXTBEE_DEVICE_ID;
 const TEXTBEE_API_URL = process.env.TEXTBEE_API_URL || 'https://api.textbee.dev/api/v1';
@@ -209,25 +215,15 @@ export function getValidSmsStatus(status: string): string {
 }
 
 export const formatPhoneNumber = (phone: string): string => {
-  if (!phone || typeof phone !== 'string') {
-    throw new ApiError('Invalid phone number', 400);
+  if (!phone) return '';
+  let cleaned = phone.replace(/\D/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '254' + cleaned.substring(1);
+  } else if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+    if (cleaned.length === 9) cleaned = '254' + cleaned;
   }
 
-  let num = phone.replace(/\D/g, '');
-
-  if (num.startsWith('0') && num.length === 10) {
-    num = '254' + num.slice(1);
-  } else if (num.startsWith('7') && num.length === 9) {
-    num = '254' + num;
-  } else if (!num.startsWith('254') && num.length === 9) {
-    num = '254' + num;
-  }
-
-  if (!num.startsWith('254') || num.length !== 12) {
-    throw new ApiError(`Invalid Kenyan phone number format: ${phone}`, 400);
-  }
-
-  return '+' + num;
+  return '+' + cleaned;
 };
 
 export const validatePhoneNumber = (phone: string): boolean => {
@@ -1324,90 +1320,37 @@ function createMarketSelectionMessage(region: string, markets: Array<{ id: strin
   return message;
 }
 
-// Get market-specific prices
-async function getMarketPrices(marketId: string, regionName: string): Promise<string | null> {
-  try {
-    const result = await query(`
-      SELECT 
-        c.name as crop_name,
-        c.unit,
-        pe.price,
-        m.name as market_name,
-        pe.entry_date
-      FROM price_entries pe
-      JOIN crops c ON pe.crop_id = c.id
-      JOIN markets m ON pe.market_id = m.id
-      WHERE m.id = $1
-        AND pe.is_verified = true
-        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
-      ORDER BY 
-        pe.entry_date DESC,
-        c.name
-      LIMIT 10
+async function getMarketPrices(marketId: string): Promise<string | null> {
+    // Get top 5 commodities for this market sorted by date
+    const res = await query(`
+        SELECT c.name, pe.price, pe.unit 
+        FROM price_entries pe
+        JOIN crops c ON pe.crop_id = c.id
+        WHERE pe.market_id = $1 AND pe.is_verified = true
+        ORDER BY pe.entry_date DESC, c.name ASC
+        LIMIT 6
     `, [marketId]);
-
-    logger.info('🔍 Market prices query results:', {
-      marketId,
-      rowCount: result.rows.length,
-      hasData: result.rows.length > 0
-    });
-
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    const priceList = result.rows
-      .map(row => `• ${row.crop_name}: KSh ${row.price.toLocaleString()}/${row.unit}`)
-      .join('\n');
-
-    return priceList;
-  } catch (error) {
-    logger.error('Error fetching market prices:', error);
-    return null;
-  }
+    
+    if (res.rows.length === 0) return null;
+    return res.rows.map(r => `• ${r.name}: KSh ${r.price}/${r.unit}`).join('\n');
 }
 
-// Get region-wide prices (all markets combined)
+
 async function getRegionPrices(regionName: string): Promise<string | null> {
-  try {
-    const result = await query(`
-      SELECT 
-        c.name as crop_name,
-        c.unit,
-        AVG(pe.price) as avg_price,
-        COUNT(DISTINCT pe.market_id) as market_count
-      FROM price_entries pe
-      JOIN crops c ON pe.crop_id = c.id
-      JOIN markets m ON pe.market_id = m.id
-      JOIN regions r ON m.region_id = r.id
-      WHERE UPPER(r.name) = UPPER($1)
-        AND pe.is_verified = true
-        AND pe.entry_date >= CURRENT_DATE - INTERVAL '7 days'
-      GROUP BY c.id, c.name, c.unit
-      ORDER BY avg_price DESC
-      LIMIT 12
+    const res = await query(`
+        SELECT c.name, AVG(pe.price) as avg_price, c.unit
+        FROM price_entries pe
+        JOIN crops c ON pe.crop_id = c.id
+        JOIN regions r ON pe.region_id = r.id
+        WHERE r.name ILIKE $1 AND pe.is_verified = true
+        AND pe.entry_date >= NOW() - INTERVAL '30 days'
+        GROUP BY c.name, c.unit
+        LIMIT 5
     `, [regionName]);
 
-    logger.info('🔍 Region prices query results:', {
-      regionName,
-      rowCount: result.rows.length,
-      hasData: result.rows.length > 0
-    });
-
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    const priceList = result.rows
-      .map(row => `• ${row.crop_name}: KSh ${Math.round(row.avg_price).toLocaleString()}/${row.unit} (${row.market_count} markets)`)
-      .join('\n');
-
-    return priceList;
-  } catch (error) {
-    logger.error('Error fetching region prices:', error);
-    return null;
-  }
-}
+    if (res.rows.length === 0) return null;
+    return res.rows.map(r => `• ${r.name}: ~KSh ${Math.round(r.avg_price)}/${r.unit}`).join('\n');
+} 
 
 // Handle market selection response
 async function handleMarketSelectionResponse(
@@ -1484,7 +1427,7 @@ async function handleMarketSelectionResponse(
 
     if (selectedMarket) {
       // Get market prices
-      const prices = await getMarketPrices(selectedMarket.id, region);
+      const prices = await getMarketPrices(selectedMarket.id);
 
       // Clear conversation context
       activeConversations.delete(phone);
@@ -1539,292 +1482,196 @@ async function handleMarketSelectionResponse(
   }
 }
 
-async function processFarmerMessage(
+async function resolveLocationQuery(userInput: string): Promise<LocationResult> {
+  // 1. CLEAN & NORMALIZE
+  // Remove noise words: "price in", "market", "soko", "bei", etc.
+  const cleanInput = userInput
+    .toLowerCase()
+    .replace(/price|bei|soko|market|town|center|centre|in|at|prices|of/g, '')
+    .trim();
+  
+  if (cleanInput.length < 3) return { type: 'none', data: null, matchQuality: 'exact' };
+
+  try {
+    // --- TIER 1: DIRECT MARKET SEARCH (High Confidence) ---
+    // Checks for exact or simple partial match on Market Name
+    const marketRes = await query(`
+      SELECT m.id, m.name, r.name as region_name 
+      FROM markets m 
+      JOIN regions r ON m.region_id = r.id
+      WHERE m.is_active = true 
+      AND (m.name ILIKE $1 OR m.location ILIKE $1)
+      LIMIT 1
+    `, [cleanInput]);
+
+    if (marketRes.rows.length > 0) {
+      return { type: 'market', data: marketRes.rows[0], matchQuality: 'exact' };
+    }
+
+    // --- TIER 2: REGION/COUNTY SEARCH ---
+    // Checks if the user typed a Region (e.g. "Eastern") or County (e.g. "Kitui")
+    // If it's a county that isn't a market, we map it to its region.
+    const regionRes = await query(`
+      SELECT name FROM regions 
+      WHERE is_active = true 
+      AND (name ILIKE $1 OR code ILIKE $1)
+      LIMIT 1
+    `, [cleanInput]);
+
+    if (regionRes.rows.length > 0) {
+      return { type: 'region', data: regionRes.rows[0].name, matchQuality: 'exact' };
+    }
+
+    // --- TIER 3: FUZZY / WILDCARD SEARCH (Typo Handling) ---
+    // "Kalund" -> "Kalundu", "Niarobi" -> "Nairobi"
+    const fuzzyRes = await query(`
+      SELECT m.id, m.name, r.name as region_name
+      FROM markets m
+      JOIN regions r ON m.region_id = r.id
+      WHERE m.is_active = true
+      AND (m.name ILIKE $1 OR m.location ILIKE $1)
+      LIMIT 1
+    `, [`%${cleanInput}%`]);
+
+    if (fuzzyRes.rows.length > 0) {
+      return { type: 'market', data: fuzzyRes.rows[0], matchQuality: 'fuzzy' };
+    }
+    
+    // JS-based Levenshtein fallback for common major markets if DB search fails
+    // (Optional optimization for very bad typos on key markets)
+    const commonTypos: Record<string, string> = {
+        'nbi': 'Nairobi', 'nai': 'Nairobi', 'niarobi': 'Nairobi',
+        'mbs': 'Mombasa', 'msa': 'Mombasa',
+        'kis': 'Kisumu', 
+        'eld': 'Eldoret'
+    };
+    if (commonTypos[cleanInput]) {
+         const corrected = commonTypos[cleanInput];
+         const manualRes = await query(`SELECT m.id, m.name, r.name as region_name FROM markets m JOIN regions r ON m.region_id = r.id WHERE m.name ILIKE $1 LIMIT 1`, [corrected]);
+         if (manualRes.rows.length > 0) return { type: 'market', data: manualRes.rows[0], matchQuality: 'alias' };
+    }
+
+    return { type: 'none', data: null, matchQuality: 'exact' };
+
+  } catch (error) {
+    logger.error('Error resolving location:', error);
+    return { type: 'none', data: null, matchQuality: 'exact' };
+  }
+}
+
+ async function processFarmerMessage(
   phone: string,
   message: string,
   messageId: string,
   logId?: string
 ): Promise<{ processed: boolean; action?: string; message?: string }> {
-  const userText = message.trim().toUpperCase();
+  const userText = message.trim();
   let action = 'processed';
   let replyContent = '';
 
   try {
-    logger.info('🎯 DEBUG: processFarmerMessage called with:', {
-      phone,
-      userText,
-      originalMessage: message,
-      messageId
-    });
-
-    // 🎯 STEP 1: CHECK FOR MARKET SELECTION RESPONSE (MUST BE FIRST!)
-    const conversation = activeConversations.get(phone);
-    if (conversation && conversation.lastMessage?.startsWith('REGION:')) {
-      logger.info('🔄 Processing market selection response', {
-        phone,
-        lastMessage: conversation.lastMessage,
-        userInput: userText
-      });
-
-      const parts = conversation.lastMessage.split(':');
-      if (parts.length >= 4) {
-        const region = parts[1];
-
-        if (!region) {
-          logger.error('❌ Region missing in conversation context');
-          activeConversations.delete(phone);
-          return {
-            processed: false,
-            action: 'invalid_context',
-            message: '❌ Session expired. Please reply with a region again.'
-          };
-        }
-
-        const marketsJson = parts.slice(3).join(':');
-        let markets: Array<{ id: string; name: string }> = [];
-        try {
-          markets = JSON.parse(marketsJson);
-        } catch (parseError) {
-          logger.error('Failed to parse markets JSON:', parseError);
-        }
-
-        return await handleMarketSelectionResponse(phone, region, markets, userText);
-      }
-    }
-
-    const farmerContext = await getFarmerContext(phone);
-    logger.debug('Farmer context:', farmerContext);
-
-    // 🎯 STEP 2: CHECK FOR SPECIAL COMMANDS
-    if (userText === 'STOP') {
-      action = await handleUnsubscribe(phone);
+    // A. Handle Special Commands (STOP, HELP, JOIN) - Priority 1
+    const upperText = userText.toUpperCase();
+    
+    if (upperText === 'STOP') {
+      await unsubscribeUser(phone);
       replyContent = 'You have been unsubscribed from AgriPrice alerts. Text JOIN to resubscribe.';
-      
-      const replyResult = await sendSmsMessage(
-        phone,
-        replyContent,
-        { smsType: 'update' }
-      );
-      
-      return {
-        processed: true,
-        action,
-        message: replyContent
-      };
-
-    } else if (userText === 'JOIN' || userText === 'START' || userText === 'YES') {
-      action = await handleSubscribe(phone);
-      
-      const welcomeMsg = 'Welcome to AgriPrice! You are now subscribed to daily price alerts.\n\nCommands:\n• Reply with location (e.g., NAIROBI) for prices\n• Reply STOP to unsubscribe\n• Reply HELP for more info';
-      await sendSmsMessage(
-        phone,
-        welcomeMsg,
-        { smsType: 'update' }
-      );
-      
-      return {
-        processed: true,
-        action,
-        message: 'Welcome message sent'
-      };
-
-    } else if (userText === 'HELP' || userText === 'INFO') {
-      replyContent = `📱 AGRIHELP - Commands:\n\n📍 PRICE LOCATIONS:\n• NAIROBI\n• CENTRAL\n• COAST\n• EASTERN\n• NYANZA\n• WESTERN\n• RIFT VALLEY\n\n📋 OTHER COMMANDS:\n• JOIN - Subscribe for daily alerts\n• STOP - Unsubscribe\n• HELP - This menu\n\n📞 Support: ${SUPPORT_PHONE}`;
+      action = 'unsubscribed';
+    } 
+    else if (upperText === 'JOIN' || upperText === 'START') {
+      await subscribeUser(phone, []); // Subscribe with no specific crops initially
+      replyContent = 'Welcome to AgriPrice! 🌾\nReply with a CROP name (e.g., Maize) or MARKET name (e.g., Nakuru) to get prices.';
+      action = 'subscribed';
+    }
+    else if (upperText === 'HELP') {
+      replyContent = '🤖 AgriBot Help:\n• To check prices, reply with a MARKET (e.g., "Kibuye") or CROP (e.g., "Beans").\n• Reply STOP to unsubscribe.\n• Support: 0712345678';
       action = 'help_sent';
-
-    } else if (userText.includes('THANK') || userText.includes('ASANTE')) {
-      replyContent = '🙏 Karibu! Happy to help.\n\nNeed more info? Reply HELP';
-      action = 'thank_you';
-
-    } else if (userText.includes('HABARI') || userText === 'HI' || userText === 'HELLO') {
-      replyContent = `👋 Habari! I'm AgriPrice Bot.\n\n📍 Reply with region for crop prices\n📋 Reply HELP for commands\n📞 Support: ${SUPPORT_PHONE}`;
-      action = 'greeting_reply';
-
-    } else {
-      // 🎯 STEP 3: CHECK IF USER SENT A SPECIFIC MARKET NAME
-      logger.debug('🔄 Checking if input is a market or region:', { userText });
-      const marketSearchResult = await searchMarketAndRegion(userText);
-      logger.debug('Market search result:', marketSearchResult);
+    }
+    else {
+      // B. Intelligent Location/Crop Parsing
+      // 1. Try to resolve location first
+      const locationResult = await resolveLocationQuery(userText);
       
-      if (marketSearchResult.marketName && marketSearchResult.region) {
-        // User sent a specific market name (e.g., "Gikomba", "Nkubu", "Maua")
-        logger.info('🎯 Direct market search detected:', {
-          userInput: userText,
-          market: marketSearchResult.marketName,
-          region: marketSearchResult.region
-        });
-
-        // Get the market details
-        const market = await getMarketByName(marketSearchResult.marketName, marketSearchResult.region);
-        logger.debug('Market found:', market);
+      if (locationResult.type === 'market') {
+        // Found a specific market!
+        const market = locationResult.data;
+        const prices = await getMarketPrices(market.id);
         
-        if (market) {
-          // Get prices for this specific market
-          const prices = await getMarketPrices(market.id, marketSearchResult.region);
-          logger.debug('Market prices:', prices ? 'Found' : 'Not found');
-          
-          if (prices) {
-            replyContent = `📊 ${market.name.toUpperCase()} MARKET (${marketSearchResult.region.toUpperCase()})\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
-            action = 'direct_market_prices_sent';
-          } else {
-            // No prices for this market, try region-wide prices
-            const regionPrices = await getRegionPrices(marketSearchResult.region);
-            if (regionPrices) {
-              replyContent = `📊 ${marketSearchResult.region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
-              action = 'market_no_data_fallback';
-            } else {
-              replyContent = `❌ No price data for ${market.name} in ${marketSearchResult.region}.\n\nTry another location or reply HELP`;
-              action = 'market_no_data';
-            }
-          }
+        if (prices) {
+            replyContent = `📊 Prices in ${market.name.toUpperCase()} (${market.region_name}):\n\n${prices}\n\nReply with another market name to compare.`;
+            action = 'market_prices_sent';
         } else {
-          // Market not found, check if it's a region instead
-          logger.debug('Market not found by name, checking if it\'s a region');
-          const regionName = await extractRegionFromText(userText);
-          if (regionName) {
-            // It's a region, show market selection
-            await handleRegionSelection(phone, regionName);
-            return {
-              processed: true,
-              action: 'region_selection_sent',
-              message: `Market selection sent for ${regionName}`
-            };
-          } else {
-            replyContent = `❌ Location "${message}" not found.\n\nTry: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
-            action = 'location_not_found';
-          }
+            // Market found but no recent data
+             const regionPrices = await getRegionPrices(market.region_name);
+             replyContent = `⚠️ No recent data for ${market.name}.\n\nShowing avg prices for ${market.region_name} region instead:\n${regionPrices}`;
+             action = 'market_empty_fallback_region';
         }
-      } 
-      // 🎯 STEP 4: CHECK IF USER SENT A REGION NAME
-      else if (marketSearchResult.region && !marketSearchResult.marketName) {
-        // This is a region name (e.g., "EASTERN", "NAIROBI")
-        logger.info('📍 Region search detected:', {
-          userInput: userText,
-          region: marketSearchResult.region
-        });
+
+      } else if (locationResult.type === 'region') {
+        // Found a region/county - Ask for specific market
+        const regionName = locationResult.data;
+        const markets = await getMarketsInRegion(regionName);
         
-        await handleRegionSelection(phone, marketSearchResult.region);
-        return {
-          processed: true,
-          action: 'region_selection_sent',
-          message: `Market selection sent for ${marketSearchResult.region}`
-        };
-      }
-      // 🎯 STEP 5: CHECK IF IT'S A REGION USING OLD METHOD (fallback)
-      else {
-        logger.debug('🔄 Checking if input is a region (fallback)');
-        const regionName = await extractRegionFromText(userText);
-        
-        if (regionName) {
-          logger.info('📍 Processing region query (fallback):', {
-            userInput: userText,
-            mappedRegion: regionName
-          });
+        replyContent = `📍 Which market in ${regionName.toUpperCase()}?\n\n`;
+        replyContent += markets.slice(0, 5).map((m: any) => `• ${m.name}`).join('\n');
+        replyContent += `\n\nReply with the market name.`;
+        action = 'region_markets_listed';
 
-          await handleRegionSelection(phone, regionName);
-          return {
-            processed: true,
-            action: 'region_selection_sent',
-            message: `Market selection sent for ${regionName}`
-          };
-        } else {
-          // 🎯 STEP 6: TRY HARDER TO FIND THE LOCATION
-          logger.debug('🔄 Doing advanced location search');
-          const locationResult = await advancedLocationSearch(userText);
-          
-          if (locationResult.type === 'market' && locationResult.market && locationResult.region) {
-            // Found a market
-            const prices = await getMarketPrices(locationResult.market.id, locationResult.region);
-            if (prices) {
-              replyContent = `📊 ${locationResult.market.name.toUpperCase()} MARKET (${locationResult.region.toUpperCase()})\n\n${prices}\n\n📍 Reply another location\n📋 Reply HELP for commands`;
-              action = 'advanced_market_prices_sent';
-            } else {
-              const regionPrices = await getRegionPrices(locationResult.region);
-              if (regionPrices) {
-                replyContent = `📊 ${locationResult.region.toUpperCase()} REGION PRICES\n\n${regionPrices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
-                action = 'advanced_market_fallback';
-              } else {
-                replyContent = `❌ No price data for ${locationResult.market.name}.\n\nTry: NAIROBI, CENTRAL, COAST, EASTERN, NYANZA\n📋 Reply HELP for commands`;
-                action = 'no_data_found';
-              }
-            }
-          } else if (locationResult.type === 'region' && locationResult.region) {
-            // Found a region
-            await handleRegionSelection(phone, locationResult.region);
-            return {
-              processed: true,
-              action: 'region_selection_sent',
-              message: `Market selection sent for ${locationResult.region}`
-            };
-          } else {
-            // Unknown message - provide helpful response
-            replyContent = `❓ Sorry, I didn't understand: "${message}"\n\nTry:\n📍 NAIROBI or GIKOMBA (for prices)\n📋 HELP (for commands)\n📞 ${SUPPORT_PHONE}`;
-            action = 'unknown_message';
-          }
-        }
-      }
-    }
-
-    // 🎯 STEP 7: SEND THE REPLY IF WE HAVE CONTENT
-    if (replyContent) {
-      logger.info(`📤 Sending reply to ${phone}`, {
-        action,
-        replyLength: replyContent.length
-      });
-
-      const replyResult = await sendSmsMessage(
-        phone,
-        replyContent,
-        {
-          smsType: 'update',
-          sentBy: undefined
-        }
-      );
-
-      if (replyResult.id || replyResult.external_id) {
-        // Track outgoing message in conversation
-        updateConversation(phone, replyContent, 'outgoing');
-
-        logger.info(`✅ Reply sent to ${phone}`, {
-          logId: replyResult.id,
-          externalId: replyResult.external_id,
-          messageLength: replyContent.length
-        });
       } else {
-        logger.error(`❌ Failed to send reply to ${phone}`);
-        action = 'reply_failed';
+        // C. Check if it's a Crop Query
+        const cropPrices = await getCropPricesGlobal(userText); // Helper to search crop name globally
+        
+        if (cropPrices) {
+             replyContent = `🌽 ${userText.toUpperCase()} Prices:\n\n${cropPrices}\n\nReply with a MARKET name to see local prices.`;
+             action = 'crop_prices_sent';
+        } else {
+             // D. Helpful Fail (Tier 4)
+             replyContent = `❓ I couldn't find "${userText}".\n\nTry replying with:\n1. A major town (e.g., Nairobi, Eldoret)\n2. A crop name (e.g., Maize, Beans)\n3. Or reply HELP.`;
+             action = 'unknown_query';
+        }
       }
     }
 
-    return {
-      processed: true,
-      action,
-      message: replyContent
-    };
+    // Send the Reply
+    if (replyContent) {
+      await sendSmsMessage(phone, replyContent, { smsType: 'update' });
+      // Log interaction logic here...
+    }
+
+    return { processed: true, action, message: replyContent };
 
   } catch (error: any) {
-    logger.error(`❌ Error processing message from ${phone}:`, error);
-
-    // Try to send error message
-    try {
-      const errorMessage = '⚠️ System error. Please try again later or contact support.';
-      await sendSmsMessage(
-        phone,
-        errorMessage,
-        { smsType: 'update' }
-      );
-
-      updateConversation(phone, errorMessage, 'outgoing');
-    } catch (smsError) {
-      logger.error('Failed to send error message:', smsError);
-    }
-
-    return {
-      processed: false,
-      action: 'error',
-      message: `Error: ${error.message}`
-    };
+    logger.error('Error in processFarmerMessage:', error);
+    return { processed: false, action: 'error', message: error.message };
   }
+}
+
+async function getMarketsInRegion(regionName: string): Promise<any[]> {
+    const res = await query(`
+        SELECT m.name FROM markets m
+        JOIN regions r ON m.region_id = r.id
+        WHERE r.name ILIKE $1 AND m.is_active = true
+        LIMIT 5
+    `, [regionName]);
+    return res.rows;
+}
+
+async function getCropPricesGlobal(cropName: string): Promise<string | null> {
+    // Clean input
+    const cleanName = cropName.replace(/price|of|cost/gi, '').trim();
+    
+    const res = await query(`
+        SELECT m.name as market, pe.price, pe.unit
+        FROM price_entries pe
+        JOIN crops c ON pe.crop_id = c.id
+        JOIN markets m ON pe.market_id = m.id
+        WHERE c.name ILIKE $1 AND pe.is_verified = true
+        ORDER BY pe.entry_date DESC
+        LIMIT 4
+    `, [`%${cleanName}%`]);
+    
+    if (res.rows.length === 0) return null;
+    return res.rows.map(r => `• ${r.market}: KSh ${r.price}`).join('\n');
 }
 
 async function advancedLocationSearch(text: string): Promise<{
@@ -1833,7 +1680,7 @@ async function advancedLocationSearch(text: string): Promise<{
   region?: string;
 }> {
   const normalizedText = text.trim().toUpperCase();
-  
+
   try {
     // Try to find market by name (case-insensitive, partial match)
     const marketResult = await query(`
@@ -1963,7 +1810,7 @@ async function handleRegionSelection(phone: string, regionName: string): Promise
   if (availableMarkets.length > 1) {
     // Multiple markets available - ask farmer to choose
     const replyContent = createMarketSelectionMessage(regionName, availableMarkets);
-    
+
     await sendSmsMessage(
       phone,
       replyContent,
@@ -1972,11 +1819,11 @@ async function handleRegionSelection(phone: string, regionName: string): Promise
 
     // Store region context for follow-up
     updateConversation(phone, `REGION:${regionName}:MARKETS:${JSON.stringify(availableMarkets)}`, 'incoming');
-    
+
   } else if (availableMarkets.length === 1) {
     const [market] = availableMarkets;
     if (market) {
-      const prices = await getMarketPrices(market.id, regionName);
+      const prices = await getMarketPrices(market.id);
 
       if (prices) {
         const replyContent = `📊 ${market.name.toUpperCase()} MARKET (${regionName.toUpperCase()})\n\n${prices}\n\n📍 Reply another region\n📋 Reply HELP for commands`;
@@ -2026,7 +1873,7 @@ async function handleRegionSelection(phone: string, regionName: string): Promise
   }
 }
 
-async function getMarketByName(marketName: string, regionName: string): Promise<{id: string, name: string} | null> {
+async function getMarketByName(marketName: string, regionName: string): Promise<{ id: string, name: string } | null> {
   try {
     const result = await query(`
       SELECT m.id, m.name
@@ -2037,7 +1884,7 @@ async function getMarketByName(marketName: string, regionName: string): Promise<
         AND m.is_active = true
       LIMIT 1
     `, [marketName, regionName]);
-    
+
     return result.rows[0] || null;
   } catch (error) {
     logger.error('Error getting market by name:', error);
@@ -3421,42 +3268,51 @@ async function getCropPricesByLocation(location: string): Promise<string | null>
 export const subscribeUser = async (
   phone: string,
   cropIds: string[] = [],
-  sentBy?: string
+  userId?: string | null
 ): Promise<any> => {
   const formattedPhone = formatPhoneNumber(phone);
+
+  const safeCrops = Array.isArray(cropIds) ? cropIds : [];
+
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    const result = await client.query(
-      `
-      INSERT INTO sms_subscriptions (phone, crops, is_active, created_at, updated_at)
-      VALUES ($1, $2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      ON CONFLICT (phone)
+    const sql = `
+      INSERT INTO sms_subscriptions (phone, user_id, crops, is_active, alert_types, updated_at)
+      VALUES ($1, $2, $3, true, '["price"]'::jsonb, NOW())
+      ON CONFLICT (phone) 
       DO UPDATE SET 
-        crops = EXCLUDED.crops,
+        crops = $3,
+        user_id = COALESCE($2, sms_subscriptions.user_id),
         is_active = true,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
       RETURNING *
-      `,
-      [formattedPhone, cropIds]
-    );
+    `;
 
-    await sendSmsMessage(
+    const result = await client.query(sql, [
       formattedPhone,
-      `Welcome to AgriPrice! You are now tracking ${cropIds.length || 'all'} crops.\n\nYou will receive daily price updates.\n\nCommands:\n• Reply with location for prices\n• Reply STOP to unsubscribe\n• Reply HELP for info`,
-      {
-        smsType: 'update',
-        ...(sentBy && { sentBy })
-      }
+      userId || null,
+      JSON.stringify(safeCrops)
+    ]);
+
+    const welcomeMsg = `Welcome to AgriPrice! Tracking ${safeCrops.length} crops. 
+Daily updates will be sent to this number. 
+Reply STOP to unsubscribe.`;
+
+    sendSmsMessage(formattedPhone, welcomeMsg, { smsType: 'update' }).catch(err =>
+      logger.error('Failed to send welcome SMS', err)
     );
 
     await client.query('COMMIT');
+    logger.info(`✅ Subscribed ${formattedPhone} (User: ${userId || 'Guest'})`);
+
     return result.rows[0];
-  } catch (error) {
+
+  } catch (error: any) {
     await client.query('ROLLBACK');
-    logger.error('Subscription error:', error);
+    logger.error('Database error in subscribeUser:', error);
     throw new ApiError('Subscription failed', 500);
   } finally {
     client.release();
@@ -3493,27 +3349,39 @@ export const unsubscribeUser = async (
   }
 };
 
-export const getSubscribedNumbers = async (
-  cropNames?: string[]
-): Promise<string[]> => {
-  try {
-    let queryText = `
-      SELECT DISTINCT phone 
-      FROM sms_subscriptions 
-      WHERE is_active = true
-    `;
+async function getCropIdsFromNames(cropNames: string[]): Promise<string[]> {
+  if (!cropNames || cropNames.length === 0) return [];
+  try { 
+    const res = await query(
+      `SELECT id FROM crops WHERE name ILIKE ANY($1)`, 
+      [cropNames]
+    );
+    return res.rows.map(r => r.id);
+  } catch (error) {
+    logger.error('Error fetching crop IDs:', error);
+    return [];
+  }
+}
 
+export const getSubscribedNumbers = async (cropNames?: string[]): Promise<string[]> => {
+  try {
+    let sql = `SELECT phone FROM sms_subscriptions WHERE is_active = true`;
     const params: any[] = [];
 
     if (cropNames && cropNames.length > 0) {
-      queryText += ' AND crops && $1::text[]';
-      params.push(cropNames);
+      const cropIds = await getCropIdsFromNames(cropNames);
+      
+      if (cropIds.length > 0) { 
+        sql += ` AND (crops ?| $1)`; 
+        params.push(cropIds);
+      } else {
+        logger.warn(`No crop IDs found for names: ${cropNames.join(', ')}`);
+        return [];  
+      }
     }
 
-    const result = await pool.query(queryText, params);
-    return result.rows
-      .map(r => r.phone)
-      .filter((phone): phone is string => phone && typeof phone === 'string');
+    const result = await query(sql, params); 
+    return [...new Set(result.rows.map(r => r.phone))];
   } catch (error) {
     logger.error('Failed to get subscribed numbers:', error);
     return [];
@@ -3630,80 +3498,104 @@ export const sendPriceAlert = async (
   sentBy?: string
 ): Promise<void> => {
   try {
-    const direction = trend === 'up' ? '📈 risen' : trend === 'down' ? '📉 dropped' : '📊 remained stable';
-    const message = `🚨 AgriPrice Alert\n\n${cropName} prices in ${region} have ${direction} by ${percentage}% to KSh ${price.toLocaleString()}.\n\nReply with location for current prices or STOP to unsubscribe.`;
-
+    // 1. Find who cares about this crop
     const subscribers = await getSubscribedNumbers([cropName]);
 
-    if (subscribers.length > 0) {
-      await sendBulkSms(subscribers, message, 'alert', sentBy);
-
-      logger.info(`✅ Price alert sent via TextBee`, {
-        crop: cropName,
-        subscribers: subscribers.length,
-        region
-      });
-    } else {
-      logger.info(`No subscribers found for ${cropName} in ${region}`);
+    if (subscribers.length === 0) {
+      logger.info(`🚨 Alert skipped: No subscribers found for ${cropName}`);
+      return;
     }
+
+    // 2. Format Message
+    const arrow = trend === 'up' ? '📈' : trend === 'down' ? '📉' : '➡️';
+    const action = trend === 'up' ? 'rose' : trend === 'down' ? 'dropped' : 'remained stable';
+    
+    // e.g. "🚨 Maize Alert: Price in Nakuru rose by 10% to KSh 3,000. 📈 Market is moving!"
+    const message = `🚨 ${cropName} Alert:\nPrice in ${region} ${action} by ${percentage}% to KSh ${price.toLocaleString()}.\n${arrow} Market is moving!\n\nReply STOP to unsubscribe.`;
+
+    // 3. Send Bulk SMS
+    logger.info(`🚨 Sending ${cropName} alert to ${subscribers.length} farmers...`);
+    await sendBulkSms(subscribers, message, 'alert', sentBy);
+
   } catch (error) {
     logger.error('Failed to send price alert:', error);
-    throw new ApiError('Failed to send price alert', 500);
+    throw new ApiError('Alert failed', 500);
   }
 };
 
 export const sendDailyPriceUpdate = async (sentBy?: string): Promise<void> => {
   try {
-    const priceChanges = await pool.query(`
-      SELECT 
-        c.name as crop_name, 
-        c.unit,
-        pe.price, 
-        r.name as region_name,
-        (pe.price - LAG(pe.price) OVER (PARTITION BY pe.crop_id, pe.region_id ORDER BY pe.entry_date)) as change
-      FROM price_entries pe
-      JOIN crops c ON pe.crop_id = c.id
-      JOIN regions r ON pe.region_id = r.id
-      WHERE pe.entry_date = CURRENT_DATE 
-        AND pe.is_verified = true
-        AND pe.region_id IN (
-          SELECT DISTINCT region_id 
-          FROM price_entries 
-          WHERE entry_date = CURRENT_DATE - INTERVAL '1 day'
-        )
-      ORDER BY ABS(change) DESC NULLS LAST
-      LIMIT 5
-    `);
+    logger.info('📅 Starting Daily Price Update job...');
 
-    if (priceChanges.rows.length === 0) {
-      logger.info('No significant price changes to report today');
+    // 1. Fetch all active subscriptions with their crop IDs
+    const subRes = await query(`
+      SELECT phone, crops 
+      FROM sms_subscriptions 
+      WHERE is_active = true 
+      AND jsonb_array_length(crops) > 0
+    `);
+    
+    if (subRes.rows.length === 0) {
+      logger.info('No active subscriptions found for daily update.');
       return;
     }
 
-    let message = '📅 Daily AgriPrice Update\n\n';
-    message += priceChanges.rows
-      .map(row => {
-        const change = row.change || 0;
-        const trend = change > 0 ? '📈' : change < 0 ? '📉' : '➡️';
-        const changeText = change !== 0 ? `${trend} ${Math.abs(change).toLocaleString()}` : 'No change';
-        return `• ${row.crop_name} (${row.region_name}): KSh ${row.price.toLocaleString()}/${row.unit} (${changeText})`;
-      })
-      .join('\n');
+    // 2. Fetch TODAY's verified prices for ALL crops to build a lookup map
+    const priceRes = await query(`
+      SELECT c.id as crop_id, c.name, AVG(pe.price) as price, c.unit
+      FROM price_entries pe
+      JOIN crops c ON pe.crop_id = c.id
+      WHERE pe.is_verified = true 
+      AND pe.entry_date >= CURRENT_DATE - INTERVAL '24 hours'
+      GROUP BY c.id, c.name, c.unit
+    `);
 
-    message += '\n\nReply with location for more prices or STOP to unsubscribe.';
+    // Map: CropID -> "Maize: KSh 50/kg"
+    const priceMap = new Map<string, string>();
+    priceRes.rows.forEach(row => {
+      priceMap.set(row.crop_id, `• ${row.name}: KSh ${Math.round(row.price)}/${row.unit}`);
+    });
 
-    const subscribers = await getSubscribedNumbers();
-
-    if (subscribers.length > 0) {
-      await sendBulkSms(subscribers, message, 'update', sentBy);
-
-      logger.info(`✅ Daily update sent via TextBee to ${subscribers.length} subscribers`);
-    } else {
-      logger.info('No active subscribers for daily update');
+    if (priceMap.size === 0) {
+      logger.warn('📅 No verified prices found for today. Skipping daily update.');
+      return;
     }
+
+    // 3. Generate & Send Personalized Messages
+    let sentCount = 0;
+    
+    for (const sub of subRes.rows) {
+      const userCrops: string[] = sub.crops || []; // Array of IDs
+      const updates: string[] = [];
+
+      // Filter prices relevant to this user
+      userCrops.forEach(id => {
+        if (priceMap.has(id)) {
+          updates.push(priceMap.get(id)!);
+        }
+      });
+
+      if (updates.length > 0) {
+        const message = `📅 Daily Update:\n\n${updates.join('\n')}\n\nReply with a MARKET name for more details.`;
+        
+        // Send individual message (Bulk API might not work for personalized content)
+        // We use a small delay or queue in production, but here we await directly
+        try {
+            await sendSmsMessage(sub.phone, message, { smsType: 'update', sentBy });
+            sentCount++;
+            // Small throttle to be nice to the API
+            await new Promise(r => setTimeout(r, 100)); 
+        } catch (e) {
+            logger.error(`Failed to send daily update to ${sub.phone}`);
+        }
+      }
+    }
+
+    logger.info(`✅ Daily update process complete. Sent to ${sentCount} subscribers.`);
+
   } catch (error) {
-    logger.error('Failed to send daily price update:', error);
-    throw new ApiError('Failed to send daily update', 500);
+    logger.error('Failed to run daily price update:', error);
+    throw new ApiError('Daily update failed', 500);
   }
 };
 
