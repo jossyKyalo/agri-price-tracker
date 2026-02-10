@@ -28,6 +28,7 @@ interface DisplayCrop {
   region_id: string;
   confidence: number;
   date: string | Date;
+  created_at?: string | Date;
   _historicalData?: any[];
 }
 
@@ -40,8 +41,8 @@ interface DisplayCrop {
 })
 export class PublicPortalComponent implements OnInit, OnDestroy {
   private baseUrl = environment.apiUrl;
-  // REMOVED: private readonly TREND_THRESHOLD_PERCENT = 2; // No longer needed
-  private readonly CACHE_DURATION = 10 * 60 * 1000; 
+  private readonly TREND_THRESHOLD_PERCENT = 2;
+  private readonly CACHE_DURATION = 10 * 60 * 1000;
   private dataLoadSubscription?: Subscription;
 
   // Cache implementation
@@ -67,6 +68,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   // UI states
   activeTab = 'prices';
   searchTerm = '';
+  marketSearchTerm = '';
   selectedCategory = '';
   selectedRegion = '';
   selectedSource = '';
@@ -78,7 +80,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   totalCrops = 0;
   totalRegions = 0;
   lastUpdated = 'Loading...';
-  aiAccuracy: number = 0;
+  aiAccuracy: number = 90;
 
   // Pagination
   currentPage: number = 1;
@@ -92,6 +94,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   smsSubCrops: { [cropName: string]: boolean } = {};
   smsSubMessage: string = '';
   smsSubIsError: boolean = false;
+  smsCropSearch: string = '';
 
   // Data
   allCrops: DisplayCrop[] = [];
@@ -142,7 +145,6 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   }
 
   loadCriticalData(): void {
-    // Check cache first
     if (this.cache && Date.now() - this.cacheTime < this.CACHE_DURATION) {
       console.log('Using cached data');
       this.allCrops = [...this.cache];
@@ -162,13 +164,13 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     console.log('Starting full data load...');
 
     this.dataLoadSubscription = forkJoin({
-        crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
-        regions: this.cropService.getRegions().pipe(catchError(() => of([]))),
-        prices: this.priceService.getPrices({ limit: 2000 }).pipe(catchError(() => of([]))),
-        predictions: this.priceService.getPredictions().pipe(catchError(() => of([]))),
-        mlStats: this.apiService.get<any>('/ml/').pipe(catchError(() => of(null)))
+      crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
+      regions: this.cropService.getRegions().pipe(catchError(() => of([]))),
+      prices: this.priceService.getPrices({ limit: 2000 }).pipe(catchError(() => of([]))),
+      predictions: this.priceService.getPredictions().pipe(catchError(() => of([]))),
+      mlStats: this.apiService.get<any>('/ml/').pipe(catchError(() => of(null)))
     }).pipe(
-      timeout(600000), 
+      timeout(600000),
       finalize(() => {
         this.isLoading = false;
         this.dataLoadInProgress = false;
@@ -182,126 +184,136 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
         this.totalRegions = this.regions.length;
 
         if (data.mlStats?.data?.performance?.r2) {
-            this.aiAccuracy = Math.round(data.mlStats.data.performance.r2 * 100);
+          this.aiAccuracy = Math.round(data.mlStats.data.performance.r2 * 100);
         }
 
         this.processLatestPrices(data.prices, data.predictions);
       },
       error: (err) => {
-          console.error('Critical load error', err);
-          this.errorMessage = 'Failed to load data. Please refresh.';
+        console.error('Critical load error', err);
+        this.errorMessage = 'Failed to load data. Please refresh.';
       }
     });
   }
 
   private loadMetadata() {
-      forkJoin({
-        crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
-        regions: this.cropService.getRegions().pipe(catchError(() => of([])))
-      }).subscribe(data => {
-          this.crops = (data.crops as any)?.data || data.crops || [];
-          this.regions = (data.regions as any)?.data || data.regions || [];
-          this.totalCrops = this.crops.length;
-          this.totalRegions = this.regions.length;
-      });
+    forkJoin({
+      crops: this.cropService.getCrops().pipe(catchError(() => of([]))),
+      regions: this.cropService.getRegions().pipe(catchError(() => of([])))
+    }).subscribe(data => {
+      this.crops = (data.crops as any)?.data || data.crops || [];
+      this.regions = (data.regions as any)?.data || data.regions || [];
+      this.totalCrops = this.crops.length;
+      this.totalRegions = this.regions.length;
+    });
   }
 
   private processLatestPrices(pricesResponse: any, predictionsResponse: any): void {
     const cats = new Set<string>();
-    
-    let pricesArray = Array.isArray(pricesResponse) ? pricesResponse : 
-                      (pricesResponse as any)?.data || (pricesResponse as any)?.prices || [];
+
+    let pricesArray = Array.isArray(pricesResponse) ? pricesResponse :
+      (pricesResponse as any)?.data || (pricesResponse as any)?.prices || [];
 
     const filteredPrices = pricesArray;
 
-    // Group prices
     const priceGroups = new Map<string, any[]>();
     for (const p of filteredPrices) {
-        const key = `${p.crop_id}_${p.market_id}`;
-        if (!priceGroups.has(key)) priceGroups.set(key, []);
-        priceGroups.get(key)?.push(p);
+      const key = `${p.crop_id}_${p.market_id}`;
+      if (!priceGroups.has(key)) {
+        priceGroups.set(key, []);
+      }
+      priceGroups.get(key)?.push(p);
     }
 
     const predictions = (predictionsResponse as any)?.data || predictionsResponse || [];
     const predictionMap = new Map<string, PricePrediction>();
     if (Array.isArray(predictions)) {
-        for (const pred of predictions) {
-            predictionMap.set(`${pred.crop_id}_${pred.region_id}`, pred);
-        }
+      for (const pred of predictions) {
+        predictionMap.set(`${pred.crop_id}_${pred.region_id}`, pred);
+      }
     }
 
-    console.log(`Processing ${filteredPrices.length} price entries`);
+    console.log(`Processing ${priceGroups.size} unique crop entries from ${filteredPrices.length} records`);
 
     const displayCrops: DisplayCrop[] = [];
 
     priceGroups.forEach((group) => {
-        group.sort((a: any, b: any) => 
-            new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime()
-        );
+      group.sort((a: any, b: any) =>
+        new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime()
+      );
 
-        const latest = group[0];
-        const previous = group[1];
+      const latest = group[0];
+      const previous = group[1];
 
-        const currentPrice = +latest.current_price || +latest.price || 0;
-        const previousPrice = previous ? (+previous.current_price || +previous.price || currentPrice) : currentPrice;
+      const currentPrice = +latest.current_price || +latest.price || 0;
+      const previousPrice = previous ? (+previous.current_price || +previous.price || currentPrice) : currentPrice;
 
-        const category = latest.crop_category || latest.category || 'General';
-        const source = latest.source || 'kamis';
-        cats.add(category);
+      const category = latest.crop_category || latest.category || 'General';
+      const source = latest.source || 'kamis';
+      cats.add(category);
 
-        let regionName = latest.region_name || latest.region || 'Unknown';
-        if (regionName === 'Unknown' && latest.region_id) {
-            const foundRegion = this.regions.find(r => r.id === latest.region_id);
-            if (foundRegion) regionName = foundRegion.name;
-        }
+      let regionName = latest.region_name || latest.region || 'Unknown';
+      if (regionName === 'Unknown' && latest.region_id) {
+        const foundRegion = this.regions.find(r => r.id === latest.region_id);
+        if (foundRegion) regionName = foundRegion.name;
+      }
 
-        let cropName = latest.crop_name || latest.name || 'Unknown';
-        if (cropName === 'Unknown' && latest.crop_id) {
-            const foundCrop = this.crops.find(c => c.id === latest.crop_id);
-            if (foundCrop) cropName = foundCrop.name;
-        }
+      let cropName = latest.crop_name || latest.name || 'Unknown';
+      if (cropName === 'Unknown' && latest.crop_id) {
+        const foundCrop = this.crops.find(c => c.id === latest.crop_id);
+        if (foundCrop) cropName = foundCrop.name;
+      }
 
-        const predKey = `${latest.crop_id}_${latest.region_id}`;
-        const realPrediction = predictionMap.get(predKey);
+      const predKey = `${latest.crop_id}_${latest.region_id}`;
+      const realPrediction = predictionMap.get(predKey);
 
-        displayCrops.push({
-            id: latest.id || latest.crop_id,
-            name: cropName,
-            category: category,
-            unit: latest.crop_unit || latest.unit || 'kg',
-            source: source,
-            currentPrice: currentPrice,
-            previousPrice: previousPrice,
-            trend: this.calculateTrend(currentPrice, previousPrice),
-            region: regionName,
-            market: latest.market_name || latest.market || 'Unknown',
-            lastUpdated: this.formatDate(latest.entry_date || latest.created_at),
-            prediction: realPrediction ? realPrediction.predicted_price : null,
-            confidence: realPrediction ? realPrediction.confidence_score : 0,
-            crop_id: latest.crop_id,
-            region_id: latest.region_id,
-            date: latest.entry_date || latest.created_at
-        });
+      const displayTime = latest.created_at || latest.entry_date;
+
+      displayCrops.push({
+        id: latest.id || latest.crop_id,
+        name: cropName,
+        category: category,
+        unit: latest.crop_unit || latest.unit || 'kg',
+        source: source,
+        currentPrice: currentPrice,
+        previousPrice: previousPrice,
+        trend: this.calculateTrend(currentPrice, previousPrice),
+        region: regionName,
+        market: latest.market_name || latest.market || 'Unknown',
+        lastUpdated: this.formatDate(displayTime),
+        prediction: realPrediction ? realPrediction.predicted_price : null,
+        confidence: realPrediction ? realPrediction.confidence_score : 0,
+        crop_id: latest.crop_id,
+        region_id: latest.region_id,
+        date: latest.entry_date || latest.created_at,
+        created_at: latest.created_at
+      });
     });
 
     this.allCrops = displayCrops;
     this.categories = Array.from(cats).sort();
-    
-    const validDates = this.allCrops.map(c => new Date(c.date).getTime()).filter(t => !isNaN(t));
-    if (validDates.length > 0) {
-        this.lastUpdated = this.formatDate(new Date(Math.max(...validDates)));
+
+    const validTimestamps = this.allCrops
+      .map(c => c.created_at ? new Date(c.created_at).getTime() : 0)
+      .filter(t => t > 0);
+
+    if (validTimestamps.length > 0) {
+      this.lastUpdated = this.formatDate(new Date(Math.max(...validTimestamps)));
     } else {
+      const entryDates = this.allCrops.map(c => new Date(c.date).getTime());
+      if (entryDates.length > 0) {
+        this.lastUpdated = this.formatDate(new Date(Math.max(...entryDates)));
+      } else {
         this.lastUpdated = 'Unknown';
+      }
     }
 
     this.cache = [...this.allCrops];
     this.cacheTime = Date.now();
 
-    this.filterCrops(); 
+    this.filterCrops();
     this.cdr.markForCheck();
   }
-
-  // ===================== HISTORY MODAL =====================
 
   openHistoryModal(crop: DisplayCrop) {
     this.showHistory = true;
@@ -318,7 +330,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       region_id: crop.region_id,
       limit: 50
     }).pipe(
-      timeout(600000),  
+      timeout(600000),
       catchError((err) => of(null))
     ).subscribe({
       next: (response: any) => {
@@ -326,7 +338,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
           const data = response.data || response.prices || response;
           this.processHistoricalData(data, crop);
         } else {
-            this.historyLoading = false;
+          this.historyLoading = false;
         }
         this.cdr.markForCheck();
       }
@@ -335,9 +347,9 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
 
   private processHistoricalData(rawData: any[], crop: DisplayCrop): void {
     if (!Array.isArray(rawData)) {
-        this.historyData = [];
-        this.historyLoading = false;
-        return;
+      this.historyData = [];
+      this.historyLoading = false;
+      return;
     }
 
     const targetMarket = (crop.market || '').toLowerCase().trim();
@@ -347,7 +359,10 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       .filter((p: any) => {
         if (isUnknownMarket) return true;
         const entryMarket = (p.market_name || p.market || '').toLowerCase().trim();
-        return !entryMarket || entryMarket === 'unknown' || entryMarket.includes(targetMarket) || targetMarket.includes(entryMarket);
+        return !entryMarket ||
+          entryMarket === 'unknown' ||
+          entryMarket.includes(targetMarket) ||
+          targetMarket.includes(entryMarket);
       })
       .map((item: any) => ({
         ...item,
@@ -374,10 +389,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       }));
 
     this.historyLoading = false;
-    
-    if (this.historyData.length > 0) {
-      this.generateChart();
-    }
+    if (this.historyData.length > 0) this.generateChart();
     this.cdr.markForCheck();
   }
 
@@ -392,16 +404,12 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       this.chartPath = '';
       return;
     }
-
     const prices = this.historyData.map(d => parseFloat(d.price));
     const minPrice = Math.min(...prices) * 0.95;
     const maxPrice = Math.max(...prices) * 1.05;
     const priceRange = maxPrice - minPrice;
     const safeRange = priceRange === 0 ? 1 : priceRange;
-
-    const width = 600;
-    const height = 200; 
-    const padding = 20;
+    const width = 600; const height = 280; const padding = 20;
 
     const points = this.historyData.map((d, i) => {
       const x = padding + (i / (this.historyData.length - 1)) * (width - 2 * padding);
@@ -410,13 +418,9 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       return `${x},${y}`;
     });
 
-    if (points.length > 0) {
-      this.chartPath = `M ${points.join(' L ')}`;
-    }
+    if (points.length > 0) this.chartPath = `M ${points.join(' L ')}`;
     this.cdr.markForCheck();
   }
-
-  // ===================== HISTORY ANALYSIS METHODS =====================
 
   getCurrentTrend(): 'up' | 'down' | 'stable' {
     if (!this.selectedHistoryCrop || this.historyData.length < 2) return 'stable';
@@ -466,7 +470,6 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     return Math.round((range / avg) * 100);
   }
 
-  // Chart helpers...
   getChartPoints(): Array<{ x: number, y: number }> {
     if (this.historyData.length < 2) return [];
     const prices = this.historyData.map(d => {
@@ -531,54 +534,49 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     const last = new Date(this.historyData[this.historyData.length - 1].entry_date || this.historyData[this.historyData.length - 1].created_at);
     const diffMs = last.getTime() - first.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays < 1) return '1 day';
+
+    if (diffDays <= 1) return '1 day';
     if (diffDays < 7) return `${diffDays} days`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
-    return `${Math.floor(diffDays / 365)} years`;
+
+    const weeks = Math.floor(diffDays / 7);
+    if (diffDays < 30) return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
+
+    const months = Math.floor(diffDays / 30);
+    if (diffDays < 365) return `${months} ${months === 1 ? 'month' : 'months'}`;
+
+    const years = Math.floor(diffDays / 365);
+    return `${years} ${years === 1 ? 'year' : 'years'}`;
   }
 
   getSellingAdvice(): string {
     if (this.historyData.length < 2) return 'Not enough data for advice';
 
-    const trend = this.getOverallTrend(); // Using overall trend
+    const trend = this.getOverallTrend();
     const totalChange = this.getTotalChange();
     const currentPrice = parseFloat(this.historyData[this.historyData.length - 1].price);
     const avgPrice = this.getAveragePrice();
     const vsAverage = ((currentPrice - avgPrice) / avgPrice) * 100;
-    const timeSpan = this.getHistoricalTimeSpan();
 
     if (trend === 'up') {
-      if (vsAverage > 10) {
-        return `Over ${timeSpan}, prices rose ${totalChange}% and are ${Math.abs(Math.round(vsAverage))}% above average. Good time to sell!`;
-      } else {
-        return `Prices increased ${totalChange}% over ${timeSpan}. Monitor for further increases.`;
-      }
+      if (vsAverage > 10) return `Over the period, prices rose ${totalChange}% and are ${Math.abs(Math.round(vsAverage))}% above average. Good time to sell!`;
+      return `Prices increased ${totalChange}% over the period. Monitor for further increases.`;
     } else if (trend === 'down') {
-      if (currentPrice < avgPrice * 0.9) {
-        return `Over ${timeSpan}, prices fell ${Math.abs(totalChange)}% and are ${Math.abs(Math.round(vsAverage))}% below average. Consider holding.`;
-      } else {
-        return `Prices decreased ${Math.abs(totalChange)}% over ${timeSpan}. Sell if urgent, otherwise wait.`;
-      }
-    } else {
-      return `Prices stable (${totalChange > 0 ? '+' : ''}${totalChange}% change over ${timeSpan}). Consistent market conditions.`;
+      if (currentPrice < avgPrice * 0.9) return `Over the period, prices fell ${Math.abs(totalChange)}% and are ${Math.abs(Math.round(vsAverage))}% below average. Consider holding.`;
+      return `Prices decreased ${Math.abs(totalChange)}% over the period. Sell if urgent.`;
     }
+    return `Prices stable (${totalChange > 0 ? '+' : ''}${totalChange}% change). Consistent market conditions.`;
   }
 
-  // ... (UI, Pagination methods) ...
   setActiveTab(tab: string) { this.activeTab = tab; this.filterCrops(); this.cdr.markForCheck(); }
   get paginatedCrops() { const startIndex = (this.currentPage - 1) * this.itemsPerPage; return this.filteredCrops.slice(startIndex, startIndex + this.itemsPerPage); }
   get totalPages() { return Math.ceil(this.filteredCrops.length / this.itemsPerPage) || 1; }
   nextPage() { if (this.currentPage < this.totalPages) { this.currentPage++; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
   prevPage() { if (this.currentPage > 1) { this.currentPage--; window.scrollTo({ top: 0, behavior: 'smooth' }); this.cdr.markForCheck(); } }
 
-  // --- UPDATED CALCULATIONS: FORCE STABLE ON 0 ---
   calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
     if (!previous || previous === 0) return 'stable';
     const percentChange = ((current - previous) / previous) * 100;
     const rounded = Math.round(percentChange);
-    
-    // Strict 0 check
     if (rounded === 0) return 'stable';
     if (rounded > 0) return 'up';
     return 'down';
@@ -588,14 +586,13 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     if (!previous || previous <= 0) return 0;
     const percentage = ((current - previous) / previous) * 100;
     if (percentage > 500 || percentage < -90) return 0;
-    return Math.round(percentage); // Integer
+    return Math.round(percentage);
   }
 
   getPredictionTrend(current: number, predicted: number): string {
     if (!current || current === 0) return 'stable';
     const percentChange = ((predicted - current) / current) * 100;
     const rounded = Math.round(percentChange);
-    
     if (rounded === 0) return 'stable';
     if (rounded > 0) return 'up';
     return 'down';
@@ -604,7 +601,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
   getPredictionChange(current: number, predicted: number): number {
     if (!current || !predicted || current === 0) return 0;
     const percentage = ((predicted - current) / current) * 100;
-    return Math.round(percentage); // Integer
+    return Math.round(percentage);
   }
 
   formatDate(date: string | Date): string {
@@ -613,41 +610,58 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     if (isNaN(d.getTime())) return 'Unknown';
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
-    if (diffMs < -60000) return d.toLocaleDateString(); 
+
+    if (diffMs < -60000) return d.toLocaleDateString();
     if (diffMs < 60000 && diffMs > -60000) return 'Just now';
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-    if (diffMins < 60) return `${diffMins} mins ago`;
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    if (diffDays < 7) return `${diffDays} days ago`;
+
+    if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'min' : 'mins'} ago`;
+    if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+
     return d.toLocaleDateString();
   }
 
-  // ... (Filtering, Auth methods unchanged) ...
   filterCrops() {
     this.filteredCrops = this.allCrops.filter(crop => {
       const matchesSearch = !this.searchTerm || crop.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesMarket = !this.marketSearchTerm || crop.market.toLowerCase().includes(this.marketSearchTerm.toLowerCase());
       const matchesCategory = !this.selectedCategory || crop.category === this.selectedCategory;
       const matchesRegion = !this.selectedRegion || crop.region.toLowerCase().includes(this.selectedRegion.toLowerCase());
       let matchesSource = true;
       if (this.selectedSource === 'official') matchesSource = crop.source === 'kamis' || crop.source === 'admin';
       else if (this.selectedSource === 'farmer') matchesSource = crop.source === 'farmer';
-      return matchesSearch && matchesCategory && matchesRegion && matchesSource;
+      return matchesSearch && matchesMarket && matchesCategory && matchesRegion && matchesSource;
     });
+
     if (this.activeTab === 'predictions') {
       this.filteredCrops.sort((a, b) => {
         const getChange = (c: DisplayCrop) => {
           if (!c.currentPrice || c.prediction == null) return -1;
           return Math.abs((c.prediction - c.currentPrice) / c.currentPrice);
         };
-        return getChange(b) - getChange(a); 
+        return getChange(b) - getChange(a);
       });
     } else {
       this.filteredCrops.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
     this.currentPage = 1;
     this.cdr.markForCheck();
+  }
+
+  get filteredSmsCrops() {
+    if (!this.smsCropSearch.trim()) {
+      return this.crops;
+    }
+    const term = this.smsCropSearch.toLowerCase();
+    return this.crops.filter(c => c.name.toLowerCase().includes(term));
+  }
+
+  getSelectedSmsCount(): number {
+    return Object.values(this.smsSubCrops).filter(selected => selected).length;
   }
 
   checkAuth() {
@@ -662,7 +676,6 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     }
     this.isLoggedIn = false; this.isAdmin = false; this.farmerName = ''; this.cdr.markForCheck();
   }
-
   showForgotPassword() { this.isForgotPasswordMode = true; this.showLogin = false; this.errorMessage = ''; this.resetMessage = ''; this.cdr.markForCheck(); }
   backToLogin() { this.isForgotPasswordMode = false; this.showLogin = true; this.resetMessage = ''; this.cdr.markForCheck(); }
   requestPasswordReset() {
@@ -697,6 +710,7 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
     });
   }
   logoutPortal() {
+    alert('Logging out now.');
     if (this.isAdmin) { alert('To fully logout as admin, use the logout button in the header.'); return; }
     else { localStorage.removeItem('farmer_token'); localStorage.removeItem('farmer_name'); this.isLoggedIn = false; this.isAdmin = false; this.farmerName = ''; alert('You have been logged out successfully'); }
     this.checkAuth();
@@ -728,6 +742,18 @@ export class PublicPortalComponent implements OnInit, OnDestroy {
       next: (response) => { this.smsSubMessage = '✅ Success! You are now subscribed to SMS alerts.'; this.smsSubIsError = false; this.smsSubPhone = ''; this.smsSubCrops = {}; },
       error: (error) => { this.smsSubMessage = error.error?.error || 'Subscription failed. Please try again.'; this.smsSubIsError = true; }
     });
+  }
+
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.marketSearchTerm = '';
+    this.selectedCategory = '';
+    this.selectedRegion = '';
+    this.selectedSource = '';
+
+    this.currentPage = 1;
+
+    this.filterCrops();
   }
   refreshData(): void { console.log('Manual refresh requested'); this.cache = null; this.cacheTime = 0; this.errorMessage = ''; this.loadCriticalData(); }
 }
