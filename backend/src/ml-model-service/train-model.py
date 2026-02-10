@@ -21,7 +21,7 @@ if sys.platform.startswith('win'):
 warnings.filterwarnings('ignore')
 
 # --- CONFIGURATION ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # src/ml-model-service/
 DATA_RAW_DIR = os.path.join(BASE_DIR, 'data', 'raw')
 DATA_PROCESSED_DIR = os.path.join(BASE_DIR, 'data', 'processed')
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
@@ -77,10 +77,31 @@ def load_and_merge_data():
     df_save['Date'] = df_save['Date'].dt.strftime('%Y-%m-%d')
     df_save.to_csv(HISTORICAL_DATA_FILE, index=False)
     
+    # --- CRITICAL FIX: EXPORT RAW RECENT PRICES BEFORE FILTERING ---
+    # This ensures the API has access to ALL commodities/markets, 
+    # even those we might filter out for training (like high-value livestock or new items).
+    print("   Exporting recent_prices.csv for API (Unfiltered)...")
+    
+    # Clean prices just for the export, but keep all rows
+    df_api = df.copy()
+    df_api['Unit'] = df_api['Retail'].apply(extract_unit)
+    df_api['Retail'] = clean_price(df_api['Retail'])
+    df_api['Wholesale'] = clean_price(df_api['Wholesale'])
+    df_api = df_api.dropna(subset=['Retail'])
+    
+    recent_data = df_api.groupby(['Commodity', 'Market', 'County']).tail(60).copy()
+    recent_data['Date'] = recent_data['Date'].dt.strftime('%Y-%m-%d')
+    output_cols = ['Date', 'Commodity', 'Market', 'County', 'Retail', 'Unit']
+    if 'Wholesale' in recent_data.columns: output_cols.append('Wholesale')
+    
+    # Only save columns that exist
+    cols_to_save = [c for c in output_cols if c in recent_data.columns]
+    recent_data[cols_to_save].to_csv(os.path.join(DATA_PROCESSED_DIR, 'recent_prices.csv'), index=False)
+    
     return df
 
 def preprocess_data(df):
-    print("\n--- 2. Preprocessing & Cleaning ---")
+    print("\n--- 2. Preprocessing & Cleaning for Training ---")
     df['Unit'] = df['Retail'].apply(extract_unit)
     df['Retail'] = clean_price(df['Retail'])
     df['Wholesale'] = clean_price(df['Wholesale'])
@@ -88,18 +109,16 @@ def preprocess_data(df):
     
     df = df.dropna(subset=['Retail'])
     
-    # --- CRITICAL FIX: REVERT TO NOTEBOOK LIMITS ---
-    # To get >80% accuracy, we must focus on the main distribution (Crops).
-    # Including 40,000 KSh cows destroys the regression scale.
+    # --- TRAINING FILTER ---
+    # We only train on standard crops (5 - 2000) to keep the model accurate for the majority of use cases.
     initial_count = len(df)
     df = df[(df['Retail'] > 5) & (df['Retail'] < 2000)] 
     
-    print(f"   Cleaned Rows: {len(df):,} (Dropped {initial_count - len(df):,} high-value/outliers)")
+    print(f"   Cleaned Rows for Training: {len(df):,} (Dropped {initial_count - len(df):,} outliers/high-value)")
     return df
 
 def feature_engineering(df):
     print("\n--- 3. Feature Engineering ---")
-    # Sort by Group for Lag Calculation
     df = df.sort_values(['Commodity', 'Market', 'County', 'Date']).reset_index(drop=True)
     
     df['year'] = df['Date'].dt.year
@@ -113,12 +132,10 @@ def feature_engineering(df):
     df['is_harvest'] = df['month'].isin([1, 2, 7, 8]).astype(int)
     df['is_rainy'] = df['month'].isin([3, 4, 5, 10, 11, 12]).astype(int)
     
-    # Notebook Lags
     lags = [1, 3, 7, 14, 21, 28, 30] 
     for lag in lags:
         df[f'lag_{lag}'] = df.groupby(['Commodity', 'Market', 'County'])['Retail'].shift(lag)
     
-    # Notebook Rolling Windows
     windows = [7, 14, 30]
     for w in windows:
         grouped = df.groupby(['Commodity', 'Market', 'County'])['Retail']
@@ -132,14 +149,12 @@ def feature_engineering(df):
 def train_model(df):
     print("\n--- 4. Training Model ---")
     
-    # Encode
     cat_cols = ['Commodity', 'Market', 'County', 'Unit']
     enc_cols = [f"{c}_enc" for c in cat_cols]
     
     encoder = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
     df[enc_cols] = encoder.fit_transform(df[cat_cols])
     
-    # Features
     lags = [1, 3, 7, 14, 21, 28, 30]
     windows = [7, 14, 30]
     
@@ -151,11 +166,10 @@ def train_model(df):
       [f'std_{w}' for w in windows] + \
       enc_cols
     
-    # Prep Data
-    train_df = df.dropna(subset=['target_retail']).fillna(0)
+    # FIX: Drop rows only if features/target are missing
+    cols_to_check = features + ['target_retail']
+    train_df = df.dropna(subset=cols_to_check).copy()
     
-    # --- IMPORTANT: Sort by DATE for TimeSeriesSplit ---
-    # This ensures we train on Past and test on Future, giving accurate validation metrics.
     train_df = train_df.sort_values(by='Date')
     
     X = train_df[features]
@@ -163,12 +177,10 @@ def train_model(df):
     
     print(f"   Training Data Shape: {X.shape}")
     
-    # Scale
     scaler = StandardScaler()
     X_scaled_array = scaler.fit_transform(X)
     X_scaled_df = pd.DataFrame(X_scaled_array, columns=features, index=X.index)
     
-    # Model (Matching Notebook Parameters)
     model = HistGradientBoostingRegressor(
         learning_rate=0.1,        
         max_iter=200,             
@@ -178,36 +190,29 @@ def train_model(df):
         verbose=0
     )
     
-    # Validate
     print("   Running Validation...")
     tscv = TimeSeriesSplit(n_splits=5)
     scores = []
-    maes = []
     
     for train_idx, test_idx in tscv.split(X_scaled_df):
         X_train, y_train = X_scaled_df.iloc[train_idx], y.iloc[train_idx]
         X_test, y_test = X_scaled_df.iloc[test_idx], y.iloc[test_idx]
         
         model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
+        score = model.score(X_test, y_test)
+        scores.append(score)
         
-        r2 = r2_score(y_test, y_pred)
-        mae = mean_absolute_error(y_test, y_pred)
-        
-        scores.append(r2)
-        maes.append(mae)
-        
-    print(f"   Average Validation R²: {np.mean(scores):.4f}")
-    print(f"   Average Validation MAE: {np.mean(maes):.2f}")
+    avg_r2 = np.mean(scores)
+    print(f"   Average Validation R²: {avg_r2:.4f}")
     
-    # Final Train
     print("   Training final model on full dataset...")
     model.fit(X_scaled_df, y)
     
-    return model, scaler, encoder, features, np.mean(scores)
+    return model, scaler, encoder, features, avg_r2
 
-def save_artifacts(model, scaler, encoder, feature_list, score, df):
+def save_artifacts(model, scaler, encoder, feature_list, score):
     print("\n--- 5. Saving Artifacts ---")
+    print(f"   Saving to: {MODELS_DIR}")
     
     joblib.dump(model, os.path.join(MODELS_DIR, 'kamis_model.pkl'))
     joblib.dump(scaler, os.path.join(MODELS_DIR, 'kamis_scaler.pkl'))
@@ -215,20 +220,13 @@ def save_artifacts(model, scaler, encoder, feature_list, score, df):
     
     metadata = {
         'features': feature_list, 
-        'model_type': 'HistGradientBoostingRegressor_Restored', 
-        'training_samples': len(df),
+        'model_type': 'HistGradientBoostingRegressor_Fixed', 
         'avg_r2': float(score),
         'trained_date': datetime.now().isoformat()
     }
     
     with open(os.path.join(MODELS_DIR, 'kamis_metadata.json'), 'w') as f:
         json.dump(metadata, f, indent=2)
-        
-    print("   Saving processed recent prices...")
-    recent_data = df.groupby(['Commodity', 'Market', 'County']).tail(60).copy()
-    recent_data['Date'] = recent_data['Date'].dt.strftime('%Y-%m-%d')
-    output_cols = ['Date', 'Commodity', 'Market', 'County', 'Retail', 'Unit']
-    recent_data[output_cols].to_csv(os.path.join(DATA_PROCESSED_DIR, 'recent_prices.csv'), index=False)
     
     print("✅ Pipeline Complete.")
 
@@ -238,6 +236,6 @@ if __name__ == "__main__":
         df_clean = preprocess_data(df_merged)
         df_features = feature_engineering(df_clean)
         model, scaler, encoder, features, score = train_model(df_features)
-        save_artifacts(model, scaler, encoder, features, score, df_features)
+        save_artifacts(model, scaler, encoder, features, score)
     except Exception as e:
-        print(f"\n❌ Pipeline Failed: {e}")
+        print(f"\nPipeline Failed: {e}")

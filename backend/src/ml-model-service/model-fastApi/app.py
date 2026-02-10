@@ -24,10 +24,8 @@ app.add_middleware(
 )
 
 # --- PATH CONFIGURATION ---
-# Assumes this script is in src/ml-model-service/model-fastApi/
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__)) 
-SERVICE_ROOT = os.path.dirname(CURRENT_DIR) # src/ml-model-service/
-
+SERVICE_ROOT = os.path.dirname(CURRENT_DIR) 
 MODELS_DIR = os.path.join(SERVICE_ROOT, 'models')
 DATA_DIR = os.path.join(SERVICE_ROOT, 'data', 'processed')
 
@@ -44,23 +42,13 @@ class PredictionRequest(BaseModel):
     market: str
     county: str
     days_ahead: int = 7
-
-def extract_unit_api(commodity_name):
-    """Fallback unit logic if not found in history"""
-    name = commodity_name.lower()
-    if 'cow' in name or 'goat' in name or 'sheep' in name: return 'head'
-    if 'bag' in name: return 'bag'
-    return 'kg' 
+    current_price: float = None # Added for safety
 
 @app.on_event("startup")
 async def load_artifacts():
     try:
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] 📦 Loading artifacts from {MODELS_DIR}...")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 📦 Loading artifacts...")
         
-        if not os.path.exists(os.path.join(MODELS_DIR, "kamis_model.pkl")):
-             print("❌ Model files not found! Please run train_model.py first.")
-             return
-
         artifacts["model"] = joblib.load(os.path.join(MODELS_DIR, "kamis_model.pkl"))
         artifacts["scaler"] = joblib.load(os.path.join(MODELS_DIR, "kamis_scaler.pkl"))
         artifacts["encoder"] = joblib.load(os.path.join(MODELS_DIR, "kamis_encoder.pkl"))
@@ -72,17 +60,16 @@ async def load_artifacts():
             df = pd.read_csv(csv_path)
             df['Date'] = pd.to_datetime(df['Date'])
             artifacts["history_df"] = df
-            print(f"   📊 Loaded history: {len(df)} records")
+            print(f"   Loaded history: {len(df)} records")
         else:
-            print(f"   ⚠️ Warning: recent_prices.csv not found at {csv_path}")
+            print(f"   Warning: recent_prices.csv not found at {csv_path}")
         print("✅ ML API Ready.")
     except Exception as e:
         print(f"❌ Startup Failed: {e}")
 
-def get_features(commodity, market, county):
+def get_features_and_price(commodity, market, county, provided_price=None):
     target_date = datetime.now() + timedelta(days=7)
     
-    # 1. Base Temporal
     features = {
         'year': target_date.year,
         'month': target_date.month,
@@ -98,33 +85,46 @@ def get_features(commodity, market, county):
     prices = []
     unit = 'kg' 
     
-    # 2. Extract History
+    # 2. Extract History with Fuzzy Matching
     if artifacts["history_df"] is not None:
-        subset = artifacts["history_df"][
-            (artifacts["history_df"]['Commodity'] == commodity) & 
-            (artifacts["history_df"]['Market'] == market) & 
-            (artifacts["history_df"]['County'] == county)
-        ].sort_values('Date')
+        df = artifacts["history_df"]
+        
+        # Try Exact Match
+        mask = (df['Commodity'] == commodity) & (df['Market'] == market) & (df['County'] == county)
+        subset = df[mask]
+
+        # If empty, try matching without "Market" suffix in name (e.g. Nakuru vs Nakuru Market)
+        if subset.empty:
+             market_simple = market.replace(' Market', '').strip()
+             mask = (df['Commodity'] == commodity) & (df['Market'].str.contains(market_simple, case=False))
+             subset = df[mask]
+
+        # If still empty, try broader Region match (County avg)
+        if subset.empty:
+             mask = (df['Commodity'] == commodity) & (df['County'] == county)
+             subset = df[mask]
         
         if not subset.empty:
-            prices = subset['Retail'].values[-40:] # Get last 40 for lags
+            subset = subset.sort_values('Date')
+            prices = subset['Retail'].values[-40:]
             if 'Unit' in subset.columns:
                 unit = subset['Unit'].iloc[-1]
     
-    if not prices:
-        unit = extract_unit_api(commodity)
-
-    # 3. Lags
+    # 3. SAFETY NET: If no history, use provided_price to backfill
+    if len(prices) == 0 and provided_price and provided_price > 0:
+        print(f"   ⚠️ No history for {commodity} in {market}. Using provided current price: {provided_price}")
+        prices = [provided_price] * 10 # Assume flat history
+    
+    # 4. Lags
     lags = [1, 3, 7, 14, 21, 28, 30]
     for lag in lags:
         idx = -lag
         if len(prices) >= lag:
             features[f'lag_{lag}'] = float(prices[idx])
         else:
-            # Fallback for new items: use last known price
             features[f'lag_{lag}'] = float(prices[-1]) if len(prices) > 0 else 0.0
 
-    # 4. Rolling Stats
+    # 5. Rolling Stats
     windows = [7, 14, 30]
     for w in windows:
         if len(prices) > 0:
@@ -135,10 +135,9 @@ def get_features(commodity, market, county):
             features[f'ma_{w}'] = 0.0
             features[f'std_{w}'] = 0.0
 
-    # 5. Encode Categoricals
+    # 6. Encode
     try:
-        cat_df = pd.DataFrame([[commodity, market, county, unit]], 
-                              columns=['Commodity', 'Market', 'County', 'Unit'])
+        cat_df = pd.DataFrame([[commodity, market, county, unit]], columns=['Commodity', 'Market', 'County', 'Unit'])
         encoded = artifacts["encoder"].transform(cat_df)[0]
         features['Commodity_enc'] = encoded[0]
         features['Market_enc'] = encoded[1]
@@ -152,19 +151,16 @@ def get_features(commodity, market, county):
         
     return features, prices, unit
 
-# --- ENDPOINTS ---
-
+# --- ADDED ROOT ENDPOINT HERE ---
 @app.get("/")
 def root():
     """Root endpoint to check API status and performance stats"""
     meta = artifacts.get("metadata") or {}
-    
     return {
         "status": "online",
         "message": "Kamis Price Prediction API is running",
         "model_loaded": artifacts["model"] is not None,
         "timestamp": datetime.now().isoformat(),
-        # FIX: Include performance object so Frontend can read r2 accuracy
         "performance": {
             "r2": meta.get("avg_r2", 0.0),
             "training_samples": meta.get("training_samples", 0),
@@ -178,26 +174,31 @@ def predict_price(req: PredictionRequest):
         raise HTTPException(status_code=503, detail="Model unavailable")
 
     try:
-        feat_dict, history, unit = get_features(req.commodity, req.market, req.county)
-        current_price = history[-1] if len(history) > 0 else 0
+        feat_dict, history, unit = get_features_and_price(
+            req.commodity, req.market, req.county, req.current_price
+        )
+        
+        current_price = history[-1] if len(history) > 0 else (req.current_price or 0)
         
         feature_order = artifacts["metadata"]['features']
-        
-        # DataFrame conversion
-        X_df = pd.DataFrame([feat_dict])
-        
-        # Align columns with training data
-        for col in feature_order:
-            if col not in X_df.columns:
-                X_df[col] = 0
-        X_df = X_df[feature_order]
-        
+        X_df = pd.DataFrame([feat_dict]).reindex(columns=feature_order, fill_value=0)
         X_scaled = artifacts["scaler"].transform(X_df)
         X_final = pd.DataFrame(X_scaled, columns=feature_order)
         
-        # Predict
         pred_val = artifacts["model"].predict(X_final)[0]
         pred_val = max(0, float(pred_val))
+        
+        # --- SANITY CLAMP ---
+        # If prediction deviates wildly (>50%) from current price, check data quality
+        if current_price > 0:
+            change_ratio = (pred_val - current_price) / current_price
+            if abs(change_ratio) > 0.5:
+                 # If extreme deviation, trust the Moving Average or Current Price
+                 ma_val = feat_dict.get('ma_7', 0)
+                 if ma_val > 0 and abs((ma_val - current_price)/current_price) < 0.3:
+                     pred_val = ma_val
+                 else:
+                     pred_val = current_price
         
         change = 0
         if current_price > 0:
@@ -207,7 +208,6 @@ def predict_price(req: PredictionRequest):
         if change > 2: trend = "rising"
         if change < -2: trend = "falling"
         
-        # Calculate Confidence based on history depth
         confidence = 0.5
         if len(history) >= 14: confidence = 0.85
         if len(history) >= 30: confidence = 0.95
@@ -232,6 +232,17 @@ def predict_price(req: PredictionRequest):
 @app.get("/health")
 def health():
     return {"status": "ok", "loaded": artifacts["model"] is not None}
+
+@app.post("/reload")
+async def reload_model_data():
+    """Force reload of model and csv data after training"""
+    try:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 🔄 Reload signal received. Refreshing artifacts...")
+        await load_artifacts()
+        return {"status": "success", "message": "Model and Data reloaded successfully"}
+    except Exception as e:
+        print(f"Reload failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

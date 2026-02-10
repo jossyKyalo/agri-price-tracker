@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { query, transaction } from '../database/connection';
+import { query } from '../database/connection';
 import { ApiError } from '../utils/apiError';
 import { logger } from '../utils/logger';
 import { 
-  sendSmsMessage, 
   sendBulkSms, 
-  processSmsWebhook,
   processTextSmsWebhook, 
   testReplySystem,
   formatPhoneNumber, 
@@ -24,7 +22,8 @@ import {
   unsubscribeUser,
   getSubscribedNumbers,
   sendPriceAlert as sendPriceAlertService,
-  sendDailyPriceUpdate
+  sendDailyPriceUpdate,
+  sendSmsMessage
 } from '../services/smsService';
 import type { 
   SendSmsRequest, 
@@ -34,8 +33,11 @@ import type {
   ApiResponse,
   SendSmsWithReplyRequest 
 } from '../types/index';
- 
 
+// ... (Keep handleSmsWebhook, handleTextBeeWebhook, checkIncomingSms, startPollingSms, stopPollingSms, getSmsPollingStats, testTwoWaySmsSystem, getSmsConversations, clearSmsConversation, clearAllSmsConversations, pollSmsNow, sendSms, sendSmsWithReply, testSmsReplySystem, testTextSmsConnectionHandler, sendTestSms, getSmsReplies as is) ...
+// (I will only include the modified functions below for brevity, assume the rest are kept as they are in your provided file unless specified)
+
+// ... existing webhooks and polling functions ...
 export const handleSmsWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try { 
     const result = await processTextSmsWebhook(req.body, req.headers, JSON.stringify(req.body));
@@ -122,7 +124,6 @@ export const handleTextBeeWebhook = async (req: Request, res: Response, next: Ne
     });
   }
 };
- 
 
 export const checkIncomingSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -345,7 +346,6 @@ export const pollSmsNow = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
- 
 
 export const sendSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -359,7 +359,7 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
 
     const sentBy = req.user!.id;
     let finalMessage = message;
- 
+
     if (template_id && template_variables) {
       const templateResult = await query('SELECT template FROM sms_templates WHERE id = $1', [template_id]);
       if (templateResult.rows.length > 0) {
@@ -369,7 +369,7 @@ export const sendSms = async (req: Request, res: Response, next: NextFunction): 
         });
       }
     }
- 
+
     const smsResults = await sendBulkSms(recipients, finalMessage, sms_type, sentBy);
 
     logger.info(`📤 SMS sent via TextBee to ${recipients.length} recipients by ${req.user!.email}`, {
@@ -411,7 +411,7 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
 
     const sentBy = req.user!.id;
     let finalMessage = message;
- 
+
     if (template_id && template_variables) {
       const templateResult = await query('SELECT template FROM sms_templates WHERE id = $1', [template_id]);
       if (templateResult.rows.length > 0) {
@@ -423,7 +423,7 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
     }
 
     const smsResults = [];
-     
+      
     for (const recipient of recipients) {
       const options: any = {
         smsType: sms_type,
@@ -433,7 +433,7 @@ export const sendSmsWithReply = async (req: Request, res: Response, next: NextFu
         replyWebhookUrl: reply_webhook_url,
         webhookData: webhook_data
       };
-       
+        
       
       const result = await sendSmsMessage(recipient, finalMessage, options);
       smsResults.push(result); 
@@ -658,69 +658,65 @@ export const getSmsReplies = async (req: Request, res: Response, next: NextFunct
 };
 
 export const getSmsLogs = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { page = 1, limit = 20, status, sms_type, date_from, date_to } = req.query;
-    const offset = (Number(page) - 1) * Number(limit);
+  try { 
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = (page - 1) * limit;
+
+    const { status, sms_type, recipient } = req.query;
 
     const conditions: string[] = [];
     const params: any[] = [];
-    let paramIndex = 1;
+    let pIdx = 1;
 
     if (status) {
-      conditions.push(`status = $${paramIndex++}`);
+      conditions.push(`status = $${pIdx++}`);
       params.push(status);
     }
     if (sms_type) {
-      conditions.push(`sms_type = $${paramIndex++}`);
+      conditions.push(`sms_type = $${pIdx++}`);
       params.push(sms_type);
     }
-    if (date_from) {
-      conditions.push(`created_at >= $${paramIndex++}`);
-      params.push(date_from);
-    }
-    if (date_to) {
-      conditions.push(`created_at <= $${paramIndex++}`);
-      params.push(date_to);
+    if (recipient) {
+      conditions.push(`recipient ILIKE $${pIdx++}`);
+      params.push(`%${recipient}%`);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    params.push(limit, offset);
+ 
+    const logsSql = `
+      SELECT sl.*, u.full_name as sent_by_name
+      FROM sms_logs sl
+      LEFT JOIN users u ON sl.sent_by = u.id::varchar -- Cast UUID if needed
+      ${whereClause}
+      ORDER BY sl.created_at DESC
+      LIMIT $${pIdx++} OFFSET $${pIdx++}
+    `;
 
-    const result = await query(
-      `SELECT sl.*, u.full_name as sent_by_name
-       FROM sms_logs sl
-       LEFT JOIN users u ON sl.sent_by = u.id
-       ${whereClause}
-       ORDER BY sl.created_at DESC
-       LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
-      params
-    );
+    const countSql = `SELECT COUNT(*) FROM sms_logs ${whereClause}`;
 
-    const countResult = await query(
-      `SELECT COUNT(*) FROM sms_logs ${whereClause}`,
-      params.slice(0, -2)
-    );
+    const [logsResult, countResult] = await Promise.all([
+      query(logsSql, [...params, limit, offset]),
+      query(countSql, params)
+    ]);
 
-    const total = parseInt(countResult.rows[0].count);
-    const pages = Math.ceil(total / Number(limit));
-
-    const response: ApiResponse<SmsLog[]> = {
+    res.json({
       success: true,
-      message: `SMS logs retrieved successfully - Total: ${total}, With Replies: ${result.rows.filter(r => r.reply_received).length}, Two-way: ${total > 0 ? Math.round((result.rows.filter(r => r.reply_received).length / total) * 100) : 0}%`,
-      data: result.rows,
+      message: 'SMS logs retrieved successfully',
+      data: logsResult.rows,
       pagination: {
-        page: Number(page),
-        limit: Number(limit),
-        total,
-        pages
+        page,
+        limit,
+        total: parseInt(countResult.rows[0].count),
+        pages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
       }
-    };
-
-    res.json(response);
+    });
   } catch (error) {
-    next(error);
+    logger.error('Error fetching SMS logs:', error); 
+    next(new ApiError('Failed to fetch SMS logs', 500));
   }
 };
+
  
 
 export const createSmsTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -833,12 +829,15 @@ export const deleteSmsTemplate = async (req: Request, res: Response, next: NextF
   }
 };
  
-
+ 
 export const subscribeSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { phone, crops, regions, alert_types } = req.body;
-    const userId = req.user?.id;
+    
+    // Safely get userId if authenticated, otherwise undefined
+    const userId = (req as any).user?.id || null;
  
+    // Use subscribeUser service which handles logic
     const result = await subscribeUser(phone, crops, userId);
 
     logger.info(`SMS subscription created/updated: ${phone}`, {
@@ -854,6 +853,7 @@ export const subscribeSms = async (req: Request, res: Response, next: NextFuncti
 
     res.json(response);
   } catch (error) {
+    logger.error('Subscription error:', error);
     next(error);
   }
 };
@@ -910,7 +910,7 @@ export const getSmsSubscriptions = async (req: Request, res: Response, next: Nex
 export const unsubscribeSms = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { phone } = req.params;
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id || null;
 
     // Check if phone is provided
     if (!phone) {
@@ -1008,7 +1008,7 @@ export const sendPriceAlert = async (req: Request, res: Response, next: NextFunc
       region, 
       trend = 'stable', 
       percentage = 0,
-      sentBy = req.user?.id 
+      sentBy = (req as any).user?.id 
     } = req.body;
 
     if (!cropName || !price || !region) {
@@ -1039,7 +1039,7 @@ export const sendPriceAlert = async (req: Request, res: Response, next: NextFunc
 
 export const sendDailyPriceUpdateHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const sentBy = req.user?.id;
+    const sentBy = (req as any).user?.id;
 
     await sendDailyPriceUpdate(sentBy);
 
@@ -1085,4 +1085,3 @@ export const testWebhookEndpoint = async (req: Request, res: Response, next: Nex
     next(error);
   }
 };
-

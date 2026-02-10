@@ -985,71 +985,74 @@
       </div>
     </div>
 
-    <div *ngIf="activeTab === 'sms'" class="tab-content">
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-sms"></i> SMS Price Alerts</h3>
+      <div *ngIf="activeTab === 'sms'" class="tab-content">
+      <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+          <h3 class="fw-bold" style="color: var(--primary-green);"><i class="fas fa-sms me-2"></i> SMS Price Alerts</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
           <div class="sms-subscription">
+            
+            <!-- Left Side: Info -->
             <div class="sms-info">
-              <h4>Get price alerts on your phone</h4>
-              <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.
-              </p>
-              <ul>
-                <li>Daily price updates</li>
-                <li>Price spike alerts</li>
-                <li>Market opportunity notifications</li>
-                <li>Weather-related price warnings</li>
+              <h4 class="text-dark fw-bold mb-3">Get prices on your phone</h4>
+              <p class="text-muted mb-4">Subscribe to receive daily updates. Perfect for feature phones.</p>
+              <ul class="list-unstyled">
+                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Daily price updates</li>
+                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Price spike alerts</li>
+                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Market opportunities</li>
               </ul>
             </div>
+ 
             <div class="sms-form">
               <form (ngSubmit)="subscribeToSms()">
-                <div *ngIf="smsSubMessage" class="alert"
-                  [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
+                <div *ngIf="smsSubMessage" class="alert mb-3" [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
                   {{ smsSubMessage }}
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Phone Number *</label>
-                  <input type="tel" class="form-control" placeholder="+254 700 000 000" [(ngModel)]="smsSubPhone"
-                    name="smsSubPhone" required>
-                </div>
-                 
+
                 <div class="form-group mb-3">
-                  <label class="form-label d-flex justify-content-between">
-                    <span>Select Products to Track *</span>
-                    <span class="badge bg-secondary" *ngIf="getSelectedSmsCount() > 0">{{ getSelectedSmsCount() }} Selected</span>
+                  <label class="form-label fw-bold small text-uppercase text-muted">Phone Number</label>
+                  <input type="tel" class="form-control" placeholder="+254 700 000 000" 
+                         [(ngModel)]="smsSubPhone" name="smsSubPhone" required>
+                </div>
+
+                <div class="form-group mb-3">
+                  <label class="form-label d-flex justify-content-between align-items-center fw-bold small text-uppercase text-muted">
+                    <span>Select Crops</span>
                   </label>
-                  
+                   
                   <div class="input-group mb-2">
-                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control" placeholder="Search crops..." 
-                           [(ngModel)]="smsCropSearch" [ngModelOptions]="{standalone: true}">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0" placeholder="Search crops..." 
+                           [(ngModel)]="smsCropSearch" name="smsCropSearch" [ngModelOptions]="{standalone: true}">
                   </div>
  
-                  <div class="crop-scroll-container">
+                  <div class="crop-scroll-container border rounded p-2" style="max-height: 200px; overflow-y: auto; background: #f8f9fa;">
                     <div class="form-check" *ngFor="let crop of filteredSmsCrops">
-                      <input class="form-check-input" type="checkbox" [id]="'sms_' + crop.id" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
+                      <input class="form-check-input" type="checkbox" [id]="'sms_' + crop.id" 
+                             [(ngModel)]="smsSubCrops[crop.name]" [name]="'crop_' + crop.name">
                       <label class="form-check-label" [for]="'sms_' + crop.id">
                         {{ crop.name }}
                       </label>
                     </div>
                     
                     <div *ngIf="filteredSmsCrops.length === 0" class="text-center text-muted py-3">
-                      <small>No crops found matching "{{ smsCropSearch }}"</small>
+                      <small>No crops found</small>
                     </div>
                   </div>
-                  <small class="text-muted mt-1 d-block">Scroll to see more crops</small>
                 </div>
-                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                  <i class="fas fa-bell"></i>
-                  {{ isLoading ? 'Subscribing...' : 'Subscribe to SMS Alerts' }}
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" [disabled]="isLoading">
+                  <span *ngIf="isLoading"><i class="fas fa-spinner fa-spin me-2"></i> Subscribing...</span>
+                  <span *ngIf="!isLoading"><i class="fas fa-bell me-2"></i> Subscribe Now</span>
                 </button>
               </form>
             </div>
+
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
