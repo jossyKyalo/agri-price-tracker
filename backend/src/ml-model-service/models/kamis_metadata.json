@@ -24,13 +24,11 @@
     "std_30",
     "Commodity_enc",
     "Market_enc",
-    "County_enc"
+    "County_enc",
+    "Unit_enc"
   ],
-  "model_type": "HistGradientBoostingRegressor",
-  "n_features": 25,
-  "training_samples": 204067,
-  "avg_mae": 31.613628274873143,
-  "avg_r2": 0.8362910639949366,
-  "trained_date": "2026-01-22T05:47:59.736897",
-  "sklearn_version": "1.3.2+"
+  "model_type": "HistGradientBoostingRegressor_Restored",
+  "training_samples": 245269,
+  "avg_r2": 0.8244812420380739,
+  "trained_date": "2026-02-09T19:23:15.981047"
 }

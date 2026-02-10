@@ -25,11 +25,11 @@
             <div>
               <strong><i class="fas fa-exchange-alt"></i> Overall Price Change</strong>
               <div class="small mt-1">
-                <span class="text-muted">Starting:</span> 
+                <span class="text-muted">Starting:</span>
                 {{ (historyData[0]?.entry_date | date:'mediumDate') || 'N/A' }}
                 (KSh {{ historyData[0]?.price }})
                 <i class="fas fa-arrow-right mx-2"></i>
-                <span class="text-muted">Current:</span> 
+                <span class="text-muted">Current:</span>
                 {{ (historyData[historyData.length-1]?.entry_date | date:'mediumDate') || 'N/A' }}
                 (KSh {{ historyData[historyData.length-1]?.price }})
               </div>
@@ -141,37 +141,52 @@
               <line x1="50" y1="240" x2="580" y2="240" stroke="#e9ecef" stroke-width="1"></line>
 
               <text x="45" y="45" text-anchor="end" font-size="11" fill="#6c757d">{{ getMaxPrice() }}</text>
-              <text x="45" y="95" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.75 + getMinPrice() * 0.25) | number:'1.0-0' }}</text>
-              <text x="45" y="145" text-anchor="end" font-size="12" fill="#495057" font-weight="600">{{ getAveragePrice() }}</text>
-              <text x="45" y="195" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.25 + getMinPrice() * 0.75) | number:'1.0-0' }}</text>
+              <text x="45" y="95" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.75 +
+                getMinPrice() * 0.25) | number:'1.0-0' }}</text>
+              <text x="45" y="145" text-anchor="end" font-size="12" fill="#495057" font-weight="600">{{
+                getAveragePrice() }}</text>
+              <text x="45" y="195" text-anchor="end" font-size="11" fill="#6c757d">{{ (getMaxPrice() * 0.25 +
+                getMinPrice() * 0.75) | number:'1.0-0' }}</text>
               <text x="45" y="245" text-anchor="end" font-size="11" fill="#6c757d">{{ getMinPrice() }}</text>
 
               <path [attr.d]="getAreaPath()" fill="url(#priceGradient)"></path>
-              <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path [attr.d]="chartPath" fill="none" stroke="#0d6efd" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round"></path>
 
               <g *ngFor="let point of getChartPoints(); let i = index">
-                <circle [attr.cx]="point.x" [attr.cy]="point.y" r="5" fill="#fff" stroke="#0d6efd" stroke-width="2" class="chart-point">
+                <circle [attr.cx]="point.x" [attr.cy]="point.y" r="5" fill="#fff" stroke="#0d6efd" stroke-width="2"
+                  class="chart-point">
                   <title>{{ historyData[i]?.entry_date | date:'mediumDate' }}: KSh {{ historyData[i]?.price }}</title>
                 </circle>
               </g>
 
-              <circle [attr.cx]="getChartPoints()[0].x" [attr.cy]="getChartPoints()[0].y" r="8" fill="#17a2b8" stroke="#fff" stroke-width="2" class="highlight-point">
+              <circle [attr.cx]="getChartPoints()[0].x" [attr.cy]="getChartPoints()[0].y" r="8" fill="#17a2b8"
+                stroke="#fff" stroke-width="2" class="highlight-point">
                 <title>Starting: KSh {{ historyData[0]?.price }}</title>
               </circle>
-              <text [attr.x]="getChartPoints()[0].x + 10" [attr.y]="getChartPoints()[0].y < 50 ? getChartPoints()[0].y + 20 : getChartPoints()[0].y - 10" text-anchor="start" font-size="11" fill="#17a2b8" font-weight="600">Start</text>
+              <text [attr.x]="getChartPoints()[0].x + 10"
+                [attr.y]="getChartPoints()[0].y < 50 ? getChartPoints()[0].y + 20 : getChartPoints()[0].y - 10"
+                text-anchor="start" font-size="11" fill="#17a2b8" font-weight="600">Start</text>
 
-              <ng-container *ngIf="getHighestPoint().x !== getChartPoints()[0].x && getHighestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
-                <circle [attr.cx]="getHighestPoint().x" [attr.cy]="getHighestPoint().y" r="7" fill="#28a745" stroke="#fff" stroke-width="2" class="highlight-point">
+              <ng-container
+                *ngIf="getHighestPoint().x !== getChartPoints()[0].x && getHighestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
+                <circle [attr.cx]="getHighestPoint().x" [attr.cy]="getHighestPoint().y" r="7" fill="#28a745"
+                  stroke="#fff" stroke-width="2" class="highlight-point">
                   <title>Highest: KSh {{ getMaxPrice() }}</title>
                 </circle>
-                <text [attr.x]="getHighestPoint().x" [attr.y]="getHighestPoint().y < 50 ? getHighestPoint().y + 25 : getHighestPoint().y - 15" text-anchor="middle" font-size="11" fill="#28a745" font-weight="600">Peak</text>
+                <text [attr.x]="getHighestPoint().x"
+                  [attr.y]="getHighestPoint().y < 50 ? getHighestPoint().y + 25 : getHighestPoint().y - 15"
+                  text-anchor="middle" font-size="11" fill="#28a745" font-weight="600">Peak</text>
               </ng-container>
 
-              <ng-container *ngIf="getLowestPoint().x !== getChartPoints()[0].x && getLowestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
-                <circle [attr.cx]="getLowestPoint().x" [attr.cy]="getLowestPoint().y" r="7" fill="#dc3545" stroke="#fff" stroke-width="2" class="highlight-point">
+              <ng-container
+                *ngIf="getLowestPoint().x !== getChartPoints()[0].x && getLowestPoint().x !== getChartPoints()[getChartPoints().length-1].x">
+                <circle [attr.cx]="getLowestPoint().x" [attr.cy]="getLowestPoint().y" r="7" fill="#dc3545" stroke="#fff"
+                  stroke-width="2" class="highlight-point">
                   <title>Lowest: KSh {{ getMinPrice() }}</title>
                 </circle>
-                <text [attr.x]="getLowestPoint().x" [attr.y]="getLowestPoint().y + 25" text-anchor="middle" font-size="11" fill="#dc3545" font-weight="600">Low</text>
+                <text [attr.x]="getLowestPoint().x" [attr.y]="getLowestPoint().y + 25" text-anchor="middle"
+                  font-size="11" fill="#dc3545" font-weight="600">Low</text>
               </ng-container>
             </svg>
 
@@ -215,8 +230,9 @@
                 <h6 class="mb-1">Prices Are Falling</h6>
                 <p class="mb-0 small">
                   <!-- Conditional logic to replace Math.abs -->
-                  Prices decreased by <strong>{{ getTotalChange() < 0 ? -getTotalChange() : getTotalChange() }}%</strong> from the previous period.
-                  {{ getSellingAdvice() }}
+                  Prices decreased by <strong>{{ getTotalChange() < 0 ? -getTotalChange() : getTotalChange()
+                      }}%</strong> from the previous period.
+                      {{ getSellingAdvice() }}
                 </p>
               </div>
             </div>
@@ -228,7 +244,8 @@
               <div class="insight-content">
                 <h6 class="mb-1">Stable Market</h6>
                 <p class="mb-0 small">
-                  Prices changed by <strong>{{ getTotalChange() > 0 ? '+' : '' }}{{ getTotalChange() }}%</strong> from the previous period.
+                  Prices changed by <strong>{{ getTotalChange() > 0 ? '+' : '' }}{{ getTotalChange() }}%</strong> from
+                  the previous period.
                   {{ getSellingAdvice() }}
                 </p>
               </div>
@@ -241,7 +258,8 @@
               <div class="insight-content">
                 <h6 class="mb-1">High Price Swings</h6>
                 <p class="mb-0 small">
-                  Prices vary by <strong>KSh {{ getMaxPrice() - getMinPrice() }}</strong> ({{ getPriceVolatility() }}% volatility).
+                  Prices vary by <strong>KSh {{ getMaxPrice() - getMinPrice() }}</strong> ({{ getPriceVolatility() }}%
+                  volatility).
                   Watch the market closely for best selling opportunities.
                 </p>
               </div>
@@ -256,7 +274,8 @@
                 <p class="mb-0 small">
                   Current price (KSh {{ historyData[historyData.length-1]?.price }}) is
                   <strong>
-                    {{ ((historyData[historyData.length-1]?.price - getAveragePrice()) / getAveragePrice() * 100) | number:'1.0-0' }}%
+                    {{ ((historyData[historyData.length-1]?.price - getAveragePrice()) / getAveragePrice() * 100) |
+                    number:'1.0-0' }}%
                     {{ historyData[historyData.length-1]?.price > getAveragePrice() ? 'above' : 'below' }}
                   </strong>
                   the historical average (KSh {{ getAveragePrice() }}).
@@ -272,7 +291,8 @@
               <span>Starting Price ({{ (historyData[0]?.entry_date | date:'shortDate') || 'N/A' }})</span>
             </div>
             <div class="legend-item">
-              <div class="legend-color" [style.background]="getOverallTrend() === 'up' ? '#28a745' : getOverallTrend() === 'down' ? '#dc3545' : '#ffc107'">
+              <div class="legend-color"
+                [style.background]="getOverallTrend() === 'up' ? '#28a745' : getOverallTrend() === 'down' ? '#dc3545' : '#ffc107'">
               </div>
               <span>Current Price ({{ historyData[historyData.length-1]?.entry_date | date:'shortDate' }})</span>
             </div>
@@ -358,12 +378,14 @@
         <div class="card-body">
           <div class="search-filters">
             <div class="search-group">
-              <label class="form-label">Search Crop/Product</label> 
-              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+              <label class="form-label">Search Crop/Product</label>
+              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm"
+                (ngModelChange)="searchTerm = $event; filterCrops()">
             </div>
             <div class="search-group">
-              <label class="form-label">Search Market</label> 
-              <input type="text" class="form-control" placeholder="e.g Kalundu..." [ngModel]="marketSearchTerm" (ngModelChange)="marketSearchTerm = $event; filterCrops()">
+              <label class="form-label">Search Market</label>
+              <input type="text" class="form-control" placeholder="e.g Kalundu..." [ngModel]="marketSearchTerm"
+                (ngModelChange)="marketSearchTerm = $event; filterCrops()">
             </div>
             <div class="filter-group">
               <label class="form-label">Category</label>
@@ -405,7 +427,7 @@
                   <th>Source</th>
                   <th>Category</th>
                   <th>Current Price</th>
-                  <th>Trend</th>
+                  <th>Daily Change</th>
                   <th>Region</th>
                   <th>Market</th>
                   <th>Last Updated</th>
@@ -447,7 +469,7 @@
                       <strong>KSh {{ crop.currentPrice | number:'1.2-2' }}/{{ crop.unit }}</strong>
                     </div>
                   </td>
-                  
+
                   <!-- FIXED: Trend Cell to prevent "Up Arrow + 0%" -->
                   <td>
                     <div class="trend-cell" [ngClass]="{
@@ -455,15 +477,15 @@
                         'down': getPriceChange(crop.currentPrice, crop.previousPrice) < 0,
                         'stable': getPriceChange(crop.currentPrice, crop.previousPrice) === 0
                       }">
-                      
-                      <ng-container *ngIf="getPriceChange(crop.currentPrice, crop.previousPrice) !== 0; else stableTrend">
-                        <i class="fas"
-                           [class.fa-arrow-up]="getPriceChange(crop.currentPrice, crop.previousPrice) > 0"
-                           [class.fa-arrow-down]="getPriceChange(crop.currentPrice, crop.previousPrice) < 0"></i>
+
+                      <ng-container
+                        *ngIf="getPriceChange(crop.currentPrice, crop.previousPrice) !== 0; else stableTrend">
+                        <i class="fas" [class.fa-arrow-up]="getPriceChange(crop.currentPrice, crop.previousPrice) > 0"
+                          [class.fa-arrow-down]="getPriceChange(crop.currentPrice, crop.previousPrice) < 0"></i>
                         <!-- Removed decimal pipe to show whole numbers as requested -->
                         <span>{{ Math.abs(getPriceChange(crop.currentPrice, crop.previousPrice)) }}%</span>
                       </ng-container>
-                      
+
                       <ng-template #stableTrend>
                         <i class="fas fa-minus"></i>
                         <span>Stable</span>
@@ -494,12 +516,14 @@
               </tbody>
             </table>
           </div>
-          <div class="pagination-footer d-flex justify-content-center align-items-center mt-4" *ngIf="totalPages > 1 && !isLoading && paginatedCrops.length > 0">
+          <div class="pagination-footer d-flex justify-content-center align-items-center mt-4"
+            *ngIf="totalPages > 1 && !isLoading && paginatedCrops.length > 0">
             <button class="btn btn-outline-secondary btn-sm me-3" [disabled]="currentPage === 1" (click)="prevPage()">
               <i class="fas fa-chevron-left"></i> Previous
             </button>
             <span class="fw-bold text-muted small">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages" (click)="nextPage()">
+            <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
               Next <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -513,18 +537,23 @@
       </div>
     </div>
 
-    <!-- Predictions Tab -->
+ 
+
     <div *ngIf="activeTab === 'predictions'" class="tab-content">
-      <div class="card mb-3">
+
+      <!-- Enhanced Filter Card -->
+      <div class="predictions-filter-card mb-4">
         <div class="card-body">
-          <div class="search-filters">
+            <div class="search-filters">
             <div class="search-group">
-              <label class="form-label">Search Crop/Product</label> 
-              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm" (ngModelChange)="searchTerm = $event; filterCrops()">
+              <label class="form-label">Search Crop/Product</label>
+              <input type="text" class="form-control" placeholder="e.g Maize..." [ngModel]="searchTerm"
+                (ngModelChange)="searchTerm = $event; filterCrops()">
             </div>
             <div class="search-group">
-              <label class="form-label">Search Market</label> 
-              <input type="text" class="form-control" placeholder="e.g Nakuru..." [ngModel]="marketSearchTerm" (ngModelChange)="marketSearchTerm = $event; filterCrops()">
+              <label class="form-label">Search Market</label>
+              <input type="text" class="form-control" placeholder="e.g Kalundu..." [ngModel]="marketSearchTerm"
+                (ngModelChange)="marketSearchTerm = $event; filterCrops()">
             </div>
             <div class="filter-group">
               <label class="form-label">Category</label>
@@ -537,7 +566,7 @@
               <label class="form-label">Region</label>
               <select class="form-select" [(ngModel)]="selectedRegion" (change)="filterCrops()">
                 <option value="">All Regions</option>
-                <option *ngFor="let reg of regions" [value]="reg.name">{{ reg.name | titlecase }}</option>
+                <option *ngFor="let region of regions" [value]="region.name">{{ region.name }}</option>
               </select>
             </div>
             <div class="filter-group">
@@ -551,98 +580,167 @@
           </div>
         </div>
       </div>
-      <div class="predictions-grid">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="fas fa-brain"></i> 7-Day Price Predictions</h3>
-            <span class="badge badge-info">Powered by Machine Learning</span>
-          </div>
+
+      <!-- Section Header -->
+      <div class="predictions-section-header">
+        <h4>
+          <i class="fas fa-brain"></i>
+          7-Day AI Forecasts
+        </h4>
+        <span class="ai-badge">
+          <i class="fas fa-microchip"></i>
+          Powered by ML Model v2.0
+        </span>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="predictions-loading">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5>Analyzing Market Trends</h5>
+        <p class="text-muted">Our AI is processing thousands of data points...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && filteredCrops.length === 0" class="predictions-empty">
+        <i class="fas fa-leaf"></i>
+        <h5>No Forecasts Found</h5>
+        <p class="text-muted">Try adjusting your filters to see more results.</p>
+        <button class="btn btn-outline-primary mt-3" (click)="resetFilters()">
+          <i class="fas fa-undo"></i> Reset Filters
+        </button>
+      </div>
+
+      <!-- Predictions Grid -->
+      <div class="predictions-card-grid" *ngIf="!isLoading && paginatedCrops.length > 0">
+        <div class="prediction-card" *ngFor="let crop of paginatedCrops">
           <div class="card-body">
-            <div *ngIf="isLoading" class="text-center py-5">
-              <i class="fas fa-spinner fa-spin fa-3x text-success"></i>
-              <p class="mt-3">Generating forecasts...</p>
+
+            <!-- Card Header -->
+            <div class="prediction-card-header">
+              <div class="crop-info">
+                <h5 class="crop-title">{{ crop.name }}</h5>
+                <span class="category-badge">
+                  <i class="fas fa-tag"></i>
+                  {{ crop.category }}
+                </span>
+              </div>
+              <span class="source-badge" [ngClass]="{
+                  'official': crop.source === 'kamis', 
+                  'verified': crop.source === 'admin',
+                  'farmer': crop.source === 'farmer'
+                }">
+                <i class="fas" [ngClass]="{
+              'fa-globe': crop.source === 'kamis',
+              'fa-shield-alt': crop.source === 'admin', 
+              'fa-user': crop.source === 'farmer'
+            }"></i>
+                {{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer') }}
+              </span>
             </div>
-            
-            <div *ngIf="!isLoading && filteredCrops.length === 0" class="text-center py-5">
-              <i class="fas fa-leaf text-muted fa-3x mb-3"></i>
-              <h5>No crops found matching your criteria.</h5>
-              <p class="text-muted">Try adjusting your filters or check back later for predictions.</p>
+
+            <!-- Location -->
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ crop.market }}, {{ crop.region }}</span>
             </div>
-            
-            <div class="prediction-list" *ngIf="!isLoading && paginatedCrops.length > 0">
-              <div *ngFor="let crop of paginatedCrops" class="prediction-item">
-                <div class="prediction-info">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                      <div class="crop-name">{{ crop.name }}</div>
-                      <small class="text-muted">{{ crop.category }}</small>
-                    </div>
-                    <span class="badge" [ngClass]="{
-                      'bg-primary': crop.source === 'kamis', 
-                      'bg-purple text-white': crop.source === 'admin',
-                      'bg-warning text-dark': crop.source === 'farmer'
-                    }">
-                      {{ crop.source === 'kamis' ? 'Official' : (crop.source === 'admin' ? 'Verified' : 'Farmer') }}
-                    </span>
-                  </div>
-                  <div class="location-badge mt-2">
-                    <i class="fas fa-map-marker-alt"></i>
-                    {{ crop.market }} <span class="text-muted">({{ crop.region }})</span>
-                  </div>
-                  <div class="current-price mt-2">
-                    Current: <strong>KSh {{ crop.currentPrice | number:'1.2-2' }} / {{ crop.unit }}</strong>
-                  </div>
+
+            <!-- Price Comparison -->
+            <div class="price-compare-box" [ngClass]="{
+               'trend-up': crop.currentPrice && crop.prediction && getPredictionTrend(crop.currentPrice, crop.prediction) === 'up',
+               'trend-down': crop.currentPrice && crop.prediction && getPredictionTrend(crop.currentPrice, crop.prediction) === 'down',
+               'trend-stable': crop.currentPrice && crop.prediction && getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+             }">
+
+              <div class="price-comparison-row">
+                <!-- Current Price -->
+                <div class="price-item">
+                  <span class="price-label">Current</span>
+                  <span class="price-value">KSh {{ crop.currentPrice | number:'1.0-0' }}</span>
                 </div>
-                
-                <div class="prediction-data" *ngIf="crop.prediction !== null">
-                  <div class="predicted-price">
-                    <strong>KSh {{ crop.prediction | number:'1.2-2' }} / {{ crop.unit }}</strong>
-                    <small>7-day prediction</small>
-                  </div>
-                  <div class="confidence">
-                    <i class="fas fa-shield-alt text-muted"></i>
-                    {{ (crop.confidence * 100) | number:'1.0-0' }}% confidence
-                  </div>
+
+                <!-- Trend Arrow -->
+                <div class="trend-arrow-box" *ngIf="crop.currentPrice && crop.prediction" [ngClass]="{
+                   'up': getPredictionTrend(crop.currentPrice, crop.prediction) === 'up',
+                   'down': getPredictionTrend(crop.currentPrice, crop.prediction) === 'down',
+                   'stable': getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+                 }">
+                  <i class="fas" [ngClass]="{
+                'fa-arrow-trend-up': getPredictionTrend(crop.currentPrice, crop.prediction) === 'up',
+                'fa-arrow-trend-down': getPredictionTrend(crop.currentPrice, crop.prediction) === 'down',
+                'fa-equals': getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+              }"></i>
                 </div>
-                
-                <div class="prediction-data" *ngIf="crop.prediction === null">
-                  <div class="predicted-price">
-                    <strong>No prediction available</strong>
-                    <small>Check back later</small>
-                  </div>
-                </div>
-                
-                <div class="prediction-trend" *ngIf="crop.prediction !== null && crop.currentPrice !== undefined" 
-                     [ngClass]="{
-                        'text-success': getPredictionChange(crop.currentPrice, crop.prediction) > 0,
-                        'text-danger': getPredictionChange(crop.currentPrice, crop.prediction) < 0,
-                        'text-muted': getPredictionChange(crop.currentPrice, crop.prediction) === 0
-                     }">
-                  <i class="fas"
-                    [class.fa-arrow-up]="getPredictionChange(crop.currentPrice, crop.prediction) > 0"
-                    [class.fa-arrow-down]="getPredictionChange(crop.currentPrice, crop.prediction) < 0"
-                    [class.fa-minus]="getPredictionChange(crop.currentPrice, crop.prediction) === 0"></i>
-                  <span class="ms-1">
-                    {{ Math.abs(getPredictionChange(crop.currentPrice, crop.prediction)) }}%
-                    {{ getPredictionChange(crop.currentPrice, crop.prediction) > 0 ? 'Increase' : (getPredictionChange(crop.currentPrice, crop.prediction) < 0 ? 'Decrease' : 'Stable') }}
-                  </span>
+
+                <!-- Forecast Price -->
+                <div class="price-item">
+                  <span class="price-label">Forecast</span>
+                  <span class="price-value forecast">KSh {{ crop.prediction | number:'1.0-0' }}</span>
                 </div>
               </div>
             </div>
-            
-            <div class="pagination-footer d-flex justify-content-center align-items-center mt-4" *ngIf="totalPages > 1 && !isLoading && paginatedCrops.length > 0">
-              <button class="btn btn-outline-secondary btn-sm me-3" [disabled]="currentPage === 1" (click)="prevPage()">
-                <i class="fas fa-chevron-left"></i> Previous
-              </button>
-              <span class="fw-bold text-muted small">Page {{ currentPage }} of {{ totalPages }}</span>
-              <button class="btn btn-outline-secondary btn-sm ms-3" [disabled]="currentPage === totalPages" (click)="nextPage()">
-                Next <i class="fas fa-chevron-right"></i>
-              </button>
+
+            <!-- Analysis Row -->
+            <div class="analysis-row" *ngIf="crop.currentPrice && crop.prediction">
+              <span class="trend-badge" [ngClass]="{
+                  'up': getPredictionTrend(crop.currentPrice, crop.prediction) === 'up',
+                  'down': getPredictionTrend(crop.currentPrice, crop.prediction) === 'down',
+                  'stable': getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+                }">
+                <i class="fas" [ngClass]="{
+              'fa-arrow-up': getPredictionTrend(crop.currentPrice, crop.prediction) === 'up',
+              'fa-arrow-down': getPredictionTrend(crop.currentPrice, crop.prediction) === 'down',
+              'fa-minus': getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+            }"></i>
+                {{ getPredictionChange(crop.currentPrice, crop.prediction) > 0 ? '+' : '' }}{{
+                getPredictionChange(crop.currentPrice, crop.prediction) }}%
+              </span>
+              <span class="insight-text">
+                Expected to
+                <strong>
+                  {{ getPredictionTrend(crop.currentPrice, crop.prediction) === 'stable'
+                  ? 'remain stable'
+                  : getPredictionTrend(crop.currentPrice, crop.prediction) }}
+                </strong>
+                by next week
+              </span>
             </div>
+
+            <!-- Confidence Footer -->
+            <div class="card-footer-confidence">
+              <div class="confidence-header">
+                <span class="confidence-label">
+                  <i class="fas fa-shield-check"></i>
+                  AI Confidence
+                </span>
+                <span class="confidence-value">
+                  {{ (crop.confidence * 100) | number:'1.0-0' }}%
+                </span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" [style.width]="(crop.confidence * 100) + '%'"
+                  [attr.aria-valuenow]="crop.confidence * 100" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div class="pagination-footer" *ngIf="totalPages > 1 && !isLoading && paginatedCrops.length > 0">
+        <button class="btn" [disabled]="currentPage === 1" (click)="prevPage()">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
+
 
     <!-- Input Price Tab - FIXED STRUCTURE -->
     <div *ngIf="activeTab === 'input'" class="tab-content">
@@ -663,11 +761,13 @@
               <form (ngSubmit)="quickRegister()" #regForm="ngForm">
                 <div class="form-group">
                   <label class="form-label">Your Full Name *</label>
-                  <input type="text" class="form-control" [(ngModel)]="registration.name" name="regName" placeholder="e.g., John Kamau" required>
+                  <input type="text" class="form-control" [(ngModel)]="registration.name" name="regName"
+                    placeholder="e.g., John Kamau" required>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Phone Number *</label>
-                  <input type="tel" class="form-control" [(ngModel)]="registration.phone" name="regPhone" placeholder="+254712345678" required>
+                  <input type="tel" class="form-control" [(ngModel)]="registration.phone" name="regPhone"
+                    placeholder="+254712345678" required>
                   <small class="text-muted">You'll use this to login</small>
                 </div>
                 <div class="form-group">
@@ -681,14 +781,16 @@
                   <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
                 </div>
                 <button type="submit" class="btn btn-success btn-block mb-2" [disabled]="!regForm.valid || isLoading">
-                  <i class="fas" [class.fa-user-check]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+                  <i class="fas" [class.fa-user-check]="!isLoading" [class.fa-spinner]="isLoading"
+                    [class.fa-spin]="isLoading"></i>
                   {{ isLoading ? 'Registering...' : 'Register Now' }}
                 </button>
               </form>
               <hr>
               <p class="text-center mb-0">
                 Already have an account?
-                <a href="javascript:void(0)" (click)="showLogin = true; isForgotPasswordMode = false; errorMessage = ''" class="text-primary">
+                <a href="javascript:void(0)" (click)="showLogin = true; isForgotPasswordMode = false; errorMessage = ''"
+                  class="text-primary">
                   <strong>Login here</strong>
                 </a>
               </p>
@@ -699,13 +801,16 @@
               <form (ngSubmit)="farmerLogin()" #loginForm="ngForm">
                 <div class="form-group">
                   <label class="form-label">Phone Number *</label>
-                  <input type="tel" class="form-control" [(ngModel)]="login.phone" name="loginPhone" placeholder="+254712345678" required>
+                  <input type="tel" class="form-control" [(ngModel)]="login.phone" name="loginPhone"
+                    placeholder="+254712345678" required>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Password *</label>
                   <div class="password-input-wrapper">
-                    <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="login.password" name="loginPassword" placeholder="Enter your password" required>
-                    <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                    <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="login.password"
+                      name="loginPassword" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword"
+                      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
                       <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
                     </button>
                   </div>
@@ -715,7 +820,8 @@
                   <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
                 </div>
                 <button type="submit" class="btn btn-primary btn-block mb-2" [disabled]="!loginForm.valid || isLoading">
-                  <i class="fas" [class.fa-sign-in-alt]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+                  <i class="fas" [class.fa-sign-in-alt]="!isLoading" [class.fa-spinner]="isLoading"
+                    [class.fa-spin]="isLoading"></i>
                   {{ isLoading ? 'Logging in...' : 'Login' }}
                 </button>
               </form>
@@ -727,7 +833,8 @@
               <hr>
               <p class="text-center mb-0">
                 Don't have an account?
-                <a href="javascript:void(0)" (click)="showLogin = false; isForgotPasswordMode = false; errorMessage = ''" class="text-success">
+                <a href="javascript:void(0)"
+                  (click)="showLogin = false; isForgotPasswordMode = false; errorMessage = ''" class="text-success">
                   <strong>Register here</strong>
                 </a>
               </p>
@@ -735,21 +842,26 @@
           </div>
 
           <div *ngIf="!isLoggedIn && isForgotPasswordMode">
-            <p class="text-muted">Enter your registered phone number. We'll send a reset link to the contact method on file.</p>
-            <div class="alert" [ngClass]="{'alert-success': resetMessage.startsWith('✅'), 'alert-danger': resetMessage.startsWith('❌')}" *ngIf="resetMessage">
+            <p class="text-muted">Enter your registered phone number. We'll send a reset link to the contact method on
+              file.</p>
+            <div class="alert"
+              [ngClass]="{'alert-success': resetMessage.startsWith('✅'), 'alert-danger': resetMessage.startsWith('❌')}"
+              *ngIf="resetMessage">
               {{ resetMessage }}
             </div>
             <form (ngSubmit)="requestPasswordReset()" #resetForm="ngForm">
               <div class="form-group">
                 <label class="form-label">Phone Number *</label>
-                <input type="tel" class="form-control" [(ngModel)]="resetPhone" name="resetPhone" placeholder="+254712345678" required>
+                <input type="tel" class="form-control" [(ngModel)]="resetPhone" name="resetPhone"
+                  placeholder="+254712345678" required>
               </div>
               <div class="d-flex justify-content-between align-items-center mt-3">
                 <a href="javascript:void(0)" (click)="backToLogin()" class="text-primary">
                   <i class="fas fa-arrow-left"></i> Back to Login
                 </a>
                 <button type="submit" class="btn btn-primary" [disabled]="!resetForm.valid || isLoading">
-                  <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+                  <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
+                    [class.fa-spin]="isLoading"></i>
                   {{ isLoading ? 'Sending...' : 'Send Reset Link' }}
                 </button>
               </div>
@@ -813,11 +925,13 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Price (KSh)</label>
-                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0" step="0.01" required>
+                <input type="number" class="form-control" [(ngModel)]="priceInput.price" name="price" min="0"
+                  step="0.01" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Market Location</label>
-                <input type="text" class="form-control" [(ngModel)]="priceInput.market" name="market" placeholder="e.g., Nakuru Market">
+                <input type="text" class="form-control" [(ngModel)]="priceInput.market" name="market"
+                  placeholder="e.g., Nakuru Market">
               </div>
               <div class="form-group">
                 <label class="form-label">Region</label>
@@ -828,13 +942,15 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Additional Notes (Optional)</label>
-                <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes" placeholder="Quality, quantity, market conditions, etc."></textarea>
+                <textarea class="form-control" rows="3" [(ngModel)]="priceInput.notes" name="notes"
+                  placeholder="Quality, quantity, market conditions, etc."></textarea>
               </div>
               <div *ngIf="errorMessage" class="alert alert-danger">
                 {{ errorMessage }}
               </div>
               <button type="submit" class="btn btn-primary" [disabled]="!priceForm.valid || isLoading">
-                <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+                <i class="fas" [class.fa-paper-plane]="!isLoading" [class.fa-spinner]="isLoading"
+                  [class.fa-spin]="isLoading"></i>
                 {{ isLoading ? 'Submitting...' : 'Submit Price' }}
               </button>
             </form>
@@ -878,7 +994,8 @@
           <div class="sms-subscription">
             <div class="sms-info">
               <h4>Get price alerts on your phone</h4>
-              <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.</p>
+              <p>Subscribe to receive daily price updates and alerts via SMS. Perfect for farmers with feature phones.
+              </p>
               <ul>
                 <li>Daily price updates</li>
                 <li>Price spike alerts</li>
@@ -888,21 +1005,41 @@
             </div>
             <div class="sms-form">
               <form (ngSubmit)="subscribeToSms()">
-                <div *ngIf="smsSubMessage" class="alert" [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
+                <div *ngIf="smsSubMessage" class="alert"
+                  [ngClass]="{'alert-success': !smsSubIsError, 'alert-danger': smsSubIsError}">
                   {{ smsSubMessage }}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Phone Number *</label>
-                  <input type="tel" class="form-control" placeholder="+254 700 000 000" [(ngModel)]="smsSubPhone" name="smsSubPhone" required>
+                  <input type="tel" class="form-control" placeholder="+254 700 000 000" [(ngModel)]="smsSubPhone"
+                    name="smsSubPhone" required>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Select agricultural product *</label>
-                  <div class="crop-checkboxes">
-                    <label *ngFor="let crop of crops">
-                      <input type="checkbox" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
-                      {{ crop.name }}
-                    </label>
+                 
+                <div class="form-group mb-3">
+                  <label class="form-label d-flex justify-content-between">
+                    <span>Select Products to Track *</span>
+                    <span class="badge bg-secondary" *ngIf="getSelectedSmsCount() > 0">{{ getSelectedSmsCount() }} Selected</span>
+                  </label>
+                  
+                  <div class="input-group mb-2">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control" placeholder="Search crops..." 
+                           [(ngModel)]="smsCropSearch" [ngModelOptions]="{standalone: true}">
                   </div>
+ 
+                  <div class="crop-scroll-container">
+                    <div class="form-check" *ngFor="let crop of filteredSmsCrops">
+                      <input class="form-check-input" type="checkbox" [id]="'sms_' + crop.id" [(ngModel)]="smsSubCrops[crop.name]" [name]="crop.name">
+                      <label class="form-check-label" [for]="'sms_' + crop.id">
+                        {{ crop.name }}
+                      </label>
+                    </div>
+                    
+                    <div *ngIf="filteredSmsCrops.length === 0" class="text-center text-muted py-3">
+                      <small>No crops found matching "{{ smsCropSearch }}"</small>
+                    </div>
+                  </div>
+                  <small class="text-muted mt-1 d-block">Scroll to see more crops</small>
                 </div>
                 <button type="submit" class="btn btn-primary" [disabled]="isLoading">
                   <i class="fas fa-bell"></i>
