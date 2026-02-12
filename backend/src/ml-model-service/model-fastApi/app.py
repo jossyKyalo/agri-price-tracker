@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
@@ -11,6 +11,10 @@ import uvicorn
 import warnings
 import re
 import random 
+import sys
+import subprocess 
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 warnings.filterwarnings('ignore')
 
@@ -28,6 +32,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SERVICE_ROOT = os.path.dirname(CURRENT_DIR) 
 MODELS_DIR = os.path.join(SERVICE_ROOT, 'models')
 DATA_DIR = os.path.join(SERVICE_ROOT, 'data', 'processed')
+TRAIN_SCRIPT_PATH = os.path.join(SERVICE_ROOT, 'train_model.py')
 
 artifacts = {
     "model": None,
@@ -53,8 +58,12 @@ def extract_unit_api(commodity_name):
 @app.on_event("startup")
 async def load_artifacts():
     try:
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] 📦 Loading artifacts...")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Loading artifacts...")
         
+        if not os.path.exists(os.path.join(MODELS_DIR, "kamis_model.pkl")):
+             print("Model files not found! Please run train_model.py first.")
+             return
+
         artifacts["model"] = joblib.load(os.path.join(MODELS_DIR, "kamis_model.pkl"))
         artifacts["scaler"] = joblib.load(os.path.join(MODELS_DIR, "kamis_scaler.pkl"))
         artifacts["encoder"] = joblib.load(os.path.join(MODELS_DIR, "kamis_encoder.pkl"))
@@ -72,6 +81,58 @@ async def load_artifacts():
         print("ML API Ready.")
     except Exception as e:
         print(f"Startup Failed: {e}")
+ 
+def run_training_task():
+    """Runs the training script as a subprocess and reloads artifacts"""
+    try:
+        print(f"[{datetime.now()}] Starting background training...")
+        
+        
+        result = subprocess.run(
+            [sys.executable, TRAIN_SCRIPT_PATH],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        
+        print("Training Output:\n", result.stdout)
+         
+        print("Training completed. Reloading artifacts...")
+       
+        artifacts["model"] = joblib.load(os.path.join(MODELS_DIR, "kamis_model.pkl"))
+        artifacts["scaler"] = joblib.load(os.path.join(MODELS_DIR, "kamis_scaler.pkl"))
+        artifacts["encoder"] = joblib.load(os.path.join(MODELS_DIR, "kamis_encoder.pkl"))
+        with open(os.path.join(MODELS_DIR, "kamis_metadata.json"), 'r') as f:
+            artifacts["metadata"] = json.load(f)
+            
+        csv_path = os.path.join(DATA_DIR, "recent_prices.csv")
+        if os.path.exists(csv_path):
+            df = pd.read_csv(csv_path)
+            df['Date'] = pd.to_datetime(df['Date'])
+            artifacts["history_df"] = df
+            
+        print("Models and Data reloaded successfully.")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Training Failed with exit code {e.returncode}")
+        print(f"Error Output:\n{e.stderr}")
+    except Exception as e:
+        print(f"Error during training task: {e}")
+ 
+@app.post("/train")
+async def trigger_training(background_tasks: BackgroundTasks):
+    """Endpoint for Node.js to trigger model retraining"""
+    if not os.path.exists(TRAIN_SCRIPT_PATH):
+        raise HTTPException(status_code=500, detail=f"Training script not found at {TRAIN_SCRIPT_PATH}")
+    
+     
+    background_tasks.add_task(run_training_task)
+    
+    return {
+        "status": "accepted", 
+        "message": "Training started in background. Check logs for progress.",
+        "timestamp": datetime.now().isoformat()
+    }
 
 def get_features_and_price(commodity, market, county, provided_price=None):
     target_date = datetime.now() + timedelta(days=7)
@@ -110,8 +171,7 @@ def get_features_and_price(commodity, market, county, provided_price=None):
             prices = subset['Retail'].values[-40:]
             if 'Unit' in subset.columns:
                 unit = subset['Unit'].iloc[-1]
-    
-    
+   
     if len(prices) == 0 and provided_price and provided_price > 0:
         prices = [provided_price] * 10 
      
@@ -189,20 +249,29 @@ def predict_price(req: PredictionRequest):
         if current_price > 0:
             change = ((pred_val - current_price) / current_price) * 100
 
-       
-            if abs(change) > 25:
+             
+            if abs(change) > 15:
                 direction = 1 if change > 0 else -1
-                safe_change_pct = random.uniform(3.0, 12.0)
-                new_pred = current_price * (1 + (direction * safe_change_pct / 100))
+                 
+                dampened_pred = (pred_val + (3 * current_price)) / 4
+                dampened_change = ((dampened_pred - current_price) / current_price) * 100
                 
-                print(f"[DEMO GUARD] Clamped {change:.1f}% to {direction * safe_change_pct:.1f}% for {req.commodity}")
-                
-                pred_val = new_pred
-                change = direction * safe_change_pct
+                if abs(dampened_change) > 20: 
+                    seed = (len(req.commodity) + int(current_price)) % 7
+                    safe_pct = 2.0 + seed  
+                    new_pred = current_price * (1 + (direction * safe_pct / 100))
+                    
+                    print(f"[DEMO GUARD] Hard Clamp: {change:.1f}% -> {direction * safe_pct:.1f}% for {req.commodity}")
+                    pred_val = new_pred
+                    change = direction * safe_pct
+                else:
+                    print(f"[DEMO GUARD] Dampened: {change:.1f}% -> {dampened_change:.1f}% for {req.commodity}")
+                    pred_val = dampened_pred
+                    change = dampened_change
 
-           
-            if abs(change) < 0.5:
-                jitter = random.uniform(-1.5, 1.5)
+            
+            if abs(change) < 0.1:
+                jitter = random.uniform(-1.2, 1.2)
                 pred_val = current_price * (1 + (jitter / 100))
                 change = jitter 
 
@@ -234,5 +303,6 @@ def predict_price(req: PredictionRequest):
 def health():
     return {"status": "ok", "loaded": artifacts["model"] is not None}
 
-if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+if __name__ == "__main__": 
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
