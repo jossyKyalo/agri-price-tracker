@@ -1,10 +1,8 @@
 import winston from 'winston';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { join } from 'path';
+import { mkdirSync } from 'fs';
  
+
 const levels = {
   error: 0,
   warn: 1,
@@ -12,7 +10,7 @@ const levels = {
   http: 3,
   debug: 4,
 };
- 
+
 const colors = {
   error: 'red',
   warn: 'yellow',
@@ -21,17 +19,14 @@ const colors = {
   debug: 'white',
 };
 
- 
 winston.addColors(colors);
 
- 
 const level = () => {
   const env = process.env.NODE_ENV || 'development';
   const isDevelopment = env === 'development';
   return isDevelopment ? 'debug' : 'warn';
 };
 
- 
 const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
@@ -40,9 +35,7 @@ const format = winston.format.combine(
   ),
 );
 
- 
 const transports = [
-   
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
@@ -50,7 +43,6 @@ const transports = [
     )
   }),
   
- 
   new winston.transports.File({
     filename: join(__dirname, '../../logs/error.log'),
     level: 'error',
@@ -69,7 +61,6 @@ const transports = [
   }),
 ];
 
- 
 export const logger = winston.createLogger({
   level: level(),
   levels,
@@ -77,13 +68,10 @@ export const logger = winston.createLogger({
   transports,
   exitOnError: false,
 });
-
  
-import { mkdirSync } from 'fs';
 try {
   mkdirSync(join(__dirname, '../../logs'), { recursive: true });
-} catch (error) {
-  // Directory already exists
+} catch (error) { 
 }
 
 export default logger;
