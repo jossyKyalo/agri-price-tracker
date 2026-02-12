@@ -28,6 +28,6 @@
     "Unit_enc"
   ],
   "model_type": "HistGradientBoostingRegressor_Fixed",
-  "avg_r2": 0.8417981041807326,
-  "trained_date": "2026-02-10T06:34:01.085737"
+  "avg_r2": 0.8426110400983815,
+  "trained_date": "2026-02-12T21:21:59.081757"
 }

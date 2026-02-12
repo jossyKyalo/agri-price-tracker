@@ -13,16 +13,15 @@ export const register = async (req: Request, res: Response, next: NextFunction):
   try {
     const { email, password, full_name, phone, region, organization }: CreateUserRequest = req.body;
 
-    // Check if user already exists
+   
     const existingUser = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
       throw new ApiError('User already exists with this email', 409);
     }
 
-    // Hash password
+     
     const passwordHash = await bcrypt.hash(password, 12);
-
-    // Create user
+ 
     const result = await query(
       `INSERT INTO users (email, password_hash, full_name, phone, region, organization) 
        VALUES ($1, $2, $3, $4, $5, $6) 
@@ -31,8 +30,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     );
 
     const user = result.rows[0] as User;
-
-    // Generate tokens
+ 
     const token = generateToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -58,7 +56,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   try {
     const { email, password }: LoginRequest = req.body;
 
-    // Get user with password
+     
     const result = await query(
       `SELECT id, email, password_hash, full_name, phone, role, region, organization, 
               is_active, email_verified, last_login, created_at, updated_at
@@ -71,25 +69,20 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     }
 
     const user = result.rows[0];
-
-    // Check if user is active
+ 
     if (!user.is_active) {
       throw new ApiError('Account is deactivated', 401);
     }
-
-    // Verify password
+ 
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       throw new ApiError('Invalid credentials', 401);
     }
-
-    // Update last login
+ 
     await query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
-
-    // Remove password from user object
+ 
     const { password_hash, ...userWithoutPassword } = user;
-
-    // Generate tokens
+ 
     const token = generateToken(userWithoutPassword);
     const refreshToken = generateRefreshToken(userWithoutPassword);
 
@@ -118,8 +111,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     if (!refreshToken) {
       throw new ApiError('Refresh token is required', 400);
     }
-
-    // Verify refresh token  
+   
     const response: ApiResponse = {
       success: true,
       message: 'Token refreshed successfully'
@@ -178,21 +170,19 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
   try {
     const { current_password, new_password } = req.body;
     const userId = req.user!.id;
-
-    // Get current password hash
+ 
     const result = await query('SELECT password_hash FROM users WHERE id = $1', [userId]);
     const user = result.rows[0];
 
-    // Verify current password
+    
     const isValidPassword = await bcrypt.compare(current_password, user.password_hash);
     if (!isValidPassword) {
       throw new ApiError('Current password is incorrect', 400);
     }
 
-    // Hash new password
+     
     const newPasswordHash = await bcrypt.hash(new_password, 12);
-
-    // Update password
+ 
     await query(
       'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
       [newPasswordHash, userId]
@@ -231,7 +221,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     }
     await transaction(async (client) => {
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000);  
 
       await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [user.id]);
       await client.query(
@@ -252,8 +242,8 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         const smsContent = `To reset your AgriPrice password, click this link (expires in 1 hour): ${resetUrl}`;
 
         try {
-          const cleanPhone = user.phone.replace(/\s/g, '');
-          await sendSmsMessage(cleanPhone, smsContent, 'password-reset');
+          const cleanPhone = user.phone.replace(/\s/g, ''); 
+          await sendSmsMessage(cleanPhone, smsContent, { smsType: 'password-reset' });
           logger.info(`Password reset SMS sent to user: ${email} (phone: ${cleanPhone})`);
         } catch (smsError) {
           logger.error(`FAILED to send SMS for user ${email}.`, smsError);
@@ -302,9 +292,9 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
     const tokenResult = await query(
       `SELECT t.user_id, t.expires_at 
-             FROM password_reset_tokens t
-             JOIN users u ON t.user_id = u.id
-             WHERE t.token = $1 AND u.email = $2`,
+              FROM password_reset_tokens t
+              JOIN users u ON t.user_id = u.id
+              WHERE t.token = $1 AND u.email = $2`,
       [token, email]
     );
 
