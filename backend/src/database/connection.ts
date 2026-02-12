@@ -6,16 +6,19 @@ dotenv.config();
 const { Pool } = pg;
 
  
+const isProduction = process.env.NODE_ENV === 'production';
+const isRemoteDB = process.env.DB_HOST && process.env.DB_HOST !== 'localhost';
+
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'agri_price_tracker',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD ,
-  max: 10,  
-  idleTimeoutMillis: 10000,  
-  connectionTimeoutMillis: 10000,  
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  password: process.env.DB_PASSWORD,
+  max: 10,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000, 
+  ssl: (isProduction || isRemoteDB) ? { rejectUnauthorized: false } : false
 };
 
  
