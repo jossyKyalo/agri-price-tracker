@@ -12,7 +12,7 @@ import warnings
 import sys
 import re
 
-# Ensure UTF-8 output
+ 
 if sys.platform.startswith('win'):
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -20,8 +20,8 @@ if sys.platform.startswith('win'):
 
 warnings.filterwarnings('ignore')
 
-# --- CONFIGURATION ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # src/ml-model-service/
+ 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 DATA_RAW_DIR = os.path.join(BASE_DIR, 'data', 'raw')
 DATA_PROCESSED_DIR = os.path.join(BASE_DIR, 'data', 'processed')
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
@@ -77,12 +77,10 @@ def load_and_merge_data():
     df_save['Date'] = df_save['Date'].dt.strftime('%Y-%m-%d')
     df_save.to_csv(HISTORICAL_DATA_FILE, index=False)
     
-    # --- CRITICAL FIX: EXPORT RAW RECENT PRICES BEFORE FILTERING ---
-    # This ensures the API has access to ALL commodities/markets, 
-    # even those we might filter out for training (like high-value livestock or new items).
+     
     print("   Exporting recent_prices.csv for API (Unfiltered)...")
     
-    # Clean prices just for the export, but keep all rows
+    
     df_api = df.copy()
     df_api['Unit'] = df_api['Retail'].apply(extract_unit)
     df_api['Retail'] = clean_price(df_api['Retail'])
@@ -94,7 +92,7 @@ def load_and_merge_data():
     output_cols = ['Date', 'Commodity', 'Market', 'County', 'Retail', 'Unit']
     if 'Wholesale' in recent_data.columns: output_cols.append('Wholesale')
     
-    # Only save columns that exist
+   
     cols_to_save = [c for c in output_cols if c in recent_data.columns]
     recent_data[cols_to_save].to_csv(os.path.join(DATA_PROCESSED_DIR, 'recent_prices.csv'), index=False)
     
@@ -109,8 +107,7 @@ def preprocess_data(df):
     
     df = df.dropna(subset=['Retail'])
     
-    # --- TRAINING FILTER ---
-    # We only train on standard crops (5 - 2000) to keep the model accurate for the majority of use cases.
+    
     initial_count = len(df)
     df = df[(df['Retail'] > 5) & (df['Retail'] < 2000)] 
     
@@ -165,8 +162,7 @@ def train_model(df):
       [f'ma_{w}' for w in windows] + \
       [f'std_{w}' for w in windows] + \
       enc_cols
-    
-    # FIX: Drop rows only if features/target are missing
+     
     cols_to_check = features + ['target_retail']
     train_df = df.dropna(subset=cols_to_check).copy()
     
@@ -228,7 +224,7 @@ def save_artifacts(model, scaler, encoder, feature_list, score):
     with open(os.path.join(MODELS_DIR, 'kamis_metadata.json'), 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    print("✅ Pipeline Complete.")
+    print("Pipeline Complete.")
 
 if __name__ == "__main__":
     try:

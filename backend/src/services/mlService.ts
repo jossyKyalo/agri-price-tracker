@@ -7,11 +7,14 @@ import util from 'util';
 import type { PredictionResponse } from '../types/index';
 
  
+const execPromise = util.promisify(exec);
+
 export interface MLPredictionRequest {
   commodity: string;
   market: string;
   county: string;
   prediction_days: number;
+  current_price: number;
 }
 
 
@@ -121,28 +124,28 @@ const generateSimplePrediction = async (
 
 export const runModelTraining = async (): Promise<boolean> => {
     try {
-        const scriptPath = path.join(__dirname, '../ml-model-service/train-model.py');
-        logger.info(`Starting Model Retraining (${scriptPath})...`);
-         
-        const { stdout, stderr } = await execPromise(`python "${scriptPath}"`);
-        
-        logger.info('Training Output:', stdout);
-        if (stderr) logger.warn('Training Warnings:', stderr);
-        
-        return true;
+        const mlUrl = process.env.ML_MODEL_URL || 'http://0.0.0.0:8000';
+        logger.info(`Requesting Model Retraining at ${mlUrl}/train...`);
+        const response = await axios.post(`${mlUrl}/train`, {}, { timeout: 5000 });
+        if (response.status === 200 || response.status === 202) {
+            logger.info('Training started successfully.');
+            return true;
+        }
+        return false;
     } catch (error: any) {
-        logger.error('Model training failed:', error.message);
+        logger.error('Failed to trigger model training:', error.message);
         return false;
     }
 };
 
+
 export const reloadPredictionApi = async (): Promise<void> => {
     try {
-        logger.info('🔄 Sending reload signal to Python API...');
+        logger.info('Sending reload signal to Python API...');
         await axios.post(`${ML_MODEL_URL}/reload`);
         logger.info('Python API reloaded successfully.');
     } catch (error) {
-        logger.error('❌ Failed to reload Python API (Is it running?):', error);
+        logger.error('Failed to reload Python API (Is it running?):', error);
     }
 };
 
@@ -153,114 +156,97 @@ export const generatePricePrediction = async (
   countyName: string,  
   cropId: string, 
   regionId: string,
+  currentPrice: number,  
   predictionDays: number = 7
 ): Promise<PredictionResponse | null> => {
   try {
-     
     const requestData: MLPredictionRequest = {
       commodity: commodityName,
       market: marketName,
       county: countyName,
-      prediction_days: predictionDays
+      prediction_days: predictionDays,
+      current_price: currentPrice  
     };
- 
+
+    const mlUrl = process.env.ML_MODEL_URL || 'http://localhost:8001';
+
     const response = await axios.post(
-      `${process.env.ML_MODEL_URL}/predict`,
+      `${mlUrl}/predict`,
       requestData,
-      {
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      }
+      { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
     ); 
+    
     const predictionResult = response.data;
- 
     const mainPrediction = predictionResult.predictions[0];
-    const trend = predictionResult.trend;
 
     const dbPrediction: PredictionResponse = {
       crop_id: cropId,
       region_id: regionId,
-      current_price: predictionResult.current_price,
+      current_price: predictionResult.current_price, // Use returned price (should match sent)
       predicted_prices: [{
         date: new Date(mainPrediction.date),
         price: mainPrediction.predicted_price,
-        confidence: 0.75  
+        confidence: predictionResult.confidence  
       }],
       factors: {
-        method: 'ml-random-forest',
-        trend: trend,
+        method: 'ml-gradient-boost',
+        trend: predictionResult.trend,
         recommendation: predictionResult.recommendation
       },
-      model_version: 'RandomForest-v1'  
+      model_version: 'v2-boosted-clamped'  
     };
-     
+      
     await storePrediction(dbPrediction);
-
-    logger.info(`ML Prediction generated for ${commodityName} in ${marketName}`);
     return dbPrediction;
 
   } catch (error: any) {
-    if (axios.isAxiosError(error) && error.response) {
-      logger.error(`ML prediction failed with status ${error.response.status}: ${JSON.stringify(error.response.data)}`);
-    } else {
-      logger.error('ML prediction failed:', error.message);
-    } 
-    logger.warn(`ML service failed. Falling back to simple prediction for ${commodityName}.`);
-    return generateSimplePrediction(cropId, regionId, predictionDays);
+    logger.warn(`ML service failed for ${commodityName}. Falling back.`);
+    return null; 
   }
 };
 
  
 export const generateDailyPredictions = async (): Promise<void> => {
   try {
-    logger.info('Starting daily predictions generation');
- 
+    logger.info('Starting batch prediction generation...');
+
+    // UPDATED QUERY: Get the LATEST price for each combo
     const combinations = await query(`
-      SELECT DISTINCT 
+      SELECT DISTINCT ON (pe.crop_id, pe.region_id, pe.market_id)
         pe.crop_id, 
         pe.region_id, 
         pe.market_id,
+        pe.price as latest_price, -- ✅ FETCH PRICE
         c.name as crop_name, 
         r.name as region_name,
-        m.name as market_name
+        m.name as market_name,
+        r.name as county_name
       FROM price_entries pe
       JOIN crops c ON pe.crop_id = c.id
       JOIN regions r ON pe.region_id = r.id
       JOIN markets m ON pe.market_id = m.id
       WHERE pe.entry_date >= CURRENT_DATE - INTERVAL '30 days'
         AND pe.is_verified = true
-      GROUP BY pe.crop_id, pe.region_id, pe.market_id, c.name, r.name, m.name
-      HAVING COUNT(pe.id) >= 5 -- Only predict for combos with recent data
+      ORDER BY pe.crop_id, pe.region_id, pe.market_id, pe.entry_date DESC
     `);
 
     let generated = 0;
     let failed = 0;
 
     for (const combo of combinations.rows) {
-      try { 
-        const prediction = await generatePricePrediction(
+      await new Promise(r => setTimeout(r, 50));  
+
+      const result = await generatePricePrediction(
           combo.crop_name,
           combo.market_name,
-          combo.region_name,  
+          combo.county_name || combo.region_name,
           combo.crop_id,
           combo.region_id,
-          7  
-        );
-        
-        if (prediction) {
-          generated++;
-        } else {
-          failed++;
-        }
-         
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-      } catch (error: any) {
-        logger.error(`Failed to generate prediction for ${combo.crop_name} in ${combo.market_name}:`, error.message);
-        failed++;
-      }
+          parseFloat(combo.latest_price)  
+      );
+
+      if (result) generated++;
+      else failed++;
     }
 
     logger.info(`Daily predictions completed: ${generated} generated, ${failed} failed`);
@@ -272,47 +258,28 @@ export const generateDailyPredictions = async (): Promise<void> => {
 };
 
  
-export const getPredictions = async (
-  cropId?: string,
-  regionId?: string,
-  limit: number = 20
-): Promise<any[]> => {
-  try {
-    const conditions: string[] = ['pp.prediction_date >= CURRENT_DATE'];
-    const params: any[] = [];
-    let paramIndex = 1;
-
-    if (cropId) {
-      conditions.push(`pp.crop_id = $${paramIndex++}`);
-      params.push(cropId);
+export const getPredictions = async (cropId?: string, regionId?: string, limit: number = 20) => {
+    try {
+        const conditions: string[] = ['pp.prediction_date >= CURRENT_DATE'];
+        const params: any[] = [];
+        let paramIndex = 1;
+        if (cropId) { conditions.push(`pp.crop_id = $${paramIndex++}`); params.push(cropId); }
+        if (regionId) { conditions.push(`pp.region_id = $${paramIndex++}`); params.push(regionId); }
+        params.push(limit);
+        const result = await query(
+          `SELECT pp.*, c.name as crop_name, r.name as region_name
+           FROM price_predictions pp
+           JOIN crops c ON pp.crop_id = c.id
+           JOIN regions r ON pp.region_id = r.id
+           WHERE ${conditions.join(' AND ')}
+           ORDER BY pp.created_at DESC LIMIT $${paramIndex}`, params
+        );
+        return result.rows;
+    } catch (error: any) {
+        logger.error('Failed to get predictions:', error); return [];
     }
-
-    if (regionId) {
-      conditions.push(`pp.region_id = $${paramIndex++}`);
-      params.push(regionId);
-    }
-
-    params.push(limit);
-
-    const result = await query(
-      `SELECT pp.*, c.name as crop_name, r.name as region_name
-       FROM price_predictions pp
-       JOIN crops c ON pp.crop_id = c.id
-       JOIN regions r ON pp.region_id = r.id
-       WHERE ${conditions.join(' AND ')}
-       ORDER BY pp.created_at DESC
-       LIMIT $${paramIndex}`,
-      params
-    );
-
-    return result.rows;
-
-  } catch (error: any) {
-    logger.error('Failed to get predictions:', error);
-    return [];
-  }
-};
-
-function execPromise(arg0: string): { stdout: any; stderr: any; } | PromiseLike<{ stdout: any; stderr: any; }> {
-  throw new Error('Function not implemented.');
 }
+
+// function execPromise(arg0: string): { stdout: any; stderr: any; } | PromiseLike<{ stdout: any; stderr: any; }> {
+//   throw new Error('Function not implemented.');
+// }
