@@ -4,26 +4,33 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const { Pool } = pg;
-
  
-const isProduction = process.env.NODE_ENV === 'production';
-const isRemoteDB = process.env.DB_HOST && process.env.DB_HOST !== 'localhost';
-
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'agri_price_tracker',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  max: 10,
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 10000, 
-  ssl: (isProduction || isRemoteDB) ? { rejectUnauthorized: false } : false
-};
-
+const connectionString = process.env.DATABASE_URL;
  
-export const pool = new Pool(dbConfig);
- 
+const poolConfig = connectionString
+  ? {
+    connectionString, 
+    ssl: {
+      rejectUnauthorized: false
+    }, 
+    max: 10,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+  }
+  : { 
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'agri_price_tracker',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD,
+    max: 10,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+    ssl: false
+  };
+
+export const pool = new Pool(poolConfig);
+
 export const connectDatabase = async (): Promise<void> => {
   try {
     const client = await pool.connect();
@@ -35,7 +42,7 @@ export const connectDatabase = async (): Promise<void> => {
     throw error;
   }
 };
- 
+
 export const query = async (text: string, params?: any[]): Promise<pg.QueryResult> => {
   const start = Date.now();
   try {
@@ -48,7 +55,7 @@ export const query = async (text: string, params?: any[]): Promise<pg.QueryResul
     throw error;
   }
 };
- 
+
 export const transaction = async <T>(
   callback: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> => {
@@ -65,7 +72,7 @@ export const transaction = async <T>(
     client.release();
   }
 };
- 
+
 export const closeDatabase = async (): Promise<void> => {
   try {
     await pool.end();
@@ -74,7 +81,7 @@ export const closeDatabase = async (): Promise<void> => {
     logger.error('Error closing database connection:', error);
   }
 };
- 
+
 pool.on('error', (err) => {
   logger.error('Unexpected error on idle client', err);
 });
