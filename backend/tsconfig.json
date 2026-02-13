@@ -11,8 +11,7 @@
      
     "strict": false,             
     "noImplicitAny": false,      
-    "skipLibCheck": true,        
-    "types": ["node","express"]           
+    "skipLibCheck": true          
   },
   "include": [
     "src/**/*"
