@@ -3375,15 +3375,19 @@ export const getSubscribedNumbers = async (cropNames?: string[]): Promise<string
       
       if (cropIds.length > 0) { 
         sql += ` AND (crops ?| $1)`; 
-        params.push(cropIds as string[]);
+        params.push(cropIds);
       } else {
         logger.warn(`No crop IDs found for names: ${cropNames.join(', ')}`);
         return [];  
       }
     }
-
-    const result = await query(sql, params); 
-    return [...new Set(result.rows.map((r: any) => r.phone as string))]; 
+ 
+    const result = await query(sql, params) as any; 
+     
+    const phones = result.rows.map((r: any) => String(r.phone));
+    
+    return [...new Set(phones)] as string[];
+    
   } catch (error) {
     logger.error('Failed to get subscribed numbers:', error);
     return [];
