@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { pool, query } from '../database/connection';
 import { logger } from '../utils/logger';
 import { ApiError } from '../utils/apiError';
+import { AnyMxRecord } from 'dns';
 
 export interface SmsLog {
   id?: string;
@@ -3382,7 +3383,7 @@ export const getSubscribedNumbers = async (cropNames?: string[]): Promise<string
     }
 
     const result = await query(sql, params); 
-    return [...new Set(result.rows.map(r => r.phone))];
+    return [...new Set(result.rows.map((r: any) => r.phone as string))]; 
   } catch (error) {
     logger.error('Failed to get subscribed numbers:', error);
     return [];
@@ -3500,7 +3501,7 @@ export const sendPriceAlert = async (
 ): Promise<void> => {
   try {
     // 1. Find who cares about this crop
-    const subscribers = await getSubscribedNumbers([cropName] as string[]);
+    const subscribers = await getSubscribedNumbers([cropName] as any[]);
 
     if (subscribers.length === 0) {
       logger.info(`🚨 Alert skipped: No subscribers found for ${cropName}`);
