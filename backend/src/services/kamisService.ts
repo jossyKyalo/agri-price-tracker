@@ -9,9 +9,7 @@ import util from 'util';
 import { fileURLToPath } from 'url';
 
 
-const execPromise = util.promisify(exec);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const execPromise = util.promisify(exec); 
 
  
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
@@ -56,7 +54,7 @@ export const syncKamisData = async (): Promise<any> => {
   const syncId = await startSyncLog();
 
   try {
-    logger.info('🔄 Starting KAMIS data synchronization...');
+    logger.info('Starting KAMIS data synchronization...');
     
  
     try {
