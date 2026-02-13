@@ -1,4 +1,5 @@
 import axios from 'axios';
+import crypto from 'crypto';
 import { pool, query } from '../database/connection';
 import { logger } from '../utils/logger';
 import { ApiError } from '../utils/apiError';
@@ -2796,15 +2797,15 @@ export const verifyWebhookSignature = (
 
     const signedPayload = `${timestamp}.${payload}`;
 
-    const crypto = require('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(signedPayload)
       .digest('hex');
+
     const signatureMatches = crypto.timingSafeEqual(
       Buffer.from(signature),
       Buffer.from(expectedSignature)
-    );
+    ); 
 
     logger.debug('Signature verification', {
       signatureMatches,
@@ -3373,7 +3374,7 @@ export const getSubscribedNumbers = async (cropNames?: string[]): Promise<string
       
       if (cropIds.length > 0) { 
         sql += ` AND (crops ?| $1)`; 
-        params.push(cropIds);
+        params.push(cropIds as string[]);
       } else {
         logger.warn(`No crop IDs found for names: ${cropNames.join(', ')}`);
         return [];  
@@ -3499,7 +3500,7 @@ export const sendPriceAlert = async (
 ): Promise<void> => {
   try {
     // 1. Find who cares about this crop
-    const subscribers = await getSubscribedNumbers([cropName]);
+    const subscribers = await getSubscribedNumbers([cropName] as string[]);
 
     if (subscribers.length === 0) {
       logger.info(`🚨 Alert skipped: No subscribers found for ${cropName}`);
