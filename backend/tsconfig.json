@@ -8,10 +8,11 @@
     "resolveJsonModule": true,
     "outDir": "./dist",
     "rootDir": "./src",
-     
-    "strict": false,             
-    "noImplicitAny": false,      
+    
+    "strict": false,
+    "noImplicitAny": false,
     "skipLibCheck": true
+     
   },
   "include": [
     "src/**/*"

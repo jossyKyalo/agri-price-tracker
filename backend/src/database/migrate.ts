@@ -4,8 +4,6 @@ import { dirname, join } from 'path';
 import { query } from './connection';
 import { logger } from '../utils/logger';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 export const runMigrations = async (): Promise<void> => {
   try {
@@ -22,8 +20,7 @@ export const runMigrations = async (): Promise<void> => {
     for (const statement of statements) {
       try {
         await query(statement);
-      } catch (error: any) {
-        // Ignore "already exists" errors
+      } catch (error: any) { 
         if (!error.message.includes('already exists')) {
           throw error;
         }
@@ -37,7 +34,7 @@ export const runMigrations = async (): Promise<void> => {
   }
 };
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   runMigrations()
     .then(() => {
       logger.info('Migrations completed');
@@ -47,4 +44,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       logger.error('Migration failed:', error);
       process.exit(1);
     });
-}
+} 

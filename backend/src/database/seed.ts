@@ -189,8 +189,7 @@ export const seedDatabase = async (): Promise<void> => {
   }
 };
 
-// Run seeding if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   seedDatabase()
     .then(() => {
       logger.info('Seeding completed');
